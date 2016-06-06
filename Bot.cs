@@ -27,18 +27,23 @@ namespace SteamBotLite
         CallbackManager manager;
 
         SteamUser steamUser;
+        SteamFriends steamFriends;
 
         bool isRunning;
 
         public void Login()
         {
             // create our steamclient instance
-            steamClient = new SteamClient();
+            steamClient = new SteamClient(System.Net.Sockets.ProtocolType.Tcp);
             // create the callback manager which will route callbacks to function calls
             manager = new CallbackManager(steamClient);
 
             // get the steamuser handler, which is used for logging on after successfully connecting
             steamUser = steamClient.GetHandler<SteamUser>();
+
+            steamFriends = steamClient.GetHandler<SteamFriends>();
+
+           
 
             // register a few callbacks we're interested in
             // these are registered upon creation to a callback manager, which will then route the callbacks
@@ -49,9 +54,13 @@ namespace SteamBotLite
             manager.Subscribe<SteamUser.LoggedOnCallback>(OnLoggedOn);
             manager.Subscribe<SteamUser.LoggedOffCallback>(OnLoggedOff);
 
+            manager.Subscribe<SteamUser.AccountInfoCallback>(OnAccountInfo);
+            manager.Subscribe<SteamFriends.FriendsListCallback>(OnFriendsList);
+
+
             manager.Subscribe<SteamFriends.FriendMsgCallback>(OnPersonalMessage);
             manager.Subscribe<SteamFriends.ChatMsgCallback>(OnChatRoomMessage);
-            
+
 
             isRunning = true;
             Console.WriteLine("User: {0} Pass {1}", user, pass);
@@ -89,14 +98,37 @@ namespace SteamBotLite
 
 
         }
-        
+        void OnFriendsList(SteamFriends.FriendsListCallback callback)
+        {
+            // at this point, the client has received it's friends list
+
+            int friendCount = steamFriends.GetFriendCount();
+
+            Console.WriteLine("We have {0} friends", friendCount);
+        }
+
+            void OnAccountInfo(SteamUser.AccountInfoCallback callback)
+        {
+            // before being able to interact with friends, you must wait for the account info callback
+            // this callback is posted shortly after a successful logon
+
+            // at this point, we can go online on friends, so lets do that
+            steamFriends.SetPersonaState(EPersonaState.Online);
+        }
+
         void OnPersonalMessage(SteamFriends.FriendMsgCallback msg)
         {
-            Console.WriteLine("Personal Message from {0}: {1}", msg.Sender, msg.Message);
+            if (msg.Message != "")
+            {
+                Console.WriteLine("Personal Message from {0}: {1}", msg.Sender, msg.Message);
+            }
         }
         void OnChatRoomMessage(SteamFriends.ChatMsgCallback msg)
         {
-            Console.WriteLine("Chatroom Message from {0}: {1}", msg.ChatterID, msg.Message);
+            if (msg.Message != "")
+            {
+                Console.WriteLine("Chatroom Message from {0}: {1}", msg.ChatterID, msg.Message);
+            }
         }
         
         void Login (SteamUser.LogOnDetails LoginDetails)
@@ -128,20 +160,21 @@ namespace SteamBotLite
                     LoginData.AuthCode = Console.ReadLine();
                     Login(LoginData);
                     //isRunning = false;
-                    
+
 
                     return;
                 }
-                
+
                 Console.WriteLine("Unable to logon to Steam: {0} / {1}", callback.Result, callback.ExtendedResult);
 
-               // isRunning = false;
+                // isRunning = false;
                 return;
             }
-
-            Console.WriteLine("Successfully logged on!");
-            Console.WriteLine(steamClient.IsConnected);
-        }
+            
+                Console.WriteLine("Successfully logged on!");
+                Console.WriteLine(steamClient.IsConnected);
+                Console.WriteLine(steamFriends.GetFriendCount().ToString());
+            }
 
         void OnLoggedOff(SteamUser.LoggedOffCallback callback)
         {
