@@ -49,7 +49,9 @@ namespace SteamBotLite
             manager.Subscribe<SteamUser.LoggedOnCallback>(OnLoggedOn);
             manager.Subscribe<SteamUser.LoggedOffCallback>(OnLoggedOff);
 
-            manager.Subscribe<SteamFriends.FriendMsgCallback>(OnMessage);
+            manager.Subscribe<SteamFriends.FriendMsgCallback>(OnPersonalMessage);
+            manager.Subscribe<SteamFriends.ChatMsgCallback>(OnChatRoomMessage);
+            
 
             isRunning = true;
             Console.WriteLine("User: {0} Pass {1}", user, pass);
@@ -87,16 +89,16 @@ namespace SteamBotLite
 
 
         }
-
-
-
-        void OnMessage(SteamFriends.FriendMsgCallback MessageText)
+        
+        void OnPersonalMessage(SteamFriends.FriendMsgCallback msg)
         {
-            Console.WriteLine(MessageText);
+            Console.WriteLine("Personal Message from {0}: {1}", msg.Sender, msg.Message);
         }
-
-
-
+        void OnChatRoomMessage(SteamFriends.ChatMsgCallback msg)
+        {
+            Console.WriteLine("Chatroom Message from {0}: {1}", msg.ChatterID, msg.Message);
+        }
+        
         void Login (SteamUser.LogOnDetails LoginDetails)
         {
             steamUser.LogOn(LoginDetails);
@@ -138,11 +140,7 @@ namespace SteamBotLite
             }
 
             Console.WriteLine("Successfully logged on!");
-            Console.ReadKey();
-            // at this point, we'd be able to perform actions on Steam
-
-            // for this sample we'll just log off
-          //  steamUser.LogOff();
+            Console.WriteLine(steamClient.IsConnected);
         }
 
         void OnLoggedOff(SteamUser.LoggedOffCallback callback)
