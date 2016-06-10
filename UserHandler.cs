@@ -9,15 +9,15 @@ namespace SteamBotLite
 {
     public abstract class UserHandler
     {
-        public UserHandler(Bot bot, SteamID sid)
+        public UserHandler(Bot bot )
         {
             Bot = bot;
-            OtherSID = sid;
+            //OtherSID = sid;
         }
-        public SteamID OtherSID { get; private set; }
+       // public SteamID OtherSID { get; private set; }
         public Bot Bot { get; private set; }
-        public abstract void OnMessage(string message, SteamKit2.EChatEntryType type);
-        public abstract void OnChatRoomMessage(SteamID chatID, SteamID sender, string message);
+        public abstract void OnMessage(SteamFriends.FriendMsgCallback msg);
+        public abstract void OnChatRoomMessage(SteamFriends.ChatMsgCallback msg);
         public abstract void OnLoginCompleted();
     }
 }

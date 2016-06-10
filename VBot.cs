@@ -9,9 +9,9 @@ namespace SteamBotLite
 {
     class VBot : UserHandler
     {
-        public VBot(Bot bot, SteamID sid) : base(bot, sid){}
-        public override void OnMessage(string message, SteamKit2.EChatEntryType type) { }
-        public override void OnChatRoomMessage(SteamID chatID, SteamID sender, string message) { }
+        public VBot(Bot bot) : base(bot){}
+        public override void OnMessage(SteamFriends.FriendMsgCallback ChatMsg) { }
+        public override void OnChatRoomMessage(SteamFriends.ChatMsgCallback ChatMsg) { }
         public override void OnLoginCompleted(){}
     }
 }
