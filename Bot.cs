@@ -17,11 +17,13 @@ namespace SteamBotLite
 
         public SteamUser.LogOnDetails LoginData;
 
+        VBot VBot;
+
         public Bot(SteamUser.LogOnDetails LoginDataReceived)
         {
             this.LoginData = LoginDataReceived;
+            VBot = new VBot(this); //Load the Vbot Class
         }
-
         SteamClient steamClient;
         CallbackManager manager;
 
@@ -52,12 +54,8 @@ namespace SteamBotLite
             manager.Subscribe<SteamUser.LoggedOnCallback>(OnLoggedOn);
             manager.Subscribe<SteamUser.LoggedOffCallback>(OnLoggedOff);
 
-            manager.Subscribe<SteamUser.AccountInfoCallback>(OnAccountInfo);
-            manager.Subscribe<SteamFriends.FriendsListCallback>(OnFriendsList);
-
-
-            manager.Subscribe<SteamFriends.FriendMsgCallback>(OnPersonalMessage);
-            manager.Subscribe<SteamFriends.ChatMsgCallback>(OnChatRoomMessage);
+            manager.Subscribe<SteamFriends.FriendMsgCallback>(VBot.OnMessage);
+            manager.Subscribe<SteamFriends.ChatMsgCallback>(VBot.OnChatRoomMessage);
 
             isRunning = true;
 
