@@ -9,7 +9,7 @@ namespace SteamBotLite
 {
     class VBot : UserHandler
     {
-        public VBot(Bot bot) : base(bot){}
+     //   public VBot(Bot bot) : base(bot){}
         public override void OnLoginCompleted() { }
 
         public override void OnMessage(SteamFriends.FriendMsgCallback ChatMsg) //This is an example of using older methods for cross-compatibility, by converting the new format to the older one
