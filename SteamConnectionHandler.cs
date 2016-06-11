@@ -7,7 +7,7 @@ using SteamKit2;
 
 namespace SteamBotLite
 {
-    public class Bot
+    public class SteamConnectionHandler
     {
         public string user;
 
@@ -17,20 +17,17 @@ namespace SteamBotLite
 
         public SteamUser.LogOnDetails LoginData;
 
-        public UserHandler UserHandler;
+        public UserHandler UserHandlerClass;
 
         VBot VBot;
 
-        public Bot(SteamUser.LogOnDetails LoginDataReceived, UserHandler ChatHandler )
+        public SteamConnectionHandler(UserHandler UserHandler)
         {
-            this.LoginData = LoginDataReceived;
-           // Type UserHandler = Vbot
-          //  Type User = ChatHandler.GetType();
-
-            VBot = new VBot(this); //Load the Vbot Class
+            LoginData = UserHandlerClass.LogonDetails;
+            UserHandlerClass = UserHandler;
         }
         SteamClient steamClient;
-        CallbackManager manager;
+        public CallbackManager manager;
 
         public SteamUser steamUser;
         public SteamFriends SteamFriends;
@@ -60,8 +57,8 @@ namespace SteamBotLite
             manager.Subscribe<SteamUser.LoggedOnCallback>(OnLoggedOn);
             manager.Subscribe<SteamUser.LoggedOffCallback>(OnLoggedOff);
 
-            manager.Subscribe<SteamFriends.FriendMsgCallback>(UserHandler.OnMessage);
-            manager.Subscribe<SteamFriends.ChatMsgCallback>(UserHandler.OnChatRoomMessage);
+            manager.Subscribe<SteamFriends.FriendMsgCallback>(UserHandlerClass.OnMessage);
+            manager.Subscribe<SteamFriends.ChatMsgCallback>(UserHandlerClass.OnChatRoomMessage);
 
             isRunning = true;
 

@@ -9,7 +9,9 @@ namespace SteamBotLite
 {
     public abstract class UserHandler
     {
-        public UserHandler(Bot bot )
+        public SteamUser.LogOnDetails LogonDetails;
+
+        public UserHandler(SteamConnectionHandler bot )
         {
             Bot = bot;
         }
@@ -17,7 +19,7 @@ namespace SteamBotLite
         {
 
         }
-        public Bot Bot { get; private set; }
+        public SteamConnectionHandler Bot { get; private set; }
         public abstract void OnMessage(SteamFriends.FriendMsgCallback msg);
         public abstract void OnChatRoomMessage(SteamFriends.ChatMsgCallback msg);
         public abstract void OnLoginCompleted();
