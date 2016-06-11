@@ -51,11 +51,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bot.cs" />
+    <Compile Include="SteamConnectionHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserHandler.cs" />
     <Compile Include="VBot.cs" />
+    <Compile Include="VbotHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
