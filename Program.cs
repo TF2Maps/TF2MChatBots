@@ -13,10 +13,6 @@ namespace SteamBotLite
 
         static void Main(string[] args)
         {
-            UserHandler[] UserHandlers = new UserHandler[9];
-            VBot Vbot = new VBot();
-            UserHandlers[0] = Vbot;
-
             //Get the login Details we'll use to login
             string[] LoginDetails = new string[2];
             Console.WriteLine("Username:");
@@ -30,14 +26,28 @@ namespace SteamBotLite
                 Username = LoginDetails[0],
                 Password = LoginDetails[1]
             };
-            foreach (UserHandler Bot in UserHandlers)
-            {
+            
+          //  SteamConnectionHandler FirstBot = new SteamConnectionHandler(new VBot(LoginData));
 
+            SteamConnectionHandler[] SteamConnections = {
+                new SteamConnectionHandler(new VBot(LoginData)),
+                new SteamConnectionHandler(new VBot(LoginData))
+            };
+            CallbackManager[] manager;
+
+            foreach (SteamConnectionHandler Connection in SteamConnections)
+            {
+                Connection.Login();
             }
 
+            foreach (SteamConnectionHandler Connection in SteamConnections)
+            {
+                if (Connection.isRunning)
+                {
+                    Connection.manager.RunWaitCallbacks();
+                }
+            }
 
-            Bot SteamBot = new Bot(LoginData, UserHandlers[0]); //Load up an instance of bot's class
-            SteamBot.Login(); //Log that bot in
             Console.ReadKey();
         }
 
