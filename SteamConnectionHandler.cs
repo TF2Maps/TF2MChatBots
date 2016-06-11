@@ -30,9 +30,23 @@ namespace SteamBotLite
         public CallbackManager manager;
 
         public SteamUser steamUser;
-        public SteamFriends SteamFriends;
+        public SteamFriends SteamFriends ;
+        public SteamClient Steamclient2 = new SteamClient(System.Net.Sockets.ProtocolType.Tcp);
 
-        bool isRunning;
+        public bool isRunning;
+
+        public void Tick()
+        {
+            if (Steamclient2.IsConnected)
+            {
+
+            }
+            else
+            {
+
+            }
+        }
+
 
         public void Login()
         {

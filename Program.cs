@@ -37,15 +37,7 @@ namespace SteamBotLite
 
             foreach (SteamConnectionHandler Connection in SteamConnections)
             {
-                Connection.Login();
-            }
-
-            foreach (SteamConnectionHandler Connection in SteamConnections)
-            {
-                if (Connection.isRunning)
-                {
-                    Connection.manager.RunWaitCallbacks();
-                }
+                Connection.Tick();
             }
 
             Console.ReadKey();
