@@ -13,6 +13,10 @@ namespace SteamBotLite
         {
             Bot = bot;
         }
+        public UserHandler (SteamUser.LogOnDetails LogonDetails)
+        {
+
+        }
         public Bot Bot { get; private set; }
         public abstract void OnMessage(SteamFriends.FriendMsgCallback msg);
         public abstract void OnChatRoomMessage(SteamFriends.ChatMsgCallback msg);

@@ -17,11 +17,16 @@ namespace SteamBotLite
 
         public SteamUser.LogOnDetails LoginData;
 
+        public UserHandler UserHandler;
+
         VBot VBot;
 
-        public Bot(SteamUser.LogOnDetails LoginDataReceived)
+        public Bot(SteamUser.LogOnDetails LoginDataReceived, UserHandler ChatHandler )
         {
             this.LoginData = LoginDataReceived;
+           // Type UserHandler = Vbot
+          //  Type User = ChatHandler.GetType();
+
             VBot = new VBot(this); //Load the Vbot Class
         }
         SteamClient steamClient;
@@ -36,6 +41,7 @@ namespace SteamBotLite
         {
             // create our steamclient instance
             steamClient = new SteamClient(System.Net.Sockets.ProtocolType.Tcp);
+            
             // create the callback manager which will route callbacks to function calls
             manager = new CallbackManager(steamClient);
 
@@ -54,8 +60,8 @@ namespace SteamBotLite
             manager.Subscribe<SteamUser.LoggedOnCallback>(OnLoggedOn);
             manager.Subscribe<SteamUser.LoggedOffCallback>(OnLoggedOff);
 
-            manager.Subscribe<SteamFriends.FriendMsgCallback>(VBot.OnMessage);
-            manager.Subscribe<SteamFriends.ChatMsgCallback>(VBot.OnChatRoomMessage);
+            manager.Subscribe<SteamFriends.FriendMsgCallback>(UserHandler.OnMessage);
+            manager.Subscribe<SteamFriends.ChatMsgCallback>(UserHandler.OnChatRoomMessage);
 
             isRunning = true;
 
@@ -69,7 +75,7 @@ namespace SteamBotLite
             steamClient.Connect();
             
             // create our callback handling loop
-            while (isRunning)
+            while (isRunning) //It would be nice if we moved this to program.cs
             {
                 // in order for the callbacks to get routed, they need to be handled by the manager
                 manager.RunWaitCallbacks(TimeSpan.FromSeconds(1));
