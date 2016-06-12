@@ -11,15 +11,15 @@ namespace SteamBotLite
     {
         public SteamUser.LogOnDetails LogonDetails;
 
-        public UserHandler(SteamConnectionHandler bot )
+        UserHandler(SteamConnectionHandler bot )
         {
             Bot = bot;
         }
-        public UserHandler (SteamUser.LogOnDetails LogonDetails)
+        public UserHandler (SteamUser.LogOnDetails LogonDetailsTransfer)
         {
-
+            LogonDetails = LogonDetailsTransfer;
         }
-        public SteamConnectionHandler Bot { get; private set; }
+        SteamConnectionHandler Bot { get; set; }
         public abstract void OnMessage(SteamFriends.FriendMsgCallback msg);
         public abstract void OnChatRoomMessage(SteamFriends.ChatMsgCallback msg);
         public abstract void OnLoginCompleted();

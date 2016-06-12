@@ -30,16 +30,18 @@ namespace SteamBotLite
           //  SteamConnectionHandler FirstBot = new SteamConnectionHandler(new VBot(LoginData));
 
             SteamConnectionHandler[] SteamConnections = {
-                new SteamConnectionHandler(new VBot(LoginData)),
                 new SteamConnectionHandler(new VBot(LoginData))
             };
-            CallbackManager[] manager;
 
-            foreach (SteamConnectionHandler Connection in SteamConnections)
+            bool Running = true;
+
+            while (Running)
             {
-                Connection.Tick();
+                foreach (SteamConnectionHandler Connection in SteamConnections)
+                {
+                    Connection.Tick();
+                }
             }
-
             Console.ReadKey();
         }
 
