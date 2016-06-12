@@ -9,12 +9,18 @@ namespace SteamBotLite
 {
     class VBot : UserHandler
     {
-        public VBot(SteamUser.LogOnDetails LogonDetails) : base(LogonDetails) {}
+        public VBot(SteamUser.LogOnDetails LogonDetails) : base(LogonDetails)
+        {
+            Console.WriteLine("Vbot Initialised");
+
+        }
         public override void OnLoginCompleted() { }
 
         public override void OnMessage(SteamFriends.FriendMsgCallback ChatMsg) //This is an example of using older methods for cross-compatibility, by converting the new format to the older one
         {
-            OnMessage(ChatMsg.Message, ChatMsg.EntryType);       
+            Console.WriteLine("MESSAGE RECEIVED");
+            Console.WriteLine(ChatMsg.Message);
+          //  OnMessage(ChatMsg.Message, ChatMsg.EntryType);       
         }
         public override void OnChatRoomMessage(SteamFriends.ChatMsgCallback ChatMsg) //This is an example of using older methods for cross-compatibility, by converting the new format to the older one
         {

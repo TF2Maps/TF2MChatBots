@@ -7,7 +7,7 @@ using SteamKit2;
 
 namespace SteamBotLite
 {
-    public class SteamConnectionHandler
+    class SteamConnectionHandler
     {
         public string user;
 
@@ -20,12 +20,7 @@ namespace SteamBotLite
         public UserHandler UserHandlerClass;
 
         VBot VBot;
-
-        public SteamConnectionHandler(UserHandler UserHandler)
-        {
-            LoginData = UserHandlerClass.LogonDetails;
-            UserHandlerClass = UserHandler;
-        }
+        
         SteamClient steamClient;
         public CallbackManager manager;
 
@@ -33,23 +28,29 @@ namespace SteamBotLite
         public SteamFriends SteamFriends ;
         public SteamClient Steamclient2 = new SteamClient(System.Net.Sockets.ProtocolType.Tcp);
 
-        public bool isRunning;
+        public bool loggingin;
 
         public void Tick()
         {
+            manager.RunWaitCallbacks(TimeSpan.FromSeconds(1));
+            /*
             if (Steamclient2.IsConnected)
             {
-
+                manager.RunWaitCallbacks(TimeSpan.FromSeconds(1));
             }
             else
             {
-
+                Reconnect();
             }
+            */
         }
 
 
-        public void Login()
+        public SteamConnectionHandler(UserHandler UserHandler) //Now it'll run when the class is initialised, what could go wrong
         {
+            UserHandlerClass = UserHandler;
+            LoginData = UserHandlerClass.LogonDetails;
+
             // create our steamclient instance
             steamClient = new SteamClient(System.Net.Sockets.ProtocolType.Tcp);
             
@@ -71,10 +72,11 @@ namespace SteamBotLite
             manager.Subscribe<SteamUser.LoggedOnCallback>(OnLoggedOn);
             manager.Subscribe<SteamUser.LoggedOffCallback>(OnLoggedOff);
 
-            manager.Subscribe<SteamFriends.FriendMsgCallback>(UserHandlerClass.OnMessage);
+          //  manager.Subscribe<SteamFriends.FriendMsgCallback>(UserHandlerClass.OnMessage);
+            manager.Subscribe<SteamFriends.FriendMsgCallback>(OnPersonalMessage);
             manager.Subscribe<SteamFriends.ChatMsgCallback>(UserHandlerClass.OnChatRoomMessage);
 
-            isRunning = true;
+            loggingin = true;
 
             Console.WriteLine("Connecting User: {0}", user);
 
@@ -85,12 +87,16 @@ namespace SteamBotLite
             // initiate the connection
             steamClient.Connect();
             
+            // This loop will be elsewhere now
+
             // create our callback handling loop
-            while (isRunning) //It would be nice if we moved this to program.cs
+            while (loggingin) //It would be nice if we moved this to program.cs
             {
                 // in order for the callbacks to get routed, they need to be handled by the manager
                 manager.RunWaitCallbacks(TimeSpan.FromSeconds(1));
             }
+            //
+
         }
 
         void OnConnected(SteamClient.ConnectedCallback callback )
@@ -149,10 +155,15 @@ namespace SteamBotLite
         void OnDisconnected(SteamClient.DisconnectedCallback callback)
         {
             Console.WriteLine("Disconnected from Steam");
-         // isRunning = false;
+            Reconnect();
+            //Login();
+        }
+
+        void Reconnect()
+        {
+            // isRunning = false;
             SteamDirectory.Initialize().Wait(); //Update internal list that is heavily used. 
             steamClient.Connect(); //Lets try and log back in
-            //Login();
         }
 
         void OnLoggedOn(SteamUser.LoggedOnCallback callback)
@@ -176,13 +187,14 @@ namespace SteamBotLite
                 {
                     Console.WriteLine("Unable to logon to Steam: {0} / {1}", callback.Result, callback.ExtendedResult);
                     Console.WriteLine("This error is more indicative of an incorrect username + password");
-                    //isRunning = false;
+                    
                     return;
                 }
             }
             else
             {
                 Console.WriteLine("Successfully logged on!");
+          //      loggingin = false;
                 Console.WriteLine(steamClient.IsConnected);
                 Console.WriteLine(SteamFriends.GetFriendCount().ToString());
             }
