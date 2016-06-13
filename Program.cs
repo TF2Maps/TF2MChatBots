@@ -37,10 +37,13 @@ namespace SteamBotLite
 
             while (Running)
             {
+                
                 foreach (SteamConnectionHandler Connection in SteamConnections)
                 {
                     Connection.Tick();
                 }
+                
+               // Console.ReadKey();
             }
             Console.ReadKey();
         }
