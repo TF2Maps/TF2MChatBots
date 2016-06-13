@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SteamKit2;
+using System.IO;
+using System.Security.Cryptography;
 
 namespace SteamBotLite
 {
@@ -17,6 +19,8 @@ namespace SteamBotLite
 
         public SteamUser.LogOnDetails LoginData;
 
+        string SentryFileName;
+        
         public UserHandler UserHandlerClass;
 
         VBot VBot;
@@ -26,8 +30,7 @@ namespace SteamBotLite
 
         public SteamUser steamUser;
         public SteamFriends SteamFriends ;
-        public SteamClient Steamclient2 = new SteamClient(System.Net.Sockets.ProtocolType.Tcp);
-
+      
         public bool loggingin;
 
         public void Tick()
@@ -51,6 +54,16 @@ namespace SteamBotLite
             UserHandlerClass = UserHandler;
             LoginData = UserHandlerClass.LogonDetails;
 
+            SentryFileName = UserHandlerClass + "_sentry.bin";
+            byte[] sentryHash = null;
+
+            if (File.Exists(SentryFileName)) //This allows us to sort sentry files based on userhandlers
+            {
+                // if we have a saved sentry file, read and sha-1 hash it
+                byte[] sentryFile = File.ReadAllBytes(SentryFileName);
+                sentryHash = CryptoHelper.SHAHash(sentryFile);
+                LoginData.SentryFileHash = sentryHash;
+            }
             // create our steamclient instance
             steamClient = new SteamClient(System.Net.Sockets.ProtocolType.Tcp);
             
@@ -72,9 +85,15 @@ namespace SteamBotLite
             manager.Subscribe<SteamUser.LoggedOnCallback>(OnLoggedOn);
             manager.Subscribe<SteamUser.LoggedOffCallback>(OnLoggedOff);
 
-          //  manager.Subscribe<SteamFriends.FriendMsgCallback>(UserHandlerClass.OnMessage);
-            manager.Subscribe<SteamFriends.FriendMsgCallback>(OnPersonalMessage);
+             manager.Subscribe<SteamUser.AccountInfoCallback>(OnAccountInfo);
+            manager.Subscribe<SteamFriends.FriendsListCallback>(OnFriendsList);
+
+            //  manager.Subscribe<SteamFriends.FriendMsgCallback>(UserHandlerClass.OnMessage);
+            manager.Subscribe<SteamFriends.FriendMsgCallback>(UserHandlerClass.OnMessage);
             manager.Subscribe<SteamFriends.ChatMsgCallback>(UserHandlerClass.OnChatRoomMessage);
+
+            // this callback is triggered when the steam servers wish for the client to store the sentry file
+            manager.Subscribe<SteamUser.UpdateMachineAuthCallback>(OnMachineAuth);
 
             loggingin = true;
 
@@ -89,13 +108,14 @@ namespace SteamBotLite
             
             // This loop will be elsewhere now
 
+            /*
             // create our callback handling loop
             while (loggingin) //It would be nice if we moved this to program.cs
             {
                 // in order for the callbacks to get routed, they need to be handled by the manager
                 manager.RunWaitCallbacks(TimeSpan.FromSeconds(1));
             }
-            //
+            // */
 
         }
 
@@ -130,6 +150,7 @@ namespace SteamBotLite
 
             // at this point, we can go online on friends, so lets do that
             SteamFriends.SetPersonaState(EPersonaState.Online);
+            Console.WriteLine("We have {0} friends", SteamFriends.GetFriendCount());
         }
 
         void OnPersonalMessage(SteamFriends.FriendMsgCallback msg)
@@ -168,37 +189,88 @@ namespace SteamBotLite
 
         void OnLoggedOn(SteamUser.LoggedOnCallback callback)
         {
-            if (callback.Result != EResult.OK)
-            {
-                if (callback.Result == EResult.AccountLogonDenied)
-                {
-                    // if we recieve AccountLogonDenied or one of it's flavors (AccountLogonDeniedNoMailSent, etc)
-                    // then the account we're logging into is SteamGuard protected
-                    // see sample 5 for how SteamGuard can be handled
+            bool isSteamGuard = callback.Result == EResult.AccountLogonDenied;
+            bool is2FA = callback.Result == EResult.AccountLoginDeniedNeedTwoFactor;
 
-                    Console.WriteLine("Unable to logon to Steam: This account is SteamGuard protected.");
-                    Console.WriteLine("Please enter your SteamAuth code:");
-                    LoginData.AuthCode = Console.ReadLine();
-                    Login(LoginData);
-                    //isRunning = false;
+            if (callback.Result != EResult.OK) //If we didn't log in
+            {
+                if (isSteamGuard || is2FA) //Check what steamguard protection is used 
+                {
+                    Console.WriteLine("This account is SteamGuard protected!");
+
+                    if (is2FA)
+                    {
+                        Console.Write("Please enter your 2 factor auth code from your authenticator app: ");
+                        LoginData.TwoFactorCode = Console.ReadLine();
+                    }
+                    else
+                    {
+                        Console.Write("Please enter the auth code sent to the email at {0}: ", callback.EmailDomain);
+                        LoginData.AuthCode = Console.ReadLine();
+                    }
+
                     return;
                 }
                 else
                 {
                     Console.WriteLine("Unable to logon to Steam: {0} / {1}", callback.Result, callback.ExtendedResult);
                     Console.WriteLine("This error is more indicative of an incorrect username + password");
-                    
                     return;
                 }
             }
             else
             {
                 Console.WriteLine("Successfully logged on!");
-          //      loggingin = false;
                 Console.WriteLine(steamClient.IsConnected);
                 Console.WriteLine(SteamFriends.GetFriendCount().ToString());
             }
         }
+        void OnMachineAuth(SteamUser.UpdateMachineAuthCallback callback)
+        {
+            Console.WriteLine("Updating sentryfile...");
+
+            // write out our sentry file
+            // ideally we'd want to write to the filename specified in the callback
+            // but then this sample would require more code to find the correct sentry file to read during logon
+            // for the sake of simplicity, we'll just use "sentry.bin"
+
+            int fileSize;
+            byte[] sentryHash;
+            using (var fs = File.Open(SentryFileName, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            {
+                fs.Seek(callback.Offset, SeekOrigin.Begin);
+                fs.Write(callback.Data, 0, callback.BytesToWrite);
+                fileSize = (int)fs.Length;
+
+                fs.Seek(0, SeekOrigin.Begin);
+                using (var sha = new SHA1CryptoServiceProvider())
+                {
+                    sentryHash = sha.ComputeHash(fs);
+                }
+            }
+
+            // inform the steam servers that we're accepting this sentry file
+            steamUser.SendMachineAuthResponse(new SteamUser.MachineAuthDetails
+            {
+                JobID = callback.JobID,
+
+                FileName = callback.FileName,
+
+                BytesWritten = callback.BytesToWrite,
+                FileSize = fileSize,
+                Offset = callback.Offset,
+
+                Result = EResult.OK,
+                LastError = 0,
+
+                OneTimePassword = callback.OneTimePassword,
+
+                SentryFileHash = sentryHash,
+            });
+
+            Console.WriteLine("Done!");
+        }
+
 
         void OnLoggedOff(SteamUser.LoggedOffCallback callback)
         {
