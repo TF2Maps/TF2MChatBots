@@ -63,6 +63,7 @@ namespace SteamBotLite
                 byte[] sentryFile = File.ReadAllBytes(SentryFileName);
                 sentryHash = CryptoHelper.SHAHash(sentryFile);
                 LoginData.SentryFileHash = sentryHash;
+                LoginData.ShouldRememberPassword = true;
             }
             // create our steamclient instance
             steamClient = new SteamClient(System.Net.Sockets.ProtocolType.Tcp);
@@ -85,7 +86,7 @@ namespace SteamBotLite
             manager.Subscribe<SteamUser.LoggedOnCallback>(OnLoggedOn);
             manager.Subscribe<SteamUser.LoggedOffCallback>(OnLoggedOff);
 
-             manager.Subscribe<SteamUser.AccountInfoCallback>(OnAccountInfo);
+            manager.Subscribe<SteamUser.AccountInfoCallback>(OnAccountInfo);
             manager.Subscribe<SteamFriends.FriendsListCallback>(OnFriendsList);
 
             //  manager.Subscribe<SteamFriends.FriendMsgCallback>(UserHandlerClass.OnMessage);
@@ -106,17 +107,6 @@ namespace SteamBotLite
             // initiate the connection
             steamClient.Connect();
             
-            // This loop will be elsewhere now
-
-            /*
-            // create our callback handling loop
-            while (loggingin) //It would be nice if we moved this to program.cs
-            {
-                // in order for the callbacks to get routed, they need to be handled by the manager
-                manager.RunWaitCallbacks(TimeSpan.FromSeconds(1));
-            }
-            // */
-
         }
 
         void OnConnected(SteamClient.ConnectedCallback callback )
