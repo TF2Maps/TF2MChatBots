@@ -19,7 +19,7 @@ namespace SteamBotLite
 
         public SteamUser.LogOnDetails LoginData;
 
-        string SentryFileName;
+        string SentryFileName = "sentry.bin";
         
         public UserHandler UserHandlerClass;
 
@@ -54,17 +54,7 @@ namespace SteamBotLite
             UserHandlerClass = UserHandler;
             LoginData = UserHandlerClass.LogonDetails;
 
-            SentryFileName = UserHandlerClass + "_sentry.bin";
-            byte[] sentryHash = null;
-
-            if (File.Exists(SentryFileName)) //This allows us to sort sentry files based on userhandlers
-            {
-                // if we have a saved sentry file, read and sha-1 hash it
-                byte[] sentryFile = File.ReadAllBytes(SentryFileName);
-                sentryHash = CryptoHelper.SHAHash(sentryFile);
-                LoginData.SentryFileHash = sentryHash;
-                LoginData.ShouldRememberPassword = true;
-            }
+           
             // create our steamclient instance
             steamClient = new SteamClient(System.Net.Sockets.ProtocolType.Tcp);
             
@@ -119,6 +109,18 @@ namespace SteamBotLite
             }
 
             Console.WriteLine("Connected to Steam! Logging in '{0}'...", user);
+            
+            //SentryFileName = UserHandlerClass + "_sentry.bin";
+
+            byte[] sentryHash = null;
+
+            if (File.Exists(SentryFileName)) //This allows us to sort sentry files based on userhandlers
+            {
+                // if we have a saved sentry file, read and sha-1 hash it
+                byte[] sentryFile = File.ReadAllBytes(SentryFileName);
+                sentryHash = CryptoHelper.SHAHash(sentryFile);
+                LoginData.SentryFileHash = sentryHash;
+            }
 
             Login(LoginData);
 
@@ -160,6 +162,7 @@ namespace SteamBotLite
         
         void Login (SteamUser.LogOnDetails LoginDetails)
         {
+          //  Console.WriteLine(LoginDetails.SentryFileHash.ToString());
             steamUser.LogOn(LoginDetails);
         }
 
