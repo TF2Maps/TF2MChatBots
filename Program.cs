@@ -11,48 +11,31 @@ namespace SteamBotLite
 {
     class Program
     {
-
-
+        
         static void Main(string[] args)
         {
-
-
             SteamBotData[] Bots = JsonConvert.DeserializeObject<SteamBotData[]>(File.ReadAllText("settings.json"));
-            //Get the login Details we'll use to login
-            string[] LoginDetails = new string[2];
-            Console.WriteLine("Username:");
-            LoginDetails[0] = Console.ReadLine();
-            Console.WriteLine("Password:");
-            LoginDetails[1] = Console.ReadLine();
 
-            
+            List<SteamConnectionHandler> SteamConnections = new List<SteamConnectionHandler>();
 
-            SteamUser.LogOnDetails LoginData = new SteamUser.LogOnDetails
+            foreach (SteamBotData Entry in Bots)
             {
+                SteamConnections.Add(new SteamConnectionHandler(Entry));
 
-                Username = LoginDetails[0],
-                Password = LoginDetails[1]
-            };
-            
-          //  SteamConnectionHandler FirstBot = new SteamConnectionHandler(new VBot(LoginData));
-
-            SteamConnectionHandler[] SteamConnections = {
-                new SteamConnectionHandler(new VBot(LoginData))
-            };
+            }
 
             bool Running = true;
 
             while (Running)
             {
-                
+
                 foreach (SteamConnectionHandler Connection in SteamConnections)
                 {
                     Connection.Tick();
                 }
-                
-               // Console.ReadKey();
+
+                // Console.ReadKey();
             }
-            Console.ReadKey();
         }
 
     }

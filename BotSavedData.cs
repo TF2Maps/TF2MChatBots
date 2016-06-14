@@ -8,8 +8,20 @@ namespace SteamBotLite
     public class SteamBotData
     {
         SteamUser.LogOnDetails LoginData = new SteamUser.LogOnDetails();
+        Type HandlerType;
+        public UserHandler Userhandler
+        {
+            get
+            {
+                return (UserHandler)Activator.CreateInstance(
+                    HandlerType, new object[] {});
+            }
+            set
+            { }
+        }
+        
 
-        public string username
+    public string username
         {
             get
             {
@@ -17,8 +29,9 @@ namespace SteamBotLite
             }
             set
             {
-                Console.WriteLine("Username {0}", username);
+                
                 LoginData.Username = value;
+                Console.WriteLine("Username {0}", username);
             }
         }
         public string password
@@ -32,7 +45,22 @@ namespace SteamBotLite
                 LoginData.Password = value;
             }
         }
-        string BotControlClass { get; set; }
+        public string BotControlClass
+        {
+            
+            get
+            {
+                return Userhandler.ToString();
+            }
+            set
+            {
+                Type T = Type.GetType(value);
+                if ((T.GetType() != null ) && (T.BaseType.ToString() == "SteamBotLite.UserHandler"))
+                    {
+                    HandlerType = Type.GetType(value);
+                    }
+            }
+        }
         
 
     }

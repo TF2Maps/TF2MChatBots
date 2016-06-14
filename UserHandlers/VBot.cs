@@ -9,7 +9,7 @@ namespace SteamBotLite
 {
     class VBot : UserHandler
     {
-        public VBot(SteamUser.LogOnDetails LogonDetails, SteamConnectionHandler SteamConnectionHandler) : base(LogonDetails,SteamConnectionHandler)
+        public VBot(SteamConnectionHandler SteamConnectionHandler) : base(SteamConnectionHandler)
         {
             Console.WriteLine("Vbot Initialised");
 

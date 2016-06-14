@@ -49,9 +49,10 @@ namespace SteamBotLite
         }
 
 
-        public SteamConnectionHandler(UserHandler UserHandler) //Now it'll run when the class is initialised, what could go wrong
+        public SteamConnectionHandler(SteamBotData BotData) //Now it'll run when the class is initialised, what could go wrong
         {
-            UserHandlerClass = UserHandler;
+          
+            UserHandlerClass = BotData.Userhandler;
             LoginData = UserHandlerClass.LogonDetails;
 
            

@@ -7,15 +7,14 @@ using SteamKit2;
 
 namespace SteamBotLite
 {
-    public abstract class UserHandler : SteamConnectionHandler
+    public abstract class UserHandler 
     {
         public SteamUser.LogOnDetails LogonDetails;
         public SteamConnectionHandler Bot { get; set; }
 
-        public UserHandler(SteamUser.LogOnDetails LogonDetailsTransfer)
+        public UserHandler(SteamConnectionHandler SteamConnectionHandler)
         {
             Bot = SteamConnectionHandler;
-            LogonDetails = LogonDetailsTransfer;
         }
         
         public abstract void OnMessage(SteamFriends.FriendMsgCallback msg);
