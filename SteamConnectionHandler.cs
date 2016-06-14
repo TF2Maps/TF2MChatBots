@@ -53,9 +53,9 @@ namespace SteamBotLite
         {
 
             UserHandlerClass = LoadUserHandler(BotData.Userhandler);
-            LoginData = UserHandlerClass.LogonDetails;
+            LoginData = BotData.LoginData;
 
-           
+
             // create our steamclient instance
             steamClient = new SteamClient(System.Net.Sockets.ProtocolType.Tcp);
             

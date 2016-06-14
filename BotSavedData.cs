@@ -7,8 +7,8 @@ namespace SteamBotLite
 {
     public class SteamBotData
     {
-        SteamUser.LogOnDetails LoginData = new SteamUser.LogOnDetails();
-        Type HandlerType;
+        public SteamUser.LogOnDetails LoginData = new SteamUser.LogOnDetails();
+       
         public Type Userhandler
         {
             get; set;
