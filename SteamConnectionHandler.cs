@@ -51,8 +51,8 @@ namespace SteamBotLite
 
         public SteamConnectionHandler(SteamBotData BotData) //Now it'll run when the class is initialised, what could go wrong
         {
-          
-            UserHandlerClass = BotData.Userhandler;
+
+            UserHandlerClass = LoadUserHandler(BotData.Userhandler);
             LoginData = UserHandlerClass.LogonDetails;
 
            
@@ -98,6 +98,11 @@ namespace SteamBotLite
             // initiate the connection
             steamClient.Connect();
             
+        }
+        UserHandler LoadUserHandler (Type HandlerType)
+        {
+            return (UserHandler)Activator.CreateInstance(
+                    HandlerType, new object[] {this });
         }
 
         void OnConnected(SteamClient.ConnectedCallback callback )
