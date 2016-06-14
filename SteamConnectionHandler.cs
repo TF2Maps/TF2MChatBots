@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 
 namespace SteamBotLite
 {
-    class SteamConnectionHandler
+    public class SteamConnectionHandler
     {
         public string user;
 
