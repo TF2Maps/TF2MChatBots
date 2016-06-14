@@ -9,15 +9,9 @@ namespace SteamBotLite
     {
         SteamUser.LogOnDetails LoginData = new SteamUser.LogOnDetails();
         Type HandlerType;
-        public UserHandler Userhandler
+        public Type Userhandler
         {
-            get
-            {
-                return (UserHandler)Activator.CreateInstance(
-                    HandlerType, new object[] {});
-            }
-            set
-            { }
+            get; set;
         }
         
 
@@ -57,7 +51,7 @@ namespace SteamBotLite
                 Type T = Type.GetType(value);
                 if ((T.GetType() != null ) && (T.BaseType.ToString() == "SteamBotLite.UserHandler"))
                     {
-                    HandlerType = Type.GetType(value);
+                    Userhandler = Type.GetType(value);
                     }
             }
         }
