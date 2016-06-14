@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SteamKit2;
+using System.IO;
+using Newtonsoft.Json;
 
 namespace SteamBotLite
 {
@@ -13,12 +15,17 @@ namespace SteamBotLite
 
         static void Main(string[] args)
         {
+
+
+            SteamBotData[] Bots = JsonConvert.DeserializeObject<SteamBotData[]>(File.ReadAllText("settings.json"));
             //Get the login Details we'll use to login
             string[] LoginDetails = new string[2];
             Console.WriteLine("Username:");
             LoginDetails[0] = Console.ReadLine();
             Console.WriteLine("Password:");
             LoginDetails[1] = Console.ReadLine();
+
+            
 
             SteamUser.LogOnDetails LoginData = new SteamUser.LogOnDetails
             {
