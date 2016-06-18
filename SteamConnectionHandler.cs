@@ -104,7 +104,7 @@ namespace SteamBotLite
             manager.Subscribe<SteamFriends.ChatMsgCallback>(UserHandlerClass.OnChatRoomMessage);
             manager.Subscribe<SteamFriends.ClanStateCallback>(UserHandlerClass.OnClanStateChange);
 
-            manager.Subscribe<SteamFriends.ChatEnterCallback>(chatenter);
+            //manager.Subscribe<SteamFriends.ChatEnterCallback>(chatenter);
             
 
             // this callback is triggered when the steam servers wish for the client to store the sentry file
@@ -132,16 +132,7 @@ namespace SteamBotLite
             return (UserHandler)Activator.CreateInstance(
                     HandlerType, new object[] {this});
         }
-        void chatinfo (SteamFriends.ClanStateCallback callbook)
-        {
-            Console.WriteLine(callbook.MemberChattingCount);
-
-        }
-        void chatenter(SteamFriends.ChatEnterCallback callback)
-        {
-            Console.WriteLine(callback.NumChatMembers);
-        }
-
+        
         void OnConnected(SteamClient.ConnectedCallback callback )
         {
             if (callback.Result != EResult.OK)
