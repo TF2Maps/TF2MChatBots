@@ -13,14 +13,19 @@ namespace SteamBotLite
     {
         public string user;
 
-        public string pass;
-
-        public string AuthCode;
+        private string pass; 
 
         public SteamUser.LogOnDetails LoginData;
 
-        string SentryFileName = "sentry.bin";
-        
+        private string SentryFileName = "sentry.bin";
+
+        private string LoginKeyName = "key.txt";
+
+        string SentryFile;
+
+        string LoginKeyFile;
+
+
         public UserHandler UserHandlerClass;
 
         VBot VBot;
@@ -48,14 +53,28 @@ namespace SteamBotLite
             */
         }
 
-
         public SteamConnectionHandler(SteamBotData BotData) //Now it'll run when the class is initialised, what could go wrong
         {
+            pass = BotData.SavedPassword;
 
-            UserHandlerClass = LoadUserHandler(BotData.Userhandler);
             LoginData = BotData.LoginData;
 
+            if (!Directory.Exists(user))
+            {
+                Directory.CreateDirectory(LoginData.Username);
+            }
 
+            SentryFile = Path.Combine(LoginData.Username, SentryFileName);
+
+            LoginKeyFile = Path.Combine(LoginData.Username, LoginKeyName);
+
+            UserHandlerClass = LoadUserHandler(BotData.Userhandler);
+
+            if (File.Exists(LoginKeyFile))
+            {
+                LoginData.LoginKey = File.ReadAllText(LoginKeyFile);
+            }
+            
             // create our steamclient instance
             steamClient = new SteamClient(System.Net.Sockets.ProtocolType.Tcp);
             
@@ -83,10 +102,18 @@ namespace SteamBotLite
             //  manager.Subscribe<SteamFriends.FriendMsgCallback>(UserHandlerClass.OnMessage);
             manager.Subscribe<SteamFriends.FriendMsgCallback>(UserHandlerClass.OnMessage);
             manager.Subscribe<SteamFriends.ChatMsgCallback>(UserHandlerClass.OnChatRoomMessage);
+            manager.Subscribe<SteamFriends.ClanStateCallback>(UserHandlerClass.OnClanStateChange);
+
+            manager.Subscribe<SteamFriends.ChatEnterCallback>(chatenter);
+            
 
             // this callback is triggered when the steam servers wish for the client to store the sentry file
             manager.Subscribe<SteamUser.UpdateMachineAuthCallback>(OnMachineAuth);
 
+            if (BotData.ShouldRememberPassword)
+            {
+                manager.Subscribe<SteamUser.LoginKeyCallback>(OnLoginKey);
+            }
             loggingin = true;
 
             Console.WriteLine("Connecting User: {0}", user);
@@ -99,10 +126,20 @@ namespace SteamBotLite
             steamClient.Connect();
             
         }
+
         UserHandler LoadUserHandler (Type HandlerType)
         {
             return (UserHandler)Activator.CreateInstance(
-                    HandlerType, new object[] {this });
+                    HandlerType, new object[] {this});
+        }
+        void chatinfo (SteamFriends.ClanStateCallback callbook)
+        {
+            Console.WriteLine(callbook.MemberChattingCount);
+
+        }
+        void chatenter(SteamFriends.ChatEnterCallback callback)
+        {
+            Console.WriteLine(callback.NumChatMembers);
         }
 
         void OnConnected(SteamClient.ConnectedCallback callback )
@@ -120,11 +157,11 @@ namespace SteamBotLite
 
             byte[] sentryHash = null;
 
-            if (File.Exists(SentryFileName)) //This allows us to sort sentry files based on userhandlers
+            if (File.Exists(SentryFile)) //This allows us to sort sentry files based on userhandlers
             {
                 // if we have a saved sentry file, read and sha-1 hash it
-                byte[] sentryFile = File.ReadAllBytes(SentryFileName);
-                sentryHash = CryptoHelper.SHAHash(sentryFile);
+                byte[] sentryFiledata = File.ReadAllBytes(SentryFile);
+                sentryHash = CryptoHelper.SHAHash(sentryFiledata);
                 LoginData.SentryFileHash = sentryHash;
             }
 
@@ -139,6 +176,7 @@ namespace SteamBotLite
             int friendCount = SteamFriends.GetFriendCount();
 
             Console.WriteLine("We have {0} friends", friendCount);
+            UserHandlerClass.OnLoginCompleted();
         }
 
         void OnAccountInfo(SteamUser.AccountInfoCallback callback)
@@ -148,7 +186,8 @@ namespace SteamBotLite
 
             // at this point, we can go online on friends, so lets do that
             SteamFriends.SetPersonaState(EPersonaState.Online);
-            Console.WriteLine("We have {0} friends", SteamFriends.GetFriendCount());
+            Console.WriteLine("We have {0} friends yo", SteamFriends.GetFriendCount());
+            
         }
 
         void OnPersonalMessage(SteamFriends.FriendMsgCallback msg)
@@ -185,6 +224,16 @@ namespace SteamBotLite
             SteamDirectory.Initialize().Wait(); //Update internal list that is heavily used. 
             steamClient.Connect(); //Lets try and log back in
         }
+        void OnLoginKey(SteamUser.LoginKeyCallback callback)
+        {
+            if ((callback != null) && (!string.IsNullOrEmpty(callback.LoginKey)))
+            {
+                steamUser.AcceptNewLoginKey(callback);
+                File.WriteAllText(LoginKeyFile, callback.LoginKey);
+                LoginData.LoginKey = File.ReadAllText(LoginKeyFile);
+                Console.WriteLine("Wrote New LoginKey");
+            }
+        }
 
         void OnLoggedOn(SteamUser.LoggedOnCallback callback)
         {
@@ -214,6 +263,8 @@ namespace SteamBotLite
                 {
                     Console.WriteLine("Unable to logon to Steam: {0} / {1}", callback.Result, callback.ExtendedResult);
                     Console.WriteLine("This error is more indicative of an incorrect username + password");
+                    LoginData.LoginKey = null;
+                    LoginData.Password = pass;
                     return;
                 }
             }
@@ -222,6 +273,7 @@ namespace SteamBotLite
                 Console.WriteLine("Successfully logged on!");
                 Console.WriteLine(steamClient.IsConnected);
                 Console.WriteLine(SteamFriends.GetFriendCount().ToString());
+                
             }
         }
         void OnMachineAuth(SteamUser.UpdateMachineAuthCallback callback)
@@ -235,7 +287,7 @@ namespace SteamBotLite
 
             int fileSize;
             byte[] sentryHash;
-            using (var fs = File.Open(SentryFileName, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            using (var fs = File.Open(SentryFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))
             {
                 fs.Seek(callback.Offset, SeekOrigin.Begin);
                 fs.Write(callback.Data, 0, callback.BytesToWrite);

@@ -21,7 +21,6 @@ namespace SteamBotLite
             foreach (SteamBotData Entry in Bots)
             {
                 SteamConnections.Add(new SteamConnectionHandler(Entry));
-
             }
 
             bool Running = true;
@@ -34,7 +33,6 @@ namespace SteamBotLite
                     Connection.Tick();
                 }
 
-                // Console.ReadKey();
             }
         }
 
