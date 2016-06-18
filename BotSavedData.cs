@@ -8,12 +8,26 @@ namespace SteamBotLite
     public class SteamBotData
     {
         public SteamUser.LogOnDetails LoginData = new SteamUser.LogOnDetails();
+        public string SavedPassword;
+        
        
         public Type Userhandler
         {
             get; set;
         }
         
+        public string LoginKey
+        {
+            get
+            {
+                return LoginData.LoginKey;
+            }
+            set
+            {
+                LoginData.LoginKey = value;
+                LoginData.Password = null;
+            }
+        }
 
     public string username
         {
@@ -23,9 +37,19 @@ namespace SteamBotLite
             }
             set
             {
-                
                 LoginData.Username = value;
                 Console.WriteLine("Username {0}", username);
+            }
+        }
+        public bool ShouldRememberPassword
+        {
+            get
+            {
+                return LoginData.ShouldRememberPassword;
+            }
+            set
+            {
+                LoginData.ShouldRememberPassword = true;
             }
         }
         public string password
@@ -37,6 +61,7 @@ namespace SteamBotLite
             set
             {
                 LoginData.Password = value;
+                SavedPassword = value;
             }
         }
         public string BotControlClass
