@@ -29,10 +29,11 @@ namespace SteamBotLite
         public override void OnChatRoomMessage(SteamFriends.ChatMsgCallback ChatMsg) //This is an example of using older methods for cross-compatibility, by converting the new format to the older one
         {
             Console.WriteLine("{0}:{1}", ChatMsg.ChatRoomID, ChatMsg.Message);
+            Bot.SteamFriends.GetFriendPersonaState(103582791429594873);
         }
         public override void OnClanStateChange (SteamFriends.ClanStateCallback callback)
         {
-            Console.WriteLine(callback.MemberChattingCount);
+            Console.WriteLine(callback.MemberChattingCount); 
         }
         
         public override void OnChatRoomMessage(SteamID chatID, SteamID sender, string message)
