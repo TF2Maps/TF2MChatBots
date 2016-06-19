@@ -9,19 +9,30 @@ namespace SteamBotLite
 {
     public abstract class UserHandler 
     {
+        /// <summary>
+        /// Our Logon Details, which may be useful later
+        /// </summary>
         public SteamUser.LogOnDetails LogonDetails;
-        public SteamConnectionHandler Bot { get; set; }
+        /// <summary>
+        /// The SteamConnectionhandler that will act as the bridge between Steam and the Userhandler
+        /// </summary>
+        public SteamConnectionHandler steamConnectionHandler { get; set; }
 
+        /// <summary>
+        /// Sets the SteamConnectionHandler to Bot
+        /// </summary>
+        /// <param name="SteamConnectionHandler"></param>
         public UserHandler(SteamConnectionHandler SteamConnectionHandler)
         {
-            Bot = SteamConnectionHandler;
+            steamConnectionHandler = SteamConnectionHandler;
         }
         
         public abstract void OnMessage(SteamFriends.FriendMsgCallback msg);
         public abstract void OnChatRoomMessage(SteamFriends.ChatMsgCallback msg);
+        /// <summary>
+        /// This Void Runs when the Bot has successfully logged into steam and is ready to interact
+        /// </summary>
         public abstract void OnLoginCompleted();
-        public abstract void OnChatRoomMessage(SteamID chatID, SteamID sender, string message); //Incase older methods rely heavily on these exact parameters, these are left in, and can be re-routed into
-        public abstract void OnMessage(string message, SteamKit2.EChatEntryType type); //Incase older methods rely heavily on these exact parameters, these are left in, and can be re-routed into
-        public abstract void OnClanStateChange(SteamFriends.ClanStateCallback Callback);
+        
     }
 }
