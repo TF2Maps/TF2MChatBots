@@ -44,7 +44,7 @@ namespace SteamBotLite
                 {
                     Connection.Tick();
                 }
-
+                System.Threading.Thread.Sleep(100);
             }
         }
 

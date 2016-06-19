@@ -65,7 +65,7 @@ namespace SteamBotLite
         /// </summary>
         public void Tick()
         {
-            manager.RunWaitCallbacks(TimeSpan.FromSeconds(1));
+            manager.RunCallbacks();
         }
         /// <summary>
         /// Creates an instance of SteamConnectionHandler with the data given and logs in
