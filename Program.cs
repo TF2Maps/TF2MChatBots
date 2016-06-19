@@ -14,18 +14,30 @@ namespace SteamBotLite
         
         static void Main(string[] args)
         {
-            SteamBotData[] Bots = JsonConvert.DeserializeObject<SteamBotData[]>(File.ReadAllText("settings.json"));
+            
+            SteamBotData[] Bots = JsonConvert.DeserializeObject<SteamBotData[]>(File.ReadAllText("settings.json")); //Get the data about each bot alongside their info from the JSON file
 
-            List<SteamConnectionHandler> SteamConnections = new List<SteamConnectionHandler>();
+            List<SteamConnectionHandler> SteamConnections = new List<SteamConnectionHandler>(); //We make a list that'll contain our connections to steam
 
-            foreach (SteamBotData Entry in Bots)
+            int ID = 0;
+
+            foreach (SteamBotData Entry in Bots) //We create an instance of each Bot and add it to the list
             {
-                SteamConnections.Add(new SteamConnectionHandler(Entry));
+                if (Entry.Userhandler != null) //We check if the UserHandler has been set before adding it
+                {
+                    SteamConnections.Add(new SteamConnectionHandler(Entry,ID)); //This loads the bot, then adds it to the list
+                }
+                else
+                {
+                    Console.WriteLine("Failed to load {0} because of an invalid BotControlClass", Entry.username); //Warn the user the bot isn't loaded
+                }
+                ID++;
             }
 
             bool Running = true;
 
-            while (Running)
+            //This loop iterates through each bot in the list, checking it's callbacks for anything to run 
+            while (Running) 
             {
 
                 foreach (SteamConnectionHandler Connection in SteamConnections)
