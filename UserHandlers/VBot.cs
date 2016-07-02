@@ -13,6 +13,7 @@ namespace SteamBotLite
         double interval = 5000;
         int GhostCheck = 120;
         int CrashCheck = 0;
+        string Username = "V2Bot";
         Timer Tick;
 
         // Class members
@@ -114,5 +115,9 @@ namespace SteamBotLite
             Tick.Start();
         }
 
+        public override void ClanStateCallback(SteamFriends.ClanStateCallback callback)
+        {
+            
+        }
     }
 }
