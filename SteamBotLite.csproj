@@ -61,11 +61,18 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserHandler.cs" />
     <Compile Include="UserHandlers\VBot.cs" />
+    <Compile Include="VBot\BaseCommand.cs" />
+    <Compile Include="VBot\BaseModule.cs" />
+    <Compile Include="VBot\BaseTask.cs" />
+    <Compile Include="VBot\Modules\Map.cs" />
+    <Compile Include="VBot\Modules\Motd.cs" />
+    <Compile Include="VBot\Modules\Server.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
