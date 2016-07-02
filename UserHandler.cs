@@ -33,6 +33,13 @@ namespace SteamBotLite
         /// This Void Runs when the Bot has successfully logged into steam and is ready to interact
         /// </summary>
         public abstract void OnLoginCompleted();
+        /// <summary>
+        /// Reboot the connection with steam
+        /// </summary>
+        public void Reboot ()
+        {
+            steamConnectionHandler.ResetConnection(steamConnectionHandler.SteamBotLiteLoginData, steamConnectionHandler.ID);
+        }
         
     }
 }

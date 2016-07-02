@@ -32,6 +32,8 @@ namespace SteamBotLite
         {
             Console.WriteLine("{0}:{1}", steamConnectionHandler.SteamFriends.GetFriendPersonaName(ChatMsg.ChatterID), ChatMsg.Message);
             steamConnectionHandler.SteamFriends.GetFriendPersonaState(103582791429594873);
+            if (ChatMsg.Message == "Reboot")
+                Reboot();
         
         }
         

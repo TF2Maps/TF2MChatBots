@@ -11,6 +11,11 @@ namespace SteamBotLite
 {
     public class SteamConnectionHandler
     {
+        
+        /// <summary>
+        /// We store this, in case we need to reboot
+        /// </summary>
+        public SteamBotData SteamBotLiteLoginData;
         /// <summary>
         /// Bot's ID
         /// </summary>
@@ -67,12 +72,18 @@ namespace SteamBotLite
         {
             manager.RunCallbacks();
         }
+        public SteamConnectionHandler(SteamBotData BotData, int BotID)
+        {
+            ResetConnection(BotData, BotID);
+        }
         /// <summary>
-        /// Creates an instance of SteamConnectionHandler with the data given and logs in
+        /// Creates an instance of SteamConnectionHandler with the data given and logs in, also can be fired to reset the bot
         /// </summary>
         /// <param name="BotData"> Data involving the userhandler and what bot to load</param>
-        public SteamConnectionHandler(SteamBotData BotData , int BotID) 
+        public void ResetConnection(SteamBotData BotData , int BotID) 
         {
+            Console.WriteLine("Loading New Connection");
+            SteamBotLiteLoginData = BotData;
             ID = BotID;
             pass = BotData.SavedPassword; //We'll save this now, so we can access it later for logging in if the loginkey fails
 
@@ -149,6 +160,7 @@ namespace SteamBotLite
             steamClient.Connect();
             
         }
+        
         /// <summary>
         /// Load the given userHandler
         /// </summary>
