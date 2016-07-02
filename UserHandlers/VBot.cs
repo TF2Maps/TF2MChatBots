@@ -31,6 +31,7 @@ namespace SteamBotLite
         {
             Console.WriteLine("Vbot Initialised");
             Console.WriteLine("Loading modules and stuff");
+
             // loading config
             Dictionary<string, object> jsconfig = JsonConvert.DeserializeObject<Dictionary<string, object>>(System.IO.File.ReadAllText(@"config.json"));
             GroupChatID = ulong.Parse((string)jsconfig["GroupchatID"]);
@@ -55,7 +56,7 @@ namespace SteamBotLite
         public override void OnLoginCompleted()
         {
             steamConnectionHandler.SteamFriends.SetPersonaName("V2Bot");
-            steamConnectionHandler.SteamFriends.JoinChat(103582791429594873);
+            steamConnectionHandler.SteamFriends.JoinChat(GroupChatSID);
             InitTimer();
             Console.WriteLine("{0} User: {1} Is now online", steamConnectionHandler.ID, steamConnectionHandler.LoginData.Username); //Lets tell the User we're now online
         }
