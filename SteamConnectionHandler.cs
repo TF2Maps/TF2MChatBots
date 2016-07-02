@@ -157,7 +157,7 @@ namespace SteamBotLite
             SteamDirectory.Initialize().Wait(); //Gets a new server list, this is REALLY necessary. 
 
             // initiate the connection
-            steamClient.Connect();
+            Reconnect();
             
         }
         
@@ -257,7 +257,7 @@ namespace SteamBotLite
         /// </summary>
         void Reconnect()
         {
-            SteamDirectory.Initialize().Wait(15); //Update internal list that is heavily used before attempting login. And wait 2 Seconds to avoid Spam
+            SteamDirectory.Initialize().Wait(); //Update internal list that is heavily used before attempting login. And wait 2 Seconds to avoid Spam
             steamClient.Connect(); //Lets try and log back in
         }
         /// <summary>
