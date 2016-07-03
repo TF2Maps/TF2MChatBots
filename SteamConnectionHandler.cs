@@ -70,7 +70,14 @@ namespace SteamBotLite
         /// </summary>
         public void Tick()
         {
-            manager.RunCallbacks();
+            try
+            {
+                manager.RunCallbacks();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception Handled");
+            }
         }
         public SteamConnectionHandler(SteamBotData BotData, int BotID)
         {
