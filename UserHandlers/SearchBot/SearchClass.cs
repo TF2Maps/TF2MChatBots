@@ -18,25 +18,41 @@ namespace SteamBotLite
     {
         public static string Search(SearchClassEntry SearchEntry, string SearchURL)
         {
-          
+
+            // Set a default policy level for the "http:" and "https" schemes.
+            HttpRequestCachePolicy policy = new HttpRequestCachePolicy(HttpRequestCacheLevel.NoCacheNoStore);
+            HttpWebRequest.DefaultCachePolicy = policy;
 
             Console.WriteLine("Searching...");
 
             WebRequest wrGETURL;
+            
 
             if (SearchEntry.IsCustomUrl)
                 wrGETURL = WebRequest.Create(SearchEntry.URLPrefix + SearchURL + SearchEntry.URLSuffix);
             else
                 wrGETURL = WebRequest.Create(SearchEntry.URLPrefix + SearchEntry.URLSuffix);
 
-          
+            wrGETURL.CachePolicy = policy;
+
             Stream objStream;
 
             objStream = wrGETURL.GetResponse().GetResponseStream();
 
             StreamReader objReader = new StreamReader(objStream);
 
+            
+
             string HttpData = objReader.ReadToEnd();
+
+            objStream.Close();
+            objStream.Dispose();
+
+            objReader.Close();
+            objReader.Dispose();
+
+            wrGETURL.GetResponse().Close();
+            wrGETURL.GetResponse().Dispose();
 
             string[] SpideredData = HttpData.Split(new string[] { SearchEntry.SpiderPrefix }, StringSplitOptions.RemoveEmptyEntries);
             if (SpideredData.Length > 1)

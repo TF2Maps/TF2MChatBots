@@ -67,7 +67,7 @@ namespace SteamBotLite
                     server.playerCount = serverstate.Item2;
                     if (!serverstate.Item1.Equals(server.currentMap) && !server.currentMap.Equals(string.Empty))
                     {
-                        string message = server.tag + " server is now playing " + serverstate.Item1 + " with " + serverstate.Item2 + " players";
+                        string message = server.tag + " server is now playing " + serverstate.Item1 + " with " + serverstate.Item2 + " players" ;
                         userhandler.steamConnectionHandler.SteamFriends.SendChatRoomMessage(userhandler.GroupChatSID, EChatEntryType.ChatMsg, message);
                     }
                     server.currentMap = serverstate.Item1;
