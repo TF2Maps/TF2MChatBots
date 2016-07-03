@@ -88,18 +88,22 @@ namespace SteamBotLite
         // queries a server and returns a <string, int> Tuple (mapname, playercount)
         static public Tuple<string, int> ServerQuery(IPEndPoint serverIP)
         {
+            
             // request server infos
             IPEndPoint localEndpoint = new IPEndPoint(IPAddress.Any, 0);
             UdpClient client = new UdpClient(localEndpoint);
             client.Connect(serverIP);
-
+            
             byte[] header = new byte[] {0xFF, 0xFF, 0xFF, 0xFF, 0x54};
             byte[] request = header.Concat(Encoding.ASCII.GetBytes("Source Engine Query\0")).ToArray();
             client.Send(request, request.Length);
-
+            
             // get response (timeout after 3 seconds)and skip header
             var Response = client.BeginReceive(null, null);
             Response.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(3));
+            // Response.AsyncWaitHandle.Close();
+            
+            
             if (Response.IsCompleted)
             {
                 byte[] data = client.EndReceive(Response, ref localEndpoint).Skip(6).ToArray();
@@ -108,11 +112,14 @@ namespace SteamBotLite
                 string mapname = serverinfos[1].Split('.')[0].Replace("workshop/", "");
                 // getting playerount
                 int playercount = (int)Encoding.ASCII.GetBytes(serverinfos[4]).Skip(2).ToArray()[0];
-
+                client.Close();
+                client.Dispose();
                 return new Tuple<string, int>(mapname, playercount);
             }
             else
             {
+                client.Close();
+                client.Dispose();
                 return null;
             }
         }

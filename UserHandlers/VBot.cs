@@ -43,11 +43,7 @@ namespace SteamBotLite
             mapModule = new MapModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["MapModule"].ToString()));
             serverModule = new ServerModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["ServerModule"].ToString()));
 
-            ModuleList = new List<BaseModule> { motdModule,
-                mapModule
-                //,
-               // serverModule
-            };
+            ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule};
 
             // loading module commands
             foreach (BaseModule module in ModuleList)
