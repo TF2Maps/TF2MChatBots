@@ -85,6 +85,8 @@ namespace SteamBotLite
             Tick.Start();
         }
 
-
+        public override void ChatMemberInfo(SteamFriends.ChatMemberInfoCallback callback)
+        {
+        }
     }
 }

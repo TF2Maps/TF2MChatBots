@@ -19,9 +19,6 @@ namespace SteamBotLite
         public static string Search(SearchClassEntry SearchEntry, string SearchURL)
         {
 
-            // Set a default policy level for the "http:" and "https" schemes.
-            HttpRequestCachePolicy policy = new HttpRequestCachePolicy(HttpRequestCacheLevel.NoCacheNoStore);
-            HttpWebRequest.DefaultCachePolicy = policy;
 
             Console.WriteLine("Searching...");
 
@@ -33,8 +30,6 @@ namespace SteamBotLite
             else
                 wrGETURL = WebRequest.Create(SearchEntry.URLPrefix + SearchEntry.URLSuffix);
 
-            wrGETURL.CachePolicy = policy;
-
             Stream objStream;
 
             objStream = wrGETURL.GetResponse().GetResponseStream();
@@ -45,6 +40,18 @@ namespace SteamBotLite
 
             string HttpData = objReader.ReadToEnd();
 
+            string response = "Invalid Search";
+
+            
+
+            string[] SpideredData = HttpData.Split(new string[] { SearchEntry.SpiderPrefix }, StringSplitOptions.RemoveEmptyEntries);
+            if (SpideredData.Length > 1)
+            {
+                SpideredData = SpideredData[1].Split(new string[] { SearchEntry.SpiderSuffix }, StringSplitOptions.RemoveEmptyEntries);
+                response = SpideredData[0];
+            }
+
+            Console.WriteLine(response);
             objStream.Close();
             objStream.Dispose();
 
@@ -54,16 +61,7 @@ namespace SteamBotLite
             wrGETURL.GetResponse().Close();
             wrGETURL.GetResponse().Dispose();
 
-            string[] SpideredData = HttpData.Split(new string[] { SearchEntry.SpiderPrefix }, StringSplitOptions.RemoveEmptyEntries);
-            if (SpideredData.Length > 1)
-            {
-                SpideredData = SpideredData[1].Split(new string[] { SearchEntry.SpiderSuffix }, StringSplitOptions.RemoveEmptyEntries);
-                return SpideredData[0];
-            }
-            else
-            {
-                return "Invalid Search";
-            }
+            return response;
 
 
         }
