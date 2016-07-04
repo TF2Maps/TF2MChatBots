@@ -146,7 +146,7 @@ namespace SteamBotLite
             //We will pass some down to the UserHandler instead, as these manage users not the connection
             manager.Subscribe<SteamFriends.FriendMsgCallback>(UserHandlerClass.OnMessage);
             manager.Subscribe<SteamFriends.ChatMsgCallback>(UserHandlerClass.OnChatRoomMessage);
-            manager.Subscribe < SteamFriends.ChatActionResultCallback>(chatmemberinfo);
+            manager.Subscribe < SteamFriends.ChatMemberInfoCallback>(UserHandlerClass.ChatMemberInfo);
            
             // This callback is triggered when the steam servers wish for the client to store the sentry file
             manager.Subscribe<SteamUser.UpdateMachineAuthCallback>(OnMachineAuth);

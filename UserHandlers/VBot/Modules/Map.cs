@@ -141,7 +141,7 @@ namespace SteamBotLite
                 if (parameters.Length > 0)
                 {
                     Map deletedMap = MapModule.mapList.Find(map => map.filename.Equals(parameters[0]));
-                    if (deletedMap.submitter == sender.AccountID)
+                    if ((deletedMap.submitter == sender.AccountID) || (userhandler.usersModule.admincheck(sender.AccountID)))
                     {
                         MapModule.mapList.Remove(deletedMap);
                         MapModule.savePersistentData();

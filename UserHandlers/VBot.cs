@@ -20,7 +20,7 @@ namespace SteamBotLite
         MotdModule motdModule;
         MapModule mapModule;
         ServerModule serverModule;
-
+        public UsersModule usersModule;
 
         List<BaseModule> ModuleList;
 
@@ -42,8 +42,9 @@ namespace SteamBotLite
             motdModule = new MotdModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["MotdModule"].ToString()));
             mapModule = new MapModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["MapModule"].ToString()));
             serverModule = new ServerModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["ServerModule"].ToString()));
+            usersModule = new UsersModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["usersModule"].ToString()));
 
-            ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule};
+            ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule};
 
             // loading module commands
             foreach (BaseModule module in ModuleList)
@@ -74,13 +75,30 @@ namespace SteamBotLite
                 if (ChatMsg.Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
                     response = c.run(ChatMsg.ChatterID, ChatMsg.Message);
 
-            foreach (BaseCommand c in chatAdminCommands)
-                if (ChatMsg.Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
-                    response = c.run(ChatMsg.ChatterID, ChatMsg.Message);
+            if (usersModule.admincheck(ChatMsg.ChatterID)) //Verifies that it is a moderator, Can you please check if the "ISAdmin" is being used correctly? 
+            {
+                Console.WriteLine("ADMIN SPOKE");
+                foreach (BaseCommand c in chatAdminCommands)
+                    if (ChatMsg.Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
+                        response = c.run(ChatMsg.ChatterID, ChatMsg.Message);
+            }
 
             if (response != null)
                 steamConnectionHandler.SteamFriends.SendChatRoomMessage(GroupChatSID, EChatEntryType.ChatMsg, response);
 
+        }
+
+        public override void ChatMemberInfo(SteamFriends.ChatMemberInfoCallback callback)
+        {
+            if (callback.StateChangeInfo.StateChange == EChatMemberStateChange.Left)
+            {
+                return;
+            }
+            else
+            {
+                Console.WriteLine("Callback Fired");
+                usersModule.updateUserInfo(callback);
+            }
         }
         /// <summary>
         /// The Main Timer's method, executed per tick
