@@ -72,10 +72,14 @@ namespace SteamBotLite
                 {
                     map.submitter = sender.AccountID;
                     map.filename = parameters[0];
+                    map.notes = "notesComingSoon";
                     if (parameters.Length > 1 /* && !uploaded*/)
                     {
+                        if (parameters.Length > 2)
+                        {
+                            map.notes = param.Substring(parameters[0].Length + parameters[1].Length);
+                        }
                         map.downloadURL = parameters[1];
-                        //todo queue upload
                         MapModule.mapList.Add(map);
                         MapModule.savePersistentData();
                         
@@ -91,16 +95,22 @@ namespace SteamBotLite
             public Maps(VBot bot, MapModule mapMod) : base(bot, "!maps", mapMod) { }
             protected override string exec(SteamID sender, string param)
             {
-                string list = "";
+                string maplist = "";
+                string extralist = "";
                 foreach (Map m in MapModule.mapList)
                 {
-                    if (list != string.Empty)
-                        list += " , ";
-                    list += m.filename;
+                    if (maplist != string.Empty)
+                    {
+                        maplist += " , ";
+                        extralist += " \n ";
+                    }
+                    maplist += m.filename;
+                    extralist += m.downloadURL + " Note: " + m.notes;
                 }
-                if (list.Equals(""))
+                if (maplist.Equals(""))
                     return "The list is empty";
-                return list;
+                userhandler.steamConnectionHandler.SteamFriends.SendChatMessage(sender, EChatEntryType.ChatMsg, extralist);
+                return maplist;
             }
         }
 
@@ -121,7 +131,6 @@ namespace SteamBotLite
                         editedMap.filename = parameters[1];
                         if (parameters.Length > 2)
                             editedMap.downloadURL = parameters[2];
-
                         MapModule.mapList.Add(editedMap);
                         MapModule.savePersistentData();
                         return "map edited";
