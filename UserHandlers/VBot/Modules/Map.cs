@@ -72,7 +72,7 @@ namespace SteamBotLite
                 {
                     map.submitter = sender.AccountID;
                     map.filename = parameters[0];
-                    map.notes = "notesComingSoon";
+                    map.notes = "No Notes";
                     if (parameters.Length > 1 /* && !uploaded*/)
                     {
                         if (parameters.Length > 2)
@@ -169,7 +169,7 @@ namespace SteamBotLite
             {
                 MapModule.mapList = new List<Map>();
                 MapModule.savePersistentData();
-                return "List wiped";
+                return "The map list, has been DELETED";
             }
         }
     }
