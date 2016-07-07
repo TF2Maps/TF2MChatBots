@@ -20,12 +20,13 @@ namespace SteamBotLite
         MotdModule motdModule;
         MapModule mapModule;
         ServerModule serverModule;
+        RepliesModule replyModule;
         public UsersModule usersModule;
 
         List<BaseModule> ModuleList;
 
-        List<BaseCommand> chatCommands = new List<BaseCommand>();
-        List<BaseCommand> chatAdminCommands = new List<BaseCommand>();
+        public List<BaseCommand> chatCommands = new List<BaseCommand>();
+        public List<BaseCommand> chatAdminCommands = new List<BaseCommand>();
 
 
         public VBot(SteamConnectionHandler SteamConnectionHandler) : base(SteamConnectionHandler)
@@ -43,8 +44,9 @@ namespace SteamBotLite
             mapModule = new MapModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["MapModule"].ToString()));
             serverModule = new ServerModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["ServerModule"].ToString()));
             usersModule = new UsersModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["usersModule"].ToString()));
+            replyModule = new RepliesModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["ReplyModule"].ToString()));
 
-            ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule};
+            ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule};
 
             // loading module commands
             foreach (BaseModule module in ModuleList)

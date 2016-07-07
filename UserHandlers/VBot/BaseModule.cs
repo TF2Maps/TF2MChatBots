@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace SteamBotLite
 {
     abstract class BaseModule
@@ -11,7 +12,11 @@ namespace SteamBotLite
         public List<BaseCommand> commands {get; private set;}
         public List<BaseCommand> adminCommands {get; private set;}
         public List<BaseTask> tasks { get; private set;}
-
+        public string SavedData()
+        {
+            return this.GetType().Name + ".json";
+        }
+        
         protected VBot userhandler;
 
         private Dictionary<string, object> config;
