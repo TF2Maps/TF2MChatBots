@@ -11,7 +11,7 @@ namespace SteamBotLite
     {
         SteamID ChatRoomID = 103582791429594873;
         double interval = 5000;
-        int GhostCheck = 120;
+        int GhostCheck = 240;
         Timer Tick;
        
         List<SearchClassEntry> Searches;
