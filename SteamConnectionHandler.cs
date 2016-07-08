@@ -76,7 +76,7 @@ namespace SteamBotLite
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Exception Handled");
+                Console.WriteLine("Exception Handled: {0}", ex);
             }
         }
         public SteamConnectionHandler(SteamBotData BotData, int BotID)
@@ -264,7 +264,7 @@ namespace SteamBotLite
         /// </summary>
         void Reconnect()
         {
-            SteamDirectory.Initialize().Wait(); //Update internal list that is heavily used before attempting login. And wait 2 Seconds to avoid Spam
+            SteamDirectory.Initialize().Wait(15); //Update internal list that is heavily used before attempting login. And wait 2 Seconds to avoid Spam
             steamClient.Connect(); //Lets try and log back in
         }
         /// <summary>
