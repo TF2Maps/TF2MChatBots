@@ -11,7 +11,8 @@ namespace SteamBotLite
         ulong GroupChatID;
         public SteamID GroupChatSID = 103582791429594873;
         double interval = 5000;
-        int GhostCheck = 120;
+        readonly int InitialGhostCheck = 480;
+        int GhostCheck = 480;
         int CrashCheck = 0;
         string Username = "V2Bot";
         Timer Tick;
@@ -113,7 +114,7 @@ namespace SteamBotLite
 
             if (GhostCheck <= 1)
             {
-                GhostCheck = 120;
+                GhostCheck = InitialGhostCheck;
                 CrashCheck += 1;
                 steamConnectionHandler.SteamFriends.LeaveChat(new SteamID(GroupChatSID));
                 steamConnectionHandler.SteamFriends.JoinChat(new SteamID(GroupChatSID));
