@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel;
 
 using SteamKit2;
 using Newtonsoft.Json;
@@ -13,10 +14,12 @@ namespace SteamBotLite
     {
         public List<Map> mapList = new List<Map>();
 
+        
+
         public MapModule(VBot bot, Dictionary<string, object> config) : base(bot, config)
         {
             loadPersistentData();
-
+            
             commands.Add(new Add(bot, this));
             commands.Add(new Maps(bot, this));
             commands.Add(new Update(bot, this));
