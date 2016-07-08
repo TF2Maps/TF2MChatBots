@@ -11,6 +11,7 @@ namespace SteamBotLite
     {
         SteamID ChatRoomID = 103582791429594873;
         double interval = 5000;
+        readonly int GhostCheckInitial = 480;
         int GhostCheck = 240;
         Timer Tick;
        
@@ -68,7 +69,7 @@ namespace SteamBotLite
 
             if (GhostCheck <= 1)
             {
-                GhostCheck = 120;
+                GhostCheck = GhostCheckInitial;
                 steamConnectionHandler.SteamFriends.LeaveChat(new SteamID(ChatRoomID));
                 steamConnectionHandler.SteamFriends.JoinChat(new SteamID(ChatRoomID));
             }
