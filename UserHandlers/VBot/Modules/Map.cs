@@ -32,7 +32,7 @@ namespace SteamBotLite
             public uint submitter;
             public string filename;
             public string downloadURL;
-            public string notes; // not implemeted
+            public string notes;
         }
 
         public override string getPersistentData()
@@ -47,6 +47,12 @@ namespace SteamBotLite
                 mapList = JsonConvert.DeserializeObject<List<Map>>(System.IO.File.ReadAllText(this.GetType().Name + ".json"));
             }
             catch { }
+        }
+
+        public void HandleEvent(object sender, EventArgs args)
+        {
+            ServerModule.ServerInfo imp = (ServerModule.ServerInfo) args;
+            mapList.RemoveAll(x => x.filename == imp.currentMap);
         }
 
         // The abstract command for motd
