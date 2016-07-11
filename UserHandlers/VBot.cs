@@ -9,7 +9,7 @@ namespace SteamBotLite
     class VBot : UserHandler
     {
         ulong GroupChatID;
-        public SteamID GroupChatSID = 103582791429594873;
+        public SteamID GroupChatSID;
         double interval = 5000;
         readonly int InitialGhostCheck = 480;
         int GhostCheck = 480;

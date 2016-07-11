@@ -14,6 +14,7 @@ namespace SteamBotLite
     {
         public List<ServerInfo> serverList;
         private BaseTask serverUpdate;
+        bool chatIsNotified = false;
 
         public ServerModule(VBot bot, Dictionary<string, object> config) : base(bot, config)
         {
@@ -67,10 +68,16 @@ namespace SteamBotLite
                     server.playerCount = serverstate.Item2;
                     if (!serverstate.Item1.Equals(server.currentMap) && !server.currentMap.Equals(string.Empty))
                     {
-                        string message = server.tag + " server is now playing " + serverstate.Item1 + " with " + serverstate.Item2 + " players" ;
-                        userhandler.steamConnectionHandler.SteamFriends.SendChatRoomMessage(userhandler.GroupChatSID, EChatEntryType.ChatMsg, message);
+                        server.currentMap = serverstate.Item1;
+                        chatIsNotified = false;
                     }
-                    server.currentMap = serverstate.Item1;
+                    
+                    if (!chatIsNotified && serverstate.Item2 > 3)
+                    {
+                        string message = server.tag + " server is now playing " + server.currentMap + " with " + serverstate.Item2 + " players" ;
+                        userhandler.steamConnectionHandler.SteamFriends.SendChatRoomMessage(userhandler.GroupChatSID, EChatEntryType.ChatMsg, message);
+                        chatIsNotified = true;
+                    }
                 }
             }
         }
