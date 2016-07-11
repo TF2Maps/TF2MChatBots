@@ -14,7 +14,7 @@ namespace SteamBotLite
     {
         public List<ServerInfo> serverList;
         private BaseTask serverUpdate;
-        bool chatIsNotified = false;
+        bool chatIsNotified = true;
 
         public ServerModule(VBot bot, Dictionary<string, object> config) : base(bot, config)
         {
@@ -46,6 +46,7 @@ namespace SteamBotLite
             public IPEndPoint serverIP;
             public string tag;
             public int playerCount;
+            public int capacity;
             public string currentMap;
 
             public ServerInfo(IPEndPoint serverIP, string tag)
@@ -54,28 +55,39 @@ namespace SteamBotLite
                 this.tag = tag;
                 currentMap = "";
                 playerCount = 0;
+                capacity = 0;
+            }
+            public void update(ServerInfo updated)
+            {
+                this.playerCount = updated.playerCount;
+                this.capacity = updated.capacity;
+                this.currentMap = updated.currentMap;
+            }
+            public override string ToString()
+            {
+                return this.tag + " server is now on " + this.currentMap +
+                    " - " + this.playerCount + "/" + this.capacity +
+                    " - join: steam://connect/" + this.serverIP;
             }
         }
 
         public void SyncServerInfo(object sender, EventArgs e)
         {
-            Tuple<string, int> serverstate; // map, playercount
             foreach (ServerInfo server in serverList)
             {
-                serverstate = ServerQuery(server.serverIP);
+                ServerInfo serverstate = ServerQuery(server);
+
                 if (serverstate != null)
                 {
-                    server.playerCount = serverstate.Item2;
-                    if (!serverstate.Item1.Equals(server.currentMap) && !server.currentMap.Equals(string.Empty))
-                    {
-                        server.currentMap = serverstate.Item1;
+                    bool mapUpdated = !serverstate.currentMap.Equals(server.currentMap) && !server.currentMap.Equals(string.Empty);
+                    server.update(serverstate);
+
+                    if (mapUpdated)
                         chatIsNotified = false;
-                    }
                     
-                    if (!chatIsNotified && serverstate.Item2 > 3)
+                    if (!chatIsNotified && server.playerCount > 3)
                     {
-                        string message = server.tag + " server is now playing " + server.currentMap + " with " + serverstate.Item2 + " players" ;
-                        userhandler.steamConnectionHandler.SteamFriends.SendChatRoomMessage(userhandler.GroupChatSID, EChatEntryType.ChatMsg, message);
+                        userhandler.steamConnectionHandler.SteamFriends.SendChatRoomMessage(userhandler.GroupChatSID, EChatEntryType.ChatMsg, server.ToString());
                         chatIsNotified = true;
                     }
                 }
@@ -93,13 +105,13 @@ namespace SteamBotLite
         }
 
         // queries a server and returns a <string, int> Tuple (mapname, playercount)
-        static public Tuple<string, int> ServerQuery(IPEndPoint serverIP)
+        static public ServerInfo ServerQuery(ServerInfo server)
         {
-            
+            ServerInfo updatedServer = null;
             // request server infos
             IPEndPoint localEndpoint = new IPEndPoint(IPAddress.Any, 0);
             UdpClient client = new UdpClient(localEndpoint);
-            client.Connect(serverIP);
+            client.Connect(server.serverIP);
             
             byte[] header = new byte[] {0xFF, 0xFF, 0xFF, 0xFF, 0x54};
             byte[] request = header.Concat(Encoding.ASCII.GetBytes("Source Engine Query\0")).ToArray();
@@ -108,27 +120,25 @@ namespace SteamBotLite
             // get response (timeout after 3 seconds)and skip header
             var Response = client.BeginReceive(null, null);
             Response.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(3));
-            // Response.AsyncWaitHandle.Close();
-            
+            Response.AsyncWaitHandle.Close();
             
             if (Response.IsCompleted)
             {
+                updatedServer = new ServerInfo(server.serverIP, server.tag);
                 byte[] data = client.EndReceive(Response, ref localEndpoint).Skip(6).ToArray();
                 string[] serverinfos = Encoding.ASCII.GetString(data).Split(new char[] { '\0' }, 5);
                 // getting and sanitizing map name
-                string mapname = serverinfos[1].Split('.')[0].Replace("workshop/", "");
+                updatedServer.currentMap = serverinfos[1].Split('.')[0].Replace("workshop/", "");
                 // getting playerount
-                int playercount = (int)Encoding.ASCII.GetBytes(serverinfos[4]).Skip(2).ToArray()[0];
-                client.Close();
-                client.Dispose();
-                return new Tuple<string, int>(mapname, playercount);
+                updatedServer.playerCount = (int)Encoding.ASCII.GetBytes(serverinfos[4]).Skip(2).ToArray()[0];
+                // getting server capacity
+                updatedServer.capacity = (int)Encoding.ASCII.GetBytes(serverinfos[4]).Skip(2).ToArray()[1];
+
             }
-            else
-            {
-                client.Close();
-                client.Dispose();
-                return null;
-            }
+
+            client.Close();
+            client.Dispose();
+            return updatedServer;
         }
 
 
@@ -145,12 +155,11 @@ namespace SteamBotLite
             }
             protected override string exec(SteamID sender, string param)
             {
-                Tuple<string, int> status = ServerQuery(server.serverIP);
+                ServerInfo status = ServerQuery(server);
                 if (status != null)
                 {
-                    server.currentMap = status.Item1;
-                    server.playerCount = status.Item2;
-                    return server.tag + " server is playing " + server.currentMap + " with " + server.playerCount + " players";
+                    server.update(status);
+                    return server.ToString();
                 }
                 else
                     return server.tag + " server did not respond";
@@ -172,8 +181,12 @@ namespace SteamBotLite
                 string activeServers = "";
                 foreach (ServerInfo server in module.serverList)
                     if (server.playerCount > 1)
-                        activeServers += server.tag + " server is playing " +server.currentMap+ " with "+server.playerCount+" players. ";
+                    {
+                        if (!activeServers.Equals(string.Empty))    
+                            activeServers += "\n";
 
+                        activeServers += server.ToString();
+                    }
                 return activeServers.Equals(string.Empty) ? "no server is currently active" : activeServers;
             }
         }
