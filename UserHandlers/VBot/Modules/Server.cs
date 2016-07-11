@@ -16,6 +16,8 @@ namespace SteamBotLite
         private BaseTask serverUpdate;
         bool chatIsNotified = true;
 
+        public event EventHandler mapBeingTested;
+
         public ServerModule(VBot bot, Dictionary<string, object> config) : base(bot, config)
         {
             serverList = new List<ServerInfo>();
@@ -41,7 +43,7 @@ namespace SteamBotLite
             serverUpdate = new BaseTask(updateInterval, new System.Timers.ElapsedEventHandler(SyncServerInfo));
         }
 
-        public class ServerInfo
+        public class ServerInfo : EventArgs
         {
             public IPEndPoint serverIP;
             public string tag;
@@ -87,6 +89,11 @@ namespace SteamBotLite
                     
                     if (!chatIsNotified && server.playerCount > 3)
                     {
+                        EventHandler handler = mapBeingTested;
+                        if (handler != null)
+                        {
+                            handler(this, server);
+                        }
                         userhandler.steamConnectionHandler.SteamFriends.SendChatRoomMessage(userhandler.GroupChatSID, EChatEntryType.ChatMsg, server.ToString());
                         chatIsNotified = true;
                     }

@@ -49,6 +49,8 @@ namespace SteamBotLite
 
             ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule};
 
+            serverModule.mapBeingTested += mapModule.HandleEvent;
+
             // loading module commands
             foreach (BaseModule module in ModuleList)
             {
