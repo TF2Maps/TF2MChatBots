@@ -144,7 +144,7 @@ namespace SteamBotLite
             }
 
             client.Close();
-            client.Dispose();
+          //  client.Dispose();
             return updatedServer;
         }
 
