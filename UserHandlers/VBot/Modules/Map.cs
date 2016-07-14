@@ -163,7 +163,7 @@ namespace SteamBotLite
                     {
                         MapModule.mapList.Remove(deletedMap);
                         MapModule.savePersistentData();
-                        return "map deleted";
+                        return "Map DELETED";
                     }
                 }
                 return "map not found or insufisant priviledge";
