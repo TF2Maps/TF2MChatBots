@@ -16,7 +16,7 @@ namespace SteamBotLite
         private BaseTask serverUpdate;
         bool chatIsNotified = true;
 
-        public event EventHandler mapBeingTested;
+     //   public event EventHandler mapBeingTested; //Disabled as it is likely causing major Crashes. 
 
         public ServerModule(VBot bot, Dictionary<string, object> config) : base(bot, config)
         {
