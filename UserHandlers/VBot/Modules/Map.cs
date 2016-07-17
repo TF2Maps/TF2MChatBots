@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
+using System.Collections.ObjectModel;
 
 using SteamKit2;
 using Newtonsoft.Json;
@@ -12,8 +13,8 @@ namespace SteamBotLite
 {
     class MapModule : BaseModule
     {
-        public List<Map> mapList = new List<Map>();
-
+       // public List<Map> mapList = new List<Map>();  //OLD MAP SYSTEM
+        public ObservableCollection<Map> mapList = new ObservableCollection<Map>();
         
 
         public MapModule(VBot bot, Dictionary<string, object> config) : base(bot, config)
@@ -43,8 +44,8 @@ namespace SteamBotLite
         public override void loadPersistentData()
         {
             try
-            {
-                mapList = JsonConvert.DeserializeObject<List<Map>>(System.IO.File.ReadAllText(this.GetType().Name + ".json"));
+            {ObservableCollection<Map>
+                mapList = JsonConvert.DeserializeObject<ObservableCollection<Map>>(System.IO.File.ReadAllText(this.GetType().Name + ".json"));
             }
             catch { }
         }
@@ -52,7 +53,8 @@ namespace SteamBotLite
         public void HandleEvent(object sender, EventArgs args)
         {
             ServerModule.ServerInfo imp = (ServerModule.ServerInfo) args;
-            mapList.RemoveAll(x => x.filename == imp.currentMap);
+          
+            //mapList.RemoveAll(x => x.filename == imp.currentMap); //OLD MAP SYSTEM
         }
 
         // The abstract command for motd
@@ -132,7 +134,9 @@ namespace SteamBotLite
 
                 if (parameters.Length > 1)
                 {
-                    Map editedMap = MapModule.mapList.Find(map => map.filename.Equals(parameters[0]));
+
+                    Map editedMap = MapModule.mapList.Where(x => x.filename.Equals(parameters[0])).FirstOrDefault(); //Needs to be tested 
+                   // Map editedMap = MapModule.mapList.Find(map => map.filename.Equals(parameters[0])); //OLD Map CODE
                     if (editedMap.submitter == sender.AccountID)
                     {
                         MapModule.mapList.Remove(editedMap);
@@ -158,7 +162,8 @@ namespace SteamBotLite
 
                 if (parameters.Length > 0)
                 {
-                    Map deletedMap = MapModule.mapList.Find(map => map.filename.Equals(parameters[0]));
+                    Map deletedMap = MapModule.mapList.Where(x => x.filename.Equals(parameters[0])).FirstOrDefault(); //Needs to be tested 
+              //      Map deletedMap = MapModule.mapList.Find(map => map.filename.Equals(parameters[0]));
                     if ((deletedMap.submitter == sender.AccountID) || (userhandler.usersModule.admincheck(sender.AccountID)))
                     {
                         MapModule.mapList.Remove(deletedMap);
@@ -176,7 +181,8 @@ namespace SteamBotLite
             public Wipe(VBot bot, MapModule mapMod) : base(bot, "!wipe", mapMod) { }
             protected override string exec(SteamID sender, string param)
             {
-                MapModule.mapList = new List<Map>();
+                MapModule.mapList.Clear(); 
+                //MapModule.mapList = new List<Map>(); //OLd Maplist code
                 MapModule.savePersistentData();
                 return "The map list, has been DELETED";
             }
