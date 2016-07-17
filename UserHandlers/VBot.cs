@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 
 namespace SteamBotLite
 {
+
     class VBot : UserHandler
     {
         ulong GroupChatID;
@@ -70,27 +71,35 @@ namespace SteamBotLite
 
         public override void OnMessage(SteamFriends.FriendMsgCallback ChatMsg) //This is an example of using older methods for cross-compatibility, by converting the new format to the older one
         {
+            string response = ChatMessageHandler(ChatMsg.Sender, ChatMsg.Message);
+            if (response != null)
+                steamConnectionHandler.SteamFriends.SendChatMessage(ChatMsg.Sender, EChatEntryType.ChatMsg, response);
         }
         public override void OnChatRoomMessage(SteamFriends.ChatMsgCallback ChatMsg) //This is an example of using older methods for cross-compatibility, by converting the new format to the older one
         {
-            GhostCheck = 120;
+            GhostCheck = InitialGhostCheck;
             CrashCheck = 0;
-            string response = null;
-            foreach (BaseCommand c in chatCommands)
-                if (ChatMsg.Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
-                    response = c.run(ChatMsg.ChatterID, ChatMsg.Message);
+            string response = ChatMessageHandler(ChatMsg.ChatterID, ChatMsg.Message);
+            if (response != null)
+                steamConnectionHandler.SteamFriends.SendChatRoomMessage(GroupChatSID, EChatEntryType.ChatMsg, response);
+        }
 
-            if (usersModule.admincheck(ChatMsg.ChatterID)) //Verifies that it is a moderator, Can you please check if the "ISAdmin" is being used correctly? 
+        public string ChatMessageHandler(SteamID Sender , string Message)
+        {
+            string response = null;
+
+            foreach (BaseCommand c in chatCommands)
+                if (Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
+                    response = c.run(Sender, Message);
+
+            if (usersModule.admincheck(Sender)) //Verifies that it is a moderator, Can you please check if the "ISAdmin" is being used correctly? 
             {
                 Console.WriteLine("ADMIN SPOKE");
                 foreach (BaseCommand c in chatAdminCommands)
-                    if (ChatMsg.Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
-                        response = c.run(ChatMsg.ChatterID, ChatMsg.Message);
+                    if (Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
+                        response = c.run(Sender, Message);
             }
-
-            if (response != null)
-                steamConnectionHandler.SteamFriends.SendChatRoomMessage(GroupChatSID, EChatEntryType.ChatMsg, response);
-
+            return response;
         }
 
         public override void ChatMemberInfo(SteamFriends.ChatMemberInfoCallback callback)
