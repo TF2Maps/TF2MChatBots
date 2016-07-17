@@ -3,6 +3,7 @@ using SteamKit2;
 using System.Timers;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using System.Collections.Specialized;
 
 namespace SteamBotLite
 {
@@ -49,7 +50,7 @@ namespace SteamBotLite
             replyModule = new RepliesModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["ReplyModule"].ToString()));
 
             ModuleList = new List<BaseModule> { motdModule,mapModule,/*serverModule,*/usersModule,replyModule};
-
+            mapModule.mapList.CollectionChanged += OnMaplistchange;
       //      serverModule.mapBeingTested += mapModule.HandleEvent;
 
             // loading module commands
@@ -100,6 +101,10 @@ namespace SteamBotLite
                         response = c.run(Sender, Message);
             }
             return response;
+        }
+        public void OnMaplistchange(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            steamConnectionHandler.SteamFriends.SetPersonaName("[" + mapModule.mapList.Count + "]" + Username);            
         }
 
         public override void ChatMemberInfo(SteamFriends.ChatMemberInfoCallback callback)
