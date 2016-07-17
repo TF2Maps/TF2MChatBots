@@ -89,13 +89,16 @@ namespace SteamBotLite
                     
                     if (!chatIsNotified && server.playerCount > 3)
                     {
-                        EventHandler handler = mapBeingTested;
+                        /* //TODO Re-Enabled
+                        EventHandler handler = mapBeingTested; 
+
                         if (handler != null)
                         {
                             handler(this, server);
                         }
+                        */
                         userhandler.steamConnectionHandler.SteamFriends.SendChatRoomMessage(userhandler.GroupChatSID, EChatEntryType.ChatMsg, server.ToString());
-                        chatIsNotified = true;
+                        chatIsNotified = true;                        
                     }
                 }
             }

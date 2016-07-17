@@ -44,13 +44,16 @@ namespace SteamBotLite
 
             // loading modules
             motdModule = new MotdModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["MotdModule"].ToString()));
+
             mapModule = new MapModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["MapModule"].ToString()));
+            mapModule.mapList.CollectionChanged += OnMaplistchange;
+
             serverModule = new ServerModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["ServerModule"].ToString()));
             usersModule = new UsersModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["usersModule"].ToString()));
             replyModule = new RepliesModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["ReplyModule"].ToString()));
 
-            ModuleList = new List<BaseModule> { motdModule,mapModule,/*serverModule,*/usersModule,replyModule};
-            mapModule.mapList.CollectionChanged += OnMaplistchange;
+            ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule};
+            
       //      serverModule.mapBeingTested += mapModule.HandleEvent;
 
             // loading module commands
