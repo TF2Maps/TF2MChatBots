@@ -68,6 +68,7 @@
     <Compile Include="UserHandlers\VBot\BaseTask.cs" />
     <Compile Include="UserHandlers\VBot\Modules\Map.cs" />
     <Compile Include="UserHandlers\VBot\Modules\Motd.cs" />
+    <Compile Include="UserHandlers\VBot\Modules\AdminModule.cs" />
     <Compile Include="UserHandlers\VBot\Modules\Replies.cs" />
     <Compile Include="UserHandlers\VBot\Modules\Server.cs" />
     <Compile Include="UserHandlers\VBot\Modules\Users.cs" />
