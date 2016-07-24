@@ -16,7 +16,7 @@ namespace SteamBotLite
         readonly int InitialGhostCheck = 480;
         int GhostCheck = 480;
         int CrashCheck = 0;
-        string Username = "V2Bot";
+        public string Username = "V2Bot";
         Timer Tick;
 
         // Class members
