@@ -48,7 +48,7 @@ namespace SteamBotLite
         }
         public override void OnChatRoomMessage(SteamFriends.ChatMsgCallback ChatMsg) //This is an example of using older methods for cross-compatibility, by converting the new format to the older one
         {
-            GhostCheck = 120;
+            GhostCheck = GhostCheckInitial;
             string[] Words = ChatMsg.Message.Split(' ');
             Console.WriteLine("{0}:{1}", steamConnectionHandler.SteamFriends.GetFriendPersonaName(ChatMsg.ChatterID), ChatMsg.Message);            
             foreach (SearchClassEntry Entry in Searches)
