@@ -93,11 +93,11 @@ namespace SteamBotLite
                         map.downloadURL = parameters[1];
                         MapModule.mapList.Add(map);
                         MapModule.savePersistentData();
-                        
-                        return "map added";
+
+                        return string.Format("Map '{0}' added.", map.filename);
                     }
                 }
-                return "map not added";
+                return "Invalid parameters for !add. Syntax: !add <mapname> <url> (notes)";
             }
         }
 
@@ -118,7 +118,7 @@ namespace SteamBotLite
                     maplist += m.filename;
                     extralist += m.downloadURL + " Note: " + m.notes;
                 }
-                if (maplist.Equals(""))
+                if (string.IsNullOrEmpty(maplist))
                     return "The list is empty";
                 userhandler.steamConnectionHandler.SteamFriends.SendChatMessage(sender, EChatEntryType.ChatMsg, extralist);
                 return maplist;
@@ -132,11 +132,14 @@ namespace SteamBotLite
             {
                 string[] parameters = param.Split(' ');
 
-                if (parameters.Length > 1)
+                if (parameters.Length < 1)
                 {
-
-                    Map editedMap = MapModule.mapList.Where(x => x.filename.Equals(parameters[0])).FirstOrDefault(); //Needs to be tested 
-                   // Map editedMap = MapModule.mapList.Find(map => map.filename.Equals(parameters[0])); //OLD Map CODE
+                    return string.Format("Invalid parameters for !update. Syntax: !update <mapname> (url)");
+                }
+                else
+                {
+                    Map editedMap = MapModule.mapList.Where(x => x.filename.Equals(parameters[0])).FirstOrDefault(); //Needs to be tested
+                    // Map editedMap = MapModule.mapList.Find(map => map.filename.Equals(parameters[0])); //OLD Map CODE
                     if (editedMap.submitter == sender.AccountID)
                     {
                         MapModule.mapList.Remove(editedMap);
@@ -146,10 +149,13 @@ namespace SteamBotLite
                             editedMap.downloadURL = parameters[2];
                         MapModule.mapList.Add(editedMap);
                         MapModule.savePersistentData();
-                        return "map edited";
+                        return string.Format("Map '{0}' has been edited.", editedMap.filename);
+                    }
+                    else
+                    {
+                        return string.Format("You cannot edit map '{0}' as you did not submit it.", editedMap.filename);
                     }
                 }
-                return "map not found or insufisant priviledge";
             }
         }
 
@@ -168,10 +174,14 @@ namespace SteamBotLite
                     {
                         MapModule.mapList.Remove(deletedMap);
                         MapModule.savePersistentData();
-                        return "Map DELETED";
+                        return string.Format("Map '{0}' DELETED.", deletedMap.filename);
+                    }
+                    else
+                    {
+                        return string.Format("You do not have permission to edit map '{0}'.", deletedMap.downloadURL);
                     }
                 }
-                return "map not found or insufisant priviledge";
+                return string.Format("Invalid parameters for !delete. Syntax: !delete <mapname>", parameters[0]);
             }
             
         }
@@ -184,7 +194,7 @@ namespace SteamBotLite
                 MapModule.mapList.Clear(); 
                 //MapModule.mapList = new List<Map>(); //OLd Maplist code
                 MapModule.savePersistentData();
-                return "The map list, has been DELETED";
+                return "The map list has been DELETED.";
             }
         }
     }
