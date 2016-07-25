@@ -181,7 +181,7 @@ namespace SteamBotLite
                         return string.Format("You do not have permission to edit map '{0}'.", deletedMap.downloadURL);
                     }
                 }
-                return string.Format("Invalid parameters for !delete. Syntax: !delete <mapname>", parameters[0]);
+                return "Invalid parameters for !delete. Syntax: !delete <mapname>";
             }
             
         }
