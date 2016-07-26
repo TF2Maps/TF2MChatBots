@@ -15,7 +15,7 @@ namespace SteamBotLite
     {
        // public List<Map> mapList = new List<Map>();  //OLD MAP SYSTEM
         public ObservableCollection<Map> mapList = new ObservableCollection<Map>();
-        
+        int MaxMapNumber = 10; 
 
         public MapModule(VBot bot, Dictionary<string, object> config) : base(bot, config)
         {
@@ -108,15 +108,24 @@ namespace SteamBotLite
             {
                 string maplist = "";
                 string extralist = "";
+                int i = 0;
                 foreach (Map m in MapModule.mapList)
                 {
                     if (maplist != string.Empty)
                     {
-                        maplist += " , ";
                         extralist += " \n ";
                     }
-                    maplist += m.filename;
-                    extralist += m.downloadURL + " Note: " + m.notes;
+                    if (i == MapModule.MaxMapNumber)
+                    {
+                        maplist += " | And More...";
+                    }
+                    if (i < MapModule.MaxMapNumber)
+                    {
+                        maplist += " , ";
+                        maplist += m.filename;
+                    }
+                    extralist += m.filename + ": " + m.downloadURL + " Note: " + m.notes;
+                    i++;
                 }
                 if (string.IsNullOrEmpty(maplist))
                     return "The list is empty";
