@@ -15,6 +15,7 @@ namespace SteamBotLite
     {
        // public List<Map> mapList = new List<Map>();  //OLD MAP SYSTEM
         public ObservableCollection<Map> mapList = new ObservableCollection<Map>();
+
         int MaxMapNumber = 10; 
 
         public MapModule(VBot bot, Dictionary<string, object> config) : base(bot, config)
@@ -44,8 +45,9 @@ namespace SteamBotLite
         public override void loadPersistentData()
         {
             try
-            {ObservableCollection<Map>
-                mapList = JsonConvert.DeserializeObject<ObservableCollection<Map>>(System.IO.File.ReadAllText(this.GetType().Name + ".json"));
+            {
+                ObservableCollection<Map>
+mapList = JsonConvert.DeserializeObject<ObservableCollection<Map>>(System.IO.File.ReadAllText(this.GetType().Name + ".json"));
             }
             catch { }
         }
