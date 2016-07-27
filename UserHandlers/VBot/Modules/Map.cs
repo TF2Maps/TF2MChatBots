@@ -200,7 +200,7 @@ mapList = JsonConvert.DeserializeObject<ObservableCollection<Map>>(System.IO.Fil
 
                     if (deletedMap == null)
                     {
-                        return string.Format("Map '{0}' was not found.");
+                        return string.Format("Map '{0}' was not found.", parameters[0]);
                     }
                     else
                     {
