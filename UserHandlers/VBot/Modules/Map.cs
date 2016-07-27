@@ -29,12 +29,12 @@ namespace SteamBotLite
             adminCommands.Add(new Wipe(bot, this));
         }
 
-        public struct Map
+        public class Map
         {
-            public uint submitter;
-            public string filename;
-            public string downloadURL;
-            public string notes;
+            public uint Submitter { get; set; }
+            public string Filename { get; set; }
+            public string DownloadURL { get; set; }
+            public string Notes { get; set; }
         }
 
         public override string getPersistentData()
@@ -83,20 +83,20 @@ mapList = JsonConvert.DeserializeObject<ObservableCollection<Map>>(System.IO.Fil
                 Map map = new Map();
                 if (parameters.Length > 0)
                 {
-                    map.submitter = sender.AccountID;
-                    map.filename = parameters[0];
-                    map.notes = "No Notes";
+                    map.Submitter = sender.AccountID;
+                    map.Filename = parameters[0];
+                    map.Notes = "No Notes";
                     if (parameters.Length > 1 /* && !uploaded*/)
                     {
                         if (parameters.Length > 2)
                         {
-                            map.notes = param.Substring(parameters[0].Length + parameters[1].Length);
+                            map.Notes = param.Substring(parameters[0].Length + parameters[1].Length);
                         }
-                        map.downloadURL = parameters[1];
+                        map.DownloadURL = parameters[1];
                         MapModule.mapList.Add(map);
                         MapModule.savePersistentData();
 
-                        return string.Format("Map '{0}' added.", map.filename);
+                        return string.Format("Map '{0}' added.", map.Filename);
                     }
                 }
                 return "Invalid parameters for !add. Syntax: !add <mapname> <url> (notes)";
@@ -124,9 +124,9 @@ mapList = JsonConvert.DeserializeObject<ObservableCollection<Map>>(System.IO.Fil
                     if (i < MapModule.MaxMapNumber)
                     {
                         maplist += " , ";
-                        maplist += m.filename;
+                        maplist += m.Filename;
                     }
-                    extralist += m.filename + ": " + m.downloadURL + " Note: " + m.notes;
+                    extralist += m.Filename + ": " + m.DownloadURL + " Note: " + m.Notes;
                     i++;
                 }
                 if (string.IsNullOrEmpty(maplist))
@@ -149,22 +149,22 @@ mapList = JsonConvert.DeserializeObject<ObservableCollection<Map>>(System.IO.Fil
                 }
                 else
                 {
-                    Map editedMap = MapModule.mapList.Where(x => x.filename.Equals(parameters[0])).FirstOrDefault(); //Needs to be tested
+                    Map editedMap = MapModule.mapList.Where(x => x.Filename.Equals(parameters[0])).FirstOrDefault(); //Needs to be tested
                     // Map editedMap = MapModule.mapList.Find(map => map.filename.Equals(parameters[0])); //OLD Map CODE
-                    if (editedMap.submitter == sender.AccountID)
+                    if (editedMap.Submitter == sender.AccountID)
                     {
                         MapModule.mapList.Remove(editedMap);
 
-                        editedMap.filename = parameters[1];
+                        editedMap.Filename = parameters[1];
                         if (parameters.Length > 2)
-                            editedMap.downloadURL = parameters[2];
+                            editedMap.DownloadURL = parameters[2];
                         MapModule.mapList.Add(editedMap);
                         MapModule.savePersistentData();
-                        return string.Format("Map '{0}' has been edited.", editedMap.filename);
+                        return string.Format("Map '{0}' has been edited.", editedMap.Filename);
                     }
                     else
                     {
-                        return string.Format("You cannot edit map '{0}' as you did not submit it.", editedMap.filename);
+                        return string.Format("You cannot edit map '{0}' as you did not submit it.", editedMap.Filename);
                     }
                 }
             }
@@ -179,17 +179,24 @@ mapList = JsonConvert.DeserializeObject<ObservableCollection<Map>>(System.IO.Fil
 
                 if (parameters.Length > 0)
                 {
-                    Map deletedMap = MapModule.mapList.Where(x => x.filename.Equals(parameters[0])).FirstOrDefault(); //Needs to be tested 
-              //      Map deletedMap = MapModule.mapList.Find(map => map.filename.Equals(parameters[0]));
-                    if ((deletedMap.submitter == sender.AccountID) || (userhandler.usersModule.admincheck(sender.AccountID)))
+                    Map deletedMap = MapModule.mapList.FirstOrDefault(x => x.Filename == parameters[0]);
+
+                    if (deletedMap == null)
                     {
-                        MapModule.mapList.Remove(deletedMap);
-                        MapModule.savePersistentData();
-                        return string.Format("Map '{0}' DELETED.", deletedMap.filename);
+                        return string.Format("Map '{0}' was not found.");
                     }
                     else
                     {
-                        return string.Format("You do not have permission to edit map '{0}'.", deletedMap.downloadURL);
+                        if ((deletedMap.Submitter == sender.AccountID) || (userhandler.usersModule.admincheck(sender.AccountID)))
+                        {
+                            MapModule.mapList.Remove(deletedMap);
+                            MapModule.savePersistentData();
+                            return string.Format("Map '{0}' DELETED.", deletedMap.Filename);
+                        }
+                        else
+                        {
+                            return string.Format("You do not have permission to edit map '{0}'.", deletedMap.DownloadURL);
+                        }
                     }
                 }
                 return "Invalid parameters for !delete. Syntax: !delete <mapname>";
