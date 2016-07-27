@@ -108,31 +108,48 @@ mapList = JsonConvert.DeserializeObject<ObservableCollection<Map>>(System.IO.Fil
             public Maps(VBot bot, MapModule mapMod) : base(bot, "!maps", mapMod) { }
             protected override string exec(SteamID sender, string param)
             {
-                string maplist = "";
-                string extralist = "";
-                int i = 0;
-                foreach (Map m in MapModule.mapList)
+                var maps = MapModule.mapList;
+                int maxMaps = MapModule.MaxMapNumber;
+                string chatResponse = "";
+                string pmResponse = "";
+
+                // Take the max number of maps.
+                var mapList = maps
+                    .Take(maxMaps)
+                    .ToList();
+
+                if (maps.Count == 0)
                 {
-                    if (maplist != string.Empty)
-                    {
-                        extralist += " \n ";
-                    }
-                    if (i == MapModule.MaxMapNumber)
-                    {
-                        maplist += " | And More...";
-                    }
-                    if (i < MapModule.MaxMapNumber)
-                    {
-                        maplist += " , ";
-                        maplist += m.Filename;
-                    }
-                    extralist += m.Filename + ": " + m.DownloadURL + " Note: " + m.Notes;
-                    i++;
+                    chatResponse = "The map list is empty.";
                 }
-                if (string.IsNullOrEmpty(maplist))
-                    return "The list is empty";
-                userhandler.steamConnectionHandler.SteamFriends.SendChatMessage(sender, EChatEntryType.ChatMsg, extralist);
-                return maplist;
+                else
+                {
+                    // Build the chat response.
+                    chatResponse = string.Join(" , ", mapList.Select(x => x.Filename));
+                    if (maps.Count > maxMaps)
+                        chatResponse += string.Format(" (and {0} more...)", maps.Count - maxMaps);
+
+                    // Build the private response.
+                    pmResponse = "";
+                    for (int i = 0; i < maps.Count; i++)
+                    {
+                        string mapLine = string.Format("{0} // {1}", maps[i].Filename, maps[i].DownloadURL);
+
+                        if (!string.IsNullOrEmpty(maps[i].Notes))
+                            mapLine += "\nNotes: " + maps[i].Notes;
+
+                        if (i < maps.Count - 1)
+                            mapLine += "\n";
+
+                        pmResponse += mapLine;
+                    }
+                }
+
+                // PM map list to the caller.
+                if (maps.Count != 0)
+                    userhandler.steamConnectionHandler.SteamFriends.SendChatMessage(sender, EChatEntryType.ChatMsg, pmResponse);
+
+                return chatResponse;
             }
         }
 
