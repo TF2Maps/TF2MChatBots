@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -52,11 +52,14 @@ mapList = JsonConvert.DeserializeObject<ObservableCollection<Map>>(System.IO.Fil
             catch { }
         }
 
-        public void HandleEvent(object sender, EventArgs args)
+        public void HandleEvent(object sender, ServerModule.ServerInfo args)
         {
-            ServerModule.ServerInfo imp = (ServerModule.ServerInfo) args;
-          
-            //mapList.RemoveAll(x => x.filename == imp.currentMap); //OLD MAP SYSTEM
+            var map = mapList.FirstOrDefault(x => x.Filename == args.currentMap);
+            if (map != null)
+            {
+                mapList.Remove(map);
+                Console.WriteLine("Map {0} is being tested on the {1} server and has been removed.", map.Filename, args.tag);
+            }
         }
 
         // The abstract command for motd

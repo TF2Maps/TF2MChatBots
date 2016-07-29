@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,11 +12,12 @@ namespace SteamBotLite
 {
     class ServerModule : BaseModule
     {
+        public event EventHandler<ServerInfo> ServerUpdated;
+
         public List<ServerInfo> serverList;
         private BaseTask serverUpdate;
         bool chatIsNotified = true;
 
-        //   public event EventHandler mapBeingTested; //Disabled as it is likely causing major Crashes. 
         public ServerModule(VBot bot, Dictionary<string, object> config) : base(bot, config)
         {
             serverList = new List<ServerInfo>();
@@ -54,16 +55,15 @@ namespace SteamBotLite
             {
                 this.serverIP = serverIP;
                 this.tag = tag;
-                currentMap = "";
-                playerCount = 0;
-                capacity = 0;
             }
+
             public void update(ServerInfo updated)
             {
                 this.playerCount = updated.playerCount;
                 this.capacity = updated.capacity;
                 this.currentMap = updated.currentMap;
             }
+
             public override string ToString()
             {
                 return this.tag + " server is now on " + this.currentMap +
@@ -80,7 +80,7 @@ namespace SteamBotLite
 
                 if (serverstate != null)
                 {
-                    bool mapUpdated = !serverstate.currentMap.Equals(server.currentMap) && !server.currentMap.Equals(string.Empty);
+                    bool mapUpdated = serverstate.currentMap != server.currentMap && server.currentMap != string.Empty;
                     server.update(serverstate);
 
                     if (mapUpdated)
@@ -99,6 +99,8 @@ namespace SteamBotLite
                         userhandler.steamConnectionHandler.SteamFriends.SendChatRoomMessage(userhandler.GroupChatSID, EChatEntryType.ChatMsg, server.ToString());
                         chatIsNotified = true;                        
                     }
+
+                    ServerUpdated?.Invoke(this, server);
                 }
             }
         }
