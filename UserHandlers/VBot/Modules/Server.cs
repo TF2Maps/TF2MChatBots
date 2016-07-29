@@ -100,7 +100,8 @@ namespace SteamBotLite
                         chatIsNotified = true;                        
                     }
 
-                    ServerUpdated?.Invoke(this, server);
+                    if (ServerUpdated != null)
+                        ServerUpdated(this, server);
                 }
             }
         }
