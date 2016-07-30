@@ -125,8 +125,8 @@ namespace SteamBotLite
 
             using (var client = new UdpClient(new IPEndPoint(IPAddress.Any, 0)))
             {
-                client.Client.ReceiveTimeout = 3000;
-                client.Client.SendTimeout = 3000;
+                client.Client.ReceiveTimeout = 5000;
+                client.Client.SendTimeout = 5000;
 
                 client.Connect(server.serverIP);
 
@@ -135,24 +135,25 @@ namespace SteamBotLite
                 request.AddRange(Encoding.ASCII.GetBytes("Source Engine Query\0"));
                 var requestArr = request.ToArray();
                 client.Send(requestArr, requestArr.Length);
-                var data = client.Receive(ref localEndpoint).Skip(6).ToArray();
 
-                updatedServer = new ServerInfo(server.serverIP, server.tag);
-                //byte[] data = client.EndReceive(Response, ref localEndpoint).Skip(6).ToArray();
-                string[] serverinfos = Encoding.ASCII.GetString(data).Split(new char[] { '\0' }, 5);
-                // getting and sanitizing map name
-                updatedServer.currentMap = serverinfos[1].Split('.')[0].Replace("workshop/", "");
-                // getting playerount
-                updatedServer.playerCount = (int)Encoding.ASCII.GetBytes(serverinfos[4]).Skip(2).ToArray()[0];
-                // getting server capacity
-                updatedServer.capacity = (int)Encoding.ASCII.GetBytes(serverinfos[4]).Skip(2).ToArray()[1];
+                try
+                {
+                    var data = client.Receive(ref localEndpoint).Skip(6).ToArray();
+
+                    updatedServer = new ServerInfo(server.serverIP, server.tag);
+                    string[] serverinfos = Encoding.ASCII.GetString(data).Split(new char[] { '\0' }, 5);
+                    // getting and sanitizing map name
+                    updatedServer.currentMap = serverinfos[1].Split('.')[0].Replace("workshop/", "");
+                    // getting playerount
+                    updatedServer.playerCount = (int)Encoding.ASCII.GetBytes(serverinfos[4]).Skip(2).ToArray()[0];
+                    // getting server capacity
+                    updatedServer.capacity = (int)Encoding.ASCII.GetBytes(serverinfos[4]).Skip(2).ToArray()[1];
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
-
-            Console.WriteLine("Received following data: Name - {0}, Map - {1}, Players - {2}, Capacity - {3}",
-                updatedServer.tag,
-                updatedServer.currentMap,
-                updatedServer.playerCount,
-                updatedServer.capacity); 
 
             return updatedServer;
         }
