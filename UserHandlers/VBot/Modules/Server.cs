@@ -148,6 +148,12 @@ namespace SteamBotLite
                 updatedServer.capacity = (int)Encoding.ASCII.GetBytes(serverinfos[4]).Skip(2).ToArray()[1];
             }
 
+            Console.WriteLine("Received following data: Name - {0}, Map - {1}, Players - {2}, Capacity - {3}",
+                updatedServer.tag,
+                updatedServer.currentMap,
+                updatedServer.playerCount,
+                updatedServer.capacity); 
+
             return updatedServer;
         }
 
