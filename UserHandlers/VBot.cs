@@ -24,6 +24,7 @@ namespace SteamBotLite
         MapModule mapModule;
         ServerModule serverModule;
         RepliesModule replyModule;
+        AdminModule adminmodule;
         public UsersModule usersModule;
 
         List<BaseModule> ModuleList;
@@ -51,8 +52,9 @@ namespace SteamBotLite
             serverModule = new ServerModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["ServerModule"].ToString()));
             usersModule = new UsersModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["usersModule"].ToString()));
             replyModule = new RepliesModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["ReplyModule"].ToString()));
+            adminmodule = new AdminModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["AdminModule"].ToString()));
 
-            ModuleList = new List<BaseModule> { motdModule,mapModule,/*serverModule,*/usersModule,replyModule};
+            ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule,adminmodule};
 
             serverModule.ServerUpdated += mapModule.HandleEvent;
 

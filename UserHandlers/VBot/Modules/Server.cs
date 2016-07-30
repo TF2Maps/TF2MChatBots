@@ -96,7 +96,7 @@ namespace SteamBotLite
                             handler(this, server);
                         }
                         */
-                        userhandler.steamConnectionHandler.SteamFriends.SendChatRoomMessage(userhandler.GroupChatSID, EChatEntryType.ChatMsg, server.ToString());
+                    //    userhandler.steamConnectionHandler.SteamFriends.SendChatRoomMessage(userhandler.GroupChatSID, EChatEntryType.ChatMsg, server.ToString()); //Disabled as it will keep spamming chat 
                         chatIsNotified = true;                        
                     }
 
