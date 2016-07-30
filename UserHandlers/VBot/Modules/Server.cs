@@ -117,27 +117,28 @@ namespace SteamBotLite
         }
 
         // queries a server and returns a <string, int> Tuple (mapname, playercount)
-        static public ServerInfo ServerQuery(ServerInfo server)
+        public static ServerInfo ServerQuery(ServerInfo server)
         {
             ServerInfo updatedServer = null;
             // request server infos
             IPEndPoint localEndpoint = new IPEndPoint(IPAddress.Any, 0);
-            UdpClient client = new UdpClient(localEndpoint);
-            client.Connect(server.serverIP);
-            
-            byte[] header = new byte[] {0xFF, 0xFF, 0xFF, 0xFF, 0x54};
-            byte[] request = header.Concat(Encoding.ASCII.GetBytes("Source Engine Query\0")).ToArray();
-            client.Send(request, request.Length);
-            
-            // get response (timeout after 3 seconds)and skip header
-            var Response = client.BeginReceive(null, null);
-            Response.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(3));
-            Response.AsyncWaitHandle.Close();
-            
-            if (Response.IsCompleted)
+
+            using (var client = new UdpClient(new IPEndPoint(IPAddress.Any, 0)))
             {
+                client.Client.ReceiveTimeout = 3000;
+                client.Client.SendTimeout = 3000;
+
+                client.Connect(server.serverIP);
+
+                var request = new List<byte>();
+                request.AddRange(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0x54 });
+                request.AddRange(Encoding.ASCII.GetBytes("Source Engine Query\0"));
+                var requestArr = request.ToArray();
+                client.Send(requestArr, requestArr.Length);
+                var data = client.Receive(ref localEndpoint).Skip(6).ToArray();
+
                 updatedServer = new ServerInfo(server.serverIP, server.tag);
-                byte[] data = client.EndReceive(Response, ref localEndpoint).Skip(6).ToArray();
+                //byte[] data = client.EndReceive(Response, ref localEndpoint).Skip(6).ToArray();
                 string[] serverinfos = Encoding.ASCII.GetString(data).Split(new char[] { '\0' }, 5);
                 // getting and sanitizing map name
                 updatedServer.currentMap = serverinfos[1].Split('.')[0].Replace("workshop/", "");
@@ -145,11 +146,8 @@ namespace SteamBotLite
                 updatedServer.playerCount = (int)Encoding.ASCII.GetBytes(serverinfos[4]).Skip(2).ToArray()[0];
                 // getting server capacity
                 updatedServer.capacity = (int)Encoding.ASCII.GetBytes(serverinfos[4]).Skip(2).ToArray()[1];
-
             }
 
-            client.Close();
-          //  client.Dispose();
             return updatedServer;
         }
 
