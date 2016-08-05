@@ -142,6 +142,7 @@ namespace SteamBotLite
             }
             if (CrashCheck >= 4)
             {
+                CrashCheck = 0; 
                 Reboot();
             }
         }
