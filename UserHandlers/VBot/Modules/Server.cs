@@ -80,13 +80,14 @@ namespace SteamBotLite
 
                 if (serverstate != null)
                 {
-                    bool mapUpdated = serverstate.currentMap != server.currentMap && server.currentMap != string.Empty;
+                    //Is the "ISChatNotified" nessecary? Can't we just check the vars then run? 
+                    bool mapUpdated = (serverstate.currentMap != server.currentMap) && (server.currentMap != string.Empty);
                     server.update(serverstate);
 
                     if (mapUpdated)
                         chatIsNotified = false;
                     
-                    if (!chatIsNotified && server.playerCount > 3)
+                    if ((!chatIsNotified) && (server.playerCount > 3))
                     {
                         /* //TODO Re-Enabled
                         EventHandler handler = mapBeingTested; 

@@ -46,10 +46,14 @@ namespace SteamBotLite
         {
             try
             {
-                ObservableCollection<Map>
-mapList = JsonConvert.DeserializeObject<ObservableCollection<Map>>(System.IO.File.ReadAllText(this.GetType().Name + ".json"));
+                Console.WriteLine("Loading Map List");
+                mapList = JsonConvert.DeserializeObject<ObservableCollection<Map>>(System.IO.File.ReadAllText(this.GetType().Name + ".json"));
+                Console.WriteLine("Loaded Map List");
             }
-            catch { }
+            catch
+            {
+                Console.WriteLine("Error Loading Map List");
+            }
         }
 
         public void HandleEvent(object sender, ServerModule.ServerInfo args)
