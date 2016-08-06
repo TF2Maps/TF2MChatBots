@@ -108,9 +108,9 @@ namespace SteamBotLite
 
                 Dictionary<string, string> values = replymodule.GetDataDictionary();
 
-                if (values.ContainsKey(command[0]) && (command.Length > 1))
+                if (values.ContainsKey(command[1]) && (command.Length > 1))
                 {
-                    values.Remove(command[0]);
+                    values.Remove(command[1]);
                     System.IO.File.WriteAllText(replymodule.SaveDataFile, JsonConvert.SerializeObject(values));
                     userhandler.chatCommands.Add(new Reply(userhandler, replymodule, new KeyValuePair<string, string>(command[0], command[1])));
                     return "Reply Removed";
