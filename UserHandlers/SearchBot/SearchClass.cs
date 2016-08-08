@@ -16,35 +16,44 @@ namespace SteamBotLite
     }
     static class SearchClass
     {
-        public static string Search(SearchClassEntry SearchEntry, string SearchURL)
+        public static string Search(SearchClassEntry SearchEntry, string SearchURL , Int32 Timeout = 15000)
         {
-
 
             Console.WriteLine("Searching...");
 
             WebRequest wrGETURL;
             
-
             if (SearchEntry.IsCustomUrl)
                 wrGETURL = WebRequest.Create(SearchEntry.URLPrefix + SearchURL + SearchEntry.URLSuffix);
             else
                 wrGETURL = WebRequest.Create(SearchEntry.URLPrefix + SearchEntry.URLSuffix);
 
+            wrGETURL.Timeout = Timeout;
+
             Stream objStream;
 
-            objStream = wrGETURL.GetResponse().GetResponseStream();
+            WebResponse myWebResponse;
 
-            StreamReader objReader = new StreamReader(objStream);
+            try
+            {
+                myWebResponse = wrGETURL.GetResponse() ;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(string.Format("Error when searching: {0}", ex));
+                return "An error occured when searching";
+            }
 
+            objStream = myWebResponse.GetResponseStream();
             
+            StreamReader objReader = new StreamReader(objStream);
 
             string HttpData = objReader.ReadToEnd();
 
             string response = "Invalid Search";
 
-            
-
             string[] SpideredData = HttpData.Split(new string[] { SearchEntry.SpiderPrefix }, StringSplitOptions.RemoveEmptyEntries);
+
             if (SpideredData.Length > 1)
             {
                 SpideredData = SpideredData[1].Split(new string[] { SearchEntry.SpiderSuffix }, StringSplitOptions.RemoveEmptyEntries);
@@ -58,12 +67,11 @@ namespace SteamBotLite
             objReader.Close();
             objReader.Dispose();
 
-            wrGETURL.GetResponse().Close();
-            wrGETURL.GetResponse().Dispose();
+            myWebResponse.Close();
+            myWebResponse.Dispose();
 
             return response;
-
-
+            
         }
         
     }
