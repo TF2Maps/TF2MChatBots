@@ -26,7 +26,7 @@ namespace SteamBotLite
             }
             adminCommands.Add(new ReplyAdd(bot, this));
             adminCommands.Add(new ReplyRemove(bot, this));
-            adminCommands.Add(new Reply(bot, this, new KeyValuePair<string, string>("!PathTest", SavedData())));
+            adminCommands.Add(new Reply(bot, this, new KeyValuePair<string, string>("!PathTest", ModuleSavedDataFilePath())));
         }
 
         public override string getPersistentData()

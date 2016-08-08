@@ -15,6 +15,7 @@ namespace SteamBotLite
     {
        // public List<Map> mapList = new List<Map>();  //OLD MAP SYSTEM
         public ObservableCollection<Map> mapList = new ObservableCollection<Map>();
+        
 
         int MaxMapNumber = 10; 
 
@@ -31,7 +32,7 @@ namespace SteamBotLite
 
         public class Map
         {
-            public uint Submitter { get; set; }
+            public SteamID Submitter { get; set; }
             public string Filename { get; set; }
             public string DownloadURL { get; set; }
             public string Notes { get; set; }
@@ -47,7 +48,7 @@ namespace SteamBotLite
             try
             {
                 Console.WriteLine("Loading Map List");
-                mapList = JsonConvert.DeserializeObject<ObservableCollection<Map>>(System.IO.File.ReadAllText(this.GetType().Name + ".json"));
+                mapList = JsonConvert.DeserializeObject<ObservableCollection<Map>>(System.IO.File.ReadAllText(ModuleSavedDataFilePath()));
                 Console.WriteLine("Loaded Map List");
             }
             catch
@@ -58,11 +59,17 @@ namespace SteamBotLite
 
         public void HandleEvent(object sender, ServerModule.ServerInfo args)
         {
-            var map = mapList.FirstOrDefault(x => x.Filename == args.currentMap);
+            Console.WriteLine("Going to remove {0} Map", args.currentMap);
+            Map map = mapList.FirstOrDefault(x => x.Filename == args.currentMap);
+            SteamID Submitter = new SteamID(map.Submitter);
+            Console.WriteLine("Found map, sending message to {0}", Submitter);
+                        
             if (map != null)
             {
+                userhandler.steamConnectionHandler.SteamFriends.SendChatMessage(Submitter, EChatEntryType.ChatMsg, string.Format("Map {0} is being tested on the {1} server and has been removed.", map.Filename, args.tag));                
                 mapList.Remove(map);
                 Console.WriteLine("Map {0} is being tested on the {1} server and has been removed.", map.Filename, args.tag);
+                savePersistentData();
             }
         }
 
@@ -90,7 +97,7 @@ namespace SteamBotLite
                 Map map = new Map();
                 if (parameters.Length > 0)
                 {
-                    map.Submitter = sender.AccountID;
+                    map.Submitter = sender;
                     map.Filename = parameters[0];
                     map.Notes = "No Notes";
                     if (parameters.Length > 1 /* && !uploaded*/)
@@ -102,7 +109,7 @@ namespace SteamBotLite
                         map.DownloadURL = parameters[1];
                         MapModule.mapList.Add(map);
                         MapModule.savePersistentData();
-
+                        userhandler.steamConnectionHandler.SteamFriends.SendChatMessage(map.Submitter, EChatEntryType.ChatMsg, map.Submitter.ToString());
                         return string.Format("Map '{0}' added.", map.Filename);
                     }
                 }
@@ -151,7 +158,7 @@ namespace SteamBotLite
                         pmResponse += mapLine;
                     }
                 }
-
+                userhandler.steamConnectionHandler.SteamFriends.SendChatMessage(sender, EChatEntryType.ChatMsg, sender.AccountID.ToString());
                 // PM map list to the caller.
                 if (maps.Count != 0)
                     userhandler.steamConnectionHandler.SteamFriends.SendChatMessage(sender, EChatEntryType.ChatMsg, pmResponse);
