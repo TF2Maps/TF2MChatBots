@@ -80,7 +80,12 @@ namespace SteamBotLite
 
                 if (serverstate != null)
                 {
+<<<<<<< HEAD
                     if ((serverstate.currentMap != server.currentMap)  && (serverstate.playerCount > 2))
+=======
+                   
+                    if ((serverstate.currentMap != server.currentMap) /*&& (server.playerCount > 3)*/ )
+>>>>>>> master
                     {
                         userhandler.steamConnectionHandler.SteamFriends.SendChatRoomMessage(userhandler.GroupChatSID, EChatEntryType.ChatMsg, serverstate.ToString());
                         Console.WriteLine("Going to Update Server Data");
@@ -136,11 +141,15 @@ namespace SteamBotLite
                     updatedServer.playerCount = (int)Encoding.ASCII.GetBytes(serverinfos[4]).Skip(2).ToArray()[0];
                     // getting server capacity
                     updatedServer.capacity = (int)Encoding.ASCII.GetBytes(serverinfos[4]).Skip(2).ToArray()[1];
+<<<<<<< HEAD
                     Console.WriteLine(string.Format("{0} Responded with: {1} and: {2}", updatedServer.tag, updatedServer.currentMap, updatedServer.playerCount));
+=======
+                    Console.WriteLine(string.Format("{0} Responded with {1}",server.tag, updatedServer.currentMap));
+>>>>>>> master
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    Console.WriteLine(string.Format("Error from: {0}: {1}",server.tag, ex.Message));                    
                 }
             }
 
