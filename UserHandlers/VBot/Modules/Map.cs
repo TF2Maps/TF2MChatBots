@@ -112,7 +112,6 @@ namespace SteamBotLite
                         map.DownloadURL = parameters[1];
                         MapModule.mapList.Add(map);
                         MapModule.savePersistentData();
-                        userhandler.steamConnectionHandler.SteamFriends.SendChatMessage(map.Submitter, EChatEntryType.ChatMsg, map.Submitter.ToString());
                         return string.Format("Map '{0}' added.", map.Filename);
                     }
                 }
