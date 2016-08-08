@@ -80,29 +80,15 @@ namespace SteamBotLite
 
                 if (serverstate != null)
                 {
-                    //Is the "ISChatNotified" nessecary? Can't we just check the vars then run? 
-                    bool mapUpdated = (serverstate.currentMap != server.currentMap) && (server.currentMap != string.Empty);
-                    server.update(serverstate);
-
-                    if (mapUpdated)
-                        chatIsNotified = false;
-                    
-                    if ((!chatIsNotified) && (server.playerCount > 3))
+                    if ((serverstate.currentMap != server.currentMap) && (server.currentMap != string.Empty) /*&& (server.playerCount > 3)*/)
                     {
-                        /* //TODO Re-Enabled
-                        EventHandler handler = mapBeingTested; 
-
-                        if (handler != null)
-                        {
-                            handler(this, server);
-                        }
-                        */
-                    //    userhandler.steamConnectionHandler.SteamFriends.SendChatRoomMessage(userhandler.GroupChatSID, EChatEntryType.ChatMsg, server.ToString()); //Disabled as it will keep spamming chat 
-                        chatIsNotified = true;                        
-                    }
-
-                    if (ServerUpdated != null)
+                        Console.WriteLine("Going to Update Server Data");
+                        server.update(serverstate);
+                        Console.WriteLine("Going to delete Map");
                         ServerUpdated(this, server);
+                        Console.WriteLine("Posting In Chat");
+                        userhandler.steamConnectionHandler.SteamFriends.SendChatRoomMessage(userhandler.GroupChatSID, EChatEntryType.ChatMsg, server.ToString()); 
+                    }
                 }
             }
         }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.IO;
 
 namespace SteamBotLite
 {
@@ -12,8 +12,10 @@ namespace SteamBotLite
         public List<BaseCommand> commands {get; private set;}
         public List<BaseCommand> adminCommands {get; private set;}
         public List<BaseTask> tasks { get; private set;}
-        public string SavedData()
+        public string ModuleSavedDataFilePath()
         {
+            
+            return Path.Combine(userhandler.GetType().Name, this.GetType().Name + ".json");
             return this.GetType().Name + ".json";
         }
         
@@ -33,7 +35,16 @@ namespace SteamBotLite
         public void savePersistentData()
         {
             string jsonData = getPersistentData();
-            System.IO.File.WriteAllText(this.GetType().Name + ".json", jsonData);
+            if (Directory.Exists(ModuleSavedDataFilePath()))
+            {
+                System.IO.File.WriteAllText(ModuleSavedDataFilePath(), jsonData);
+            }
+            else
+            {
+                Directory.CreateDirectory(userhandler.GetType().Name);
+                System.IO.File.WriteAllText(ModuleSavedDataFilePath(), jsonData);
+            };
+            
         }
 
         abstract public string getPersistentData();
