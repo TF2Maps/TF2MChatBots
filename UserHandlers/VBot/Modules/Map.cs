@@ -109,7 +109,6 @@ namespace SteamBotLite
                         map.DownloadURL = parameters[1];
                         MapModule.mapList.Add(map);
                         MapModule.savePersistentData();
-                        userhandler.steamConnectionHandler.SteamFriends.SendChatMessage(map.Submitter, EChatEntryType.ChatMsg, map.Submitter.ToString());
                         return string.Format("Map '{0}' added.", map.Filename);
                     }
                 }
@@ -158,7 +157,7 @@ namespace SteamBotLite
                         pmResponse += mapLine;
                     }
                 }
-                userhandler.steamConnectionHandler.SteamFriends.SendChatMessage(sender, EChatEntryType.ChatMsg, sender.AccountID.ToString());
+                
                 // PM map list to the caller.
                 if (maps.Count != 0)
                     userhandler.steamConnectionHandler.SteamFriends.SendChatMessage(sender, EChatEntryType.ChatMsg, pmResponse);
