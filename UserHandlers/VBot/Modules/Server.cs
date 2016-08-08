@@ -80,7 +80,8 @@ namespace SteamBotLite
 
                 if (serverstate != null)
                 {
-                    if ((serverstate.currentMap != server.currentMap) && (server.currentMap != string.Empty) /*&& (server.playerCount > 3)*/)
+                   
+                    if ((serverstate.currentMap != server.currentMap) /*&& (server.playerCount > 3)*/ )
                     {
                         Console.WriteLine("Going to Update Server Data");
                         server.update(serverstate);
@@ -135,10 +136,11 @@ namespace SteamBotLite
                     updatedServer.playerCount = (int)Encoding.ASCII.GetBytes(serverinfos[4]).Skip(2).ToArray()[0];
                     // getting server capacity
                     updatedServer.capacity = (int)Encoding.ASCII.GetBytes(serverinfos[4]).Skip(2).ToArray()[1];
+                    Console.WriteLine(string.Format("{0} Responded with {1}",server.tag, updatedServer.currentMap));
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    Console.WriteLine(string.Format("Error from: {0}: {1}",server.tag, ex.Message));                    
                 }
             }
 
