@@ -18,6 +18,7 @@ namespace SteamBotLite
         int CrashCheck = 0;
         public string Username = "V2Bot";
         Timer Tick;
+        bool Autojoin = true; 
 
         // Class members
         MotdModule motdModule;
@@ -37,12 +38,16 @@ namespace SteamBotLite
         {
             Console.WriteLine("Vbot Initialised");
             Console.WriteLine("Loading modules and stuff");
-
-            // loading config
+            
+            // Loading Config
             Dictionary<string, object> jsconfig = JsonConvert.DeserializeObject<Dictionary<string, object>>(System.IO.File.ReadAllText(@"config.json"));
             GroupChatID = ulong.Parse((string)jsconfig["GroupchatID"]);
             GroupChatSID = new SteamID(GroupChatID);
-
+            try {
+                Autojoin = Convert.ToBoolean(jsconfig["AutoJoin"]);
+            } catch { };
+             
+           
             // loading modules
             motdModule = new MotdModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["MotdModule"].ToString()));
 
@@ -70,7 +75,8 @@ namespace SteamBotLite
         public override void OnLoginCompleted()
         {
             steamConnectionHandler.SteamFriends.SetPersonaName("V2Bot");
-            steamConnectionHandler.SteamFriends.JoinChat(GroupChatSID);
+            if (Autojoin)
+                steamConnectionHandler.SteamFriends.JoinChat(GroupChatSID);
             InitTimer();
             Console.WriteLine("{0} User: {1} Is now online", steamConnectionHandler.ID, steamConnectionHandler.LoginData.Username); //Lets tell the User we're now online
         }
@@ -142,6 +148,7 @@ namespace SteamBotLite
             }
             if (CrashCheck >= 4)
             {
+                CrashCheck = 0; 
                 Reboot();
             }
         }
