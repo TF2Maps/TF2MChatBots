@@ -59,18 +59,21 @@ namespace SteamBotLite
 
         public void HandleEvent(object sender, ServerModule.ServerInfo args)
         {
-            Console.WriteLine("Going to remove {0} Map", args.currentMap);
+            Console.WriteLine("Going to possibly remove {0} Map...", args.currentMap);
             Map map = mapList.FirstOrDefault(x => x.Filename == args.currentMap);
-            SteamID Submitter = new SteamID(map.Submitter);
-            Console.WriteLine("Found map, sending message to {0}", Submitter);
+            
                         
             if (map != null)
             {
-                userhandler.steamConnectionHandler.SteamFriends.SendChatMessage(Submitter, EChatEntryType.ChatMsg, string.Format("Map {0} is being tested on the {1} server and has been removed.", map.Filename, args.tag));                
+                SteamID Submitter = new SteamID(map.Submitter);
+                Console.WriteLine("Found map, sending message to {0}", Submitter);
+                userhandler.steamConnectionHandler.SteamFriends.SendChatMessage(Submitter, EChatEntryType.ChatMsg, string.Format("Map {0} is being tested on the {1} server and has been DELETED.", map.Filename, args.tag));                
                 mapList.Remove(map);
-                Console.WriteLine("Map {0} is being tested on the {1} server and has been removed.", map.Filename, args.tag);
+                Console.WriteLine("Map {0} is being tested on the {1} server and has been DELETED.", map.Filename, args.tag);
                 savePersistentData();
             }
+            Console.Write("...Not Found");
+            return;
         }
 
         // The abstract command for motd
