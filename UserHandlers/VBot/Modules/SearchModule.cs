@@ -37,7 +37,6 @@ namespace SteamBotLite
         private class Search : BaseCommand
         {
             SearchClassEntry SearchData;
-            string reply;
             public Search(VBot bot, SearchClassEntry SearchEntry) : base(bot,SearchEntry.Command)
             {
                 this.SearchData = SearchEntry;
