@@ -71,6 +71,9 @@ namespace SteamBotLite
                 chatCommands.AddRange(module.commands);
                 chatAdminCommands.AddRange(module.adminCommands);
             }
+
+            OnMaplistchange(this,null);
+
             Console.WriteLine("All Loaded");
         }
 
