@@ -16,27 +16,48 @@ namespace SteamBotLite
     }
     static class SearchClass
     {
-        public static string Search(SearchClassEntry SearchEntry, string SearchURL , Int32 Timeout = 15000)
+        public static string Search(SearchClassEntry SearchEntry, string SearchURL, Int32 Timeout = 15000)
         {
 
             Console.WriteLine("Searching...");
-
             WebRequest wrGETURL;
-            
+
             if (SearchEntry.IsCustomUrl)
+            {
                 wrGETURL = WebRequest.Create(SearchEntry.URLPrefix + SearchURL + SearchEntry.URLSuffix);
+            }
             else
+            {
                 wrGETURL = WebRequest.Create(SearchEntry.URLPrefix + SearchEntry.URLSuffix);
+            }
 
             wrGETURL.Timeout = Timeout;
 
-            Stream objStream;
-
-            WebResponse myWebResponse;
-
             try
             {
-                myWebResponse = wrGETURL.GetResponse() ;
+                using (WebResponse myWebResponse = wrGETURL.GetResponse())
+                {
+                    using (Stream objStream = myWebResponse.GetResponseStream())
+                    {
+                        using (StreamReader objReader = new StreamReader(objStream))
+                        {
+                            string HttpData = objReader.ReadToEnd();
+                            string response = "Invalid Search";
+                            string[] SpideredData = HttpData.Split(new string[] { SearchEntry.SpiderPrefix }, StringSplitOptions.RemoveEmptyEntries);
+
+                            if (SpideredData.Length > 1)
+                            {
+                                SpideredData = SpideredData[1].Split(new string[] { SearchEntry.SpiderSuffix }, StringSplitOptions.RemoveEmptyEntries);
+                                response = SpideredData[0];
+                            }
+
+                            // Try to avoid console writing and prefer a proper logging system
+                            Console.WriteLine(response);
+
+                            return response;
+                        }
+                    }
+                };
             }
             catch (Exception ex)
             {
@@ -44,35 +65,8 @@ namespace SteamBotLite
                 return "An error occured when searching";
             }
 
-            objStream = myWebResponse.GetResponseStream();
-            
-            StreamReader objReader = new StreamReader(objStream);
 
-            string HttpData = objReader.ReadToEnd();
-
-            string response = "Invalid Search";
-
-            string[] SpideredData = HttpData.Split(new string[] { SearchEntry.SpiderPrefix }, StringSplitOptions.RemoveEmptyEntries);
-
-            if (SpideredData.Length > 1)
-            {
-                SpideredData = SpideredData[1].Split(new string[] { SearchEntry.SpiderSuffix }, StringSplitOptions.RemoveEmptyEntries);
-                response = SpideredData[0];
-            }
-
-            Console.WriteLine(response);
-            objStream.Close();
-            objStream.Dispose();
-
-            objReader.Close();
-            objReader.Dispose();
-
-            myWebResponse.Close();
-            myWebResponse.Dispose();
-
-            return response;
-            
         }
-        
+
     }
 }
