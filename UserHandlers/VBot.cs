@@ -12,8 +12,8 @@ namespace SteamBotLite
     {
         ulong GroupChatID;
         public SteamID GroupChatSID;
-        double interval = 5000;
-        readonly int InitialGhostCheck = 480;
+        double interval = 60000;
+        readonly int InitialGhostCheck = 10;
         int GhostCheck = 480;
         int CrashCheck = 0;
         public string Username = "V2Bot";
@@ -34,7 +34,10 @@ namespace SteamBotLite
         public List<BaseCommand> chatCommands = new List<BaseCommand>();
         public List<BaseCommand> chatAdminCommands = new List<BaseCommand>();
 
-
+        /// <summary>
+        /// Do not try using steamfriends, steamuser and all that since it'll be uninitialised at this point 
+        /// </summary>
+        /// <param name="SteamConnectionHandler"></param>
         public VBot(SteamConnectionHandler SteamConnectionHandler) : base(SteamConnectionHandler)
         {
             Console.WriteLine("Vbot Initialised");
@@ -48,7 +51,6 @@ namespace SteamBotLite
                 Autojoin = Convert.ToBoolean(jsconfig["AutoJoin"]);
             } catch { };
              
-           
             // loading modules
             motdModule = new MotdModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["MotdModule"].ToString()));
 
@@ -71,14 +73,14 @@ namespace SteamBotLite
                 chatCommands.AddRange(module.commands);
                 chatAdminCommands.AddRange(module.adminCommands);
             }
-
-            OnMaplistchange(this,null);
-
+           
             Console.WriteLine("All Loaded");
         }
 
         public override void OnLoginCompleted()
         {
+            OnMaplistchange();
+
             steamConnectionHandler.SteamFriends.SetPersonaName("V2Bot");
             if (Autojoin)
                 steamConnectionHandler.SteamFriends.JoinChat(GroupChatSID);
@@ -118,7 +120,7 @@ namespace SteamBotLite
             }
             return response;
         }
-        public void OnMaplistchange(object sender, NotifyCollectionChangedEventArgs args)
+        public void OnMaplistchange(object sender = null, NotifyCollectionChangedEventArgs args = null)
         {
             steamConnectionHandler.SteamFriends.SetPersonaName("[" + mapModule.mapList.Count + "]" + Username);            
         }
@@ -143,7 +145,7 @@ namespace SteamBotLite
         void TickTasks(object sender, EventArgs e)
         {
             GhostCheck--;
-
+            Console.WriteLine(string.Format("Ghostcheck = {0}"));
             if (GhostCheck <= 1)
             {
                 GhostCheck = InitialGhostCheck;
