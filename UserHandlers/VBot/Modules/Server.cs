@@ -143,10 +143,12 @@ namespace SteamBotLite
 
                     Console.WriteLine(string.Format("{0} Responded with {1}",server.tag, updatedServer.currentMap));
 
+                    client.Close();
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(string.Format("Error from: {0}: {1}",server.tag, ex.Message));                    
+                    Console.WriteLine(string.Format("Error from: {0}: {1}",server.tag, ex.Message));  
+                    client.Close();                  
                 }
             }
 
