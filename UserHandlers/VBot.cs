@@ -127,7 +127,7 @@ namespace SteamBotLite
 
         public override void ChatMemberInfo(SteamFriends.ChatMemberInfoCallback callback)
         {
-            if (callback.StateChangeInfo.StateChange == EChatMemberStateChange.Left)
+            if (callback.StateChangeInfo.StateChange == (EChatMemberStateChange.Left | EChatMemberStateChange.Disconnected))
             {
                 return;
             }

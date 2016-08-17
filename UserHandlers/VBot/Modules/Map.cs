@@ -18,7 +18,7 @@ namespace SteamBotLite
 
 
         int MaxMapNumber = 10;
-        string Website;
+        string ServerMapListUrl;
 
 
 
@@ -26,11 +26,13 @@ namespace SteamBotLite
         {
             loadPersistentData();
 
+            ServerMapListUrl = config["ServerMapListUrl"].ToString();
 
             commands.Add(new Add(bot, this));
             commands.Add(new Maps(bot, this));
             commands.Add(new Update(bot, this));
             commands.Add(new Delete(bot, this));
+            commands.Add(new UploadCheck(bot, ServerMapListUrl));
             adminCommands.Add(new Wipe(bot, this));
         }
 
@@ -93,6 +95,19 @@ namespace SteamBotLite
             }
         }
 
+        private sealed class UploadCheck : BaseCommand
+        {
+            string ServerMapListURL;
+            public UploadCheck(VBot bot, string Website) : base(bot, "!uploadcheck")
+            {
+                ServerMapListURL = Website;
+            }
+            protected override string exec(SteamID sender, string param)
+            {
+                return SearchClass.CheckDataExistsOnWebPage(ServerMapListURL, param).ToString(); 
+            }
+        }
+
         // The commands
 
         private class Add : MapCommand
@@ -103,9 +118,7 @@ namespace SteamBotLite
             }
 
             public Add(VBot bot, MapModule mapModule) : base(bot, "!add", mapModule) { }
-
-            string Website = "Http://Invalid";
-
+            
             protected override string exec(SteamID sender, string param)
             {
                 string[] parameters = param.Split(new char[] { ' ' }, 2);
@@ -114,8 +127,8 @@ namespace SteamBotLite
                 map.Submitter = sender;
                 map.Filename = parameters[0];
                 map.Notes = "No Notes";
-
-                if (uploadcheck(map.Filename, Website)) //Check if the map is uploaded
+                
+                if (uploadcheck(map.Filename, MapModule.ServerMapListUrl)) //Check if the map is uploaded
                 {
                     map.DownloadURL = "Uploaded";
                     if (parameters.Length > 1)
