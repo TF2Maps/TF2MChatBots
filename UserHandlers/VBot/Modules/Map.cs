@@ -27,6 +27,8 @@ namespace SteamBotLite
             loadPersistentData();
 
             ServerMapListUrl = config["ServerMapListUrl"].ToString();
+            MaxMapNumber = int.Parse(config["MaxMapList"].ToString());
+            Console.WriteLine("URL list is now {0} and maximum map number {1}", ServerMapListUrl, MaxMapNumber);
 
             commands.Add(new Add(bot, this));
             commands.Add(new Maps(bot, this));
@@ -118,7 +120,7 @@ namespace SteamBotLite
             }
 
             public Add(VBot bot, MapModule mapModule) : base(bot, "!add", mapModule) { }
-            
+
             protected override string exec(SteamID sender, string param)
             {
                 string[] parameters = param.Split(new char[] { ' ' }, 2);
@@ -127,6 +129,15 @@ namespace SteamBotLite
                 map.Submitter = sender;
                 map.Filename = parameters[0];
                 map.Notes = "No Notes";
+
+                if (parameters[0].Any(c => char.IsUpper(c)) )
+                {
+                    return "Your Map is rejected as it includes an uppercase letter";
+                }
+                if (parameters[0].Length > 32) //TODO make this the actually needed number
+                {
+                    return "Your Map is rejected for having a filename too long";
+                }
                 
                 if (uploadcheck(map.Filename, MapModule.ServerMapListUrl)) //Check if the map is uploaded
                 {
