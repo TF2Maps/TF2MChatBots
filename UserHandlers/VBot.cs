@@ -73,6 +73,7 @@ namespace SteamBotLite
                 chatCommands.AddRange(module.commands);
                 chatAdminCommands.AddRange(module.adminCommands);
             }
+
            
             Console.WriteLine("All Loaded");
         }
@@ -145,7 +146,7 @@ namespace SteamBotLite
         void TickTasks(object sender, EventArgs e)
         {
             GhostCheck--;
-            Console.WriteLine(string.Format("Ghostcheck = {0}"));
+            Console.WriteLine(string.Format("Ghostcheck = {0}"),GhostCheck);
             if (GhostCheck <= 1)
             {
                 GhostCheck = InitialGhostCheck;
