@@ -40,7 +40,7 @@ namespace SteamBotLite
 
         public class Map
         {
-            public SteamID Submitter { get; set; }
+            public string Submitter { get; set; }
             public string Filename { get; set; }
             public string DownloadURL { get; set; }
             public string Notes { get; set; }
@@ -126,7 +126,7 @@ namespace SteamBotLite
                 string[] parameters = param.Split(new char[] { ' ' }, 2);
 
                 Map map = new Map();
-                map.Submitter = sender;
+                map.Submitter = sender.ToString();
                 map.Filename = parameters[0];
                 map.Notes = "No Notes";
 
@@ -234,7 +234,7 @@ namespace SteamBotLite
                 {
                     Map editedMap = MapModule.mapList.Where(x => x.Filename.Equals(parameters[0])).FirstOrDefault(); //Needs to be tested
                     // Map editedMap = MapModule.mapList.Find(map => map.filename.Equals(parameters[0])); //OLD Map CODE
-                    if (editedMap.Submitter == sender.AccountID)
+                    if (editedMap.Submitter.Equals(sender.ToString()))
                     {
                         MapModule.mapList.Remove(editedMap);
 
@@ -270,7 +270,7 @@ namespace SteamBotLite
                     }
                     else
                     {
-                        if ((deletedMap.Submitter == sender.AccountID) || (userhandler.usersModule.admincheck(sender.AccountID)))
+                        if ((deletedMap.Submitter.Equals(sender.ToString())) /*|| (userhandler.usersModule.admincheck(sender))*/)
                         {
                             MapModule.mapList.Remove(deletedMap);
                             MapModule.savePersistentData();
@@ -278,7 +278,7 @@ namespace SteamBotLite
                         }
                         else
                         {
-                            return string.Format("You do not have permission to edit map '{0}'.", deletedMap.DownloadURL);
+                            return string.Format("You do not have permission to edit map '{0}'.", deletedMap.Filename);
                         }
                     }
                 }
