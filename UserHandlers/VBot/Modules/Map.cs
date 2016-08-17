@@ -134,7 +134,7 @@ namespace SteamBotLite
                 {
                     return "Your Map is rejected as it includes an uppercase letter";
                 }
-                if (parameters[0].Length > 32) //TODO make this the actually needed number
+                if (parameters[0].Length > 27) //TODO make this the actually needed number
                 {
                     return "Your Map is rejected for having a filename too long";
                 }
