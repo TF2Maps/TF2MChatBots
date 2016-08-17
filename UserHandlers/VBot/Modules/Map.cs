@@ -13,16 +13,20 @@ namespace SteamBotLite
 {
     class MapModule : BaseModule
     {
-       // public List<Map> mapList = new List<Map>();  //OLD MAP SYSTEM
+        // public List<Map> mapList = new List<Map>();  //OLD MAP SYSTEM
         public ObservableCollection<Map> mapList = new ObservableCollection<Map>();
-        
 
-        int MaxMapNumber = 10; 
+
+        int MaxMapNumber = 10;
+        string Website;
+
+
 
         public MapModule(VBot bot, Dictionary<string, object> config) : base(bot, config)
         {
             loadPersistentData();
-            
+
+
             commands.Add(new Add(bot, this));
             commands.Add(new Maps(bot, this));
             commands.Add(new Update(bot, this));
@@ -61,13 +65,13 @@ namespace SteamBotLite
         {
             Console.WriteLine("Going to possibly remove {0} Map...", args.currentMap);
             Map map = mapList.FirstOrDefault(x => x.Filename == args.currentMap);
-            
-                        
+
+
             if (map != null)
             {
                 SteamID Submitter = new SteamID(map.Submitter);
                 Console.WriteLine("Found map, sending message to {0}", Submitter);
-                userhandler.steamConnectionHandler.SteamFriends.SendChatMessage(Submitter, EChatEntryType.ChatMsg, string.Format("Map {0} is being tested on the {1} server and has been DELETED.", map.Filename, args.tag));                
+                userhandler.steamConnectionHandler.SteamFriends.SendChatMessage(Submitter, EChatEntryType.ChatMsg, string.Format("Map {0} is being tested on the {1} server and has been DELETED.", map.Filename, args.tag));
                 mapList.Remove(map);
                 Console.WriteLine("Map {0} is being tested on the {1} server and has been DELETED.", map.Filename, args.tag);
                 savePersistentData();
@@ -93,29 +97,51 @@ namespace SteamBotLite
 
         private class Add : MapCommand
         {
+            public bool uploadcheck(string MapName, string Website)
+            {
+                return SearchClass.CheckDataExistsOnWebPage(Website, MapName); //TODO develop method to check website
+            }
+
             public Add(VBot bot, MapModule mapModule) : base(bot, "!add", mapModule) { }
+
+            string Website = "Http://Invalid";
+
             protected override string exec(SteamID sender, string param)
             {
-                string[] parameters = param.Split(' ');
+                string[] parameters = param.Split(new char[] { ' ' }, 2);
+
                 Map map = new Map();
-                if (parameters.Length > 0)
+                map.Submitter = sender;
+                map.Filename = parameters[0];
+                map.Notes = "No Notes";
+
+                if (uploadcheck(map.Filename, Website)) //Check if the map is uploaded
                 {
-                    map.Submitter = sender;
-                    map.Filename = parameters[0];
-                    map.Notes = "No Notes";
-                    if (parameters.Length > 1 /* && !uploaded*/)
+                    map.DownloadURL = "Uploaded";
+                    if (parameters.Length > 1)
                     {
-                        if (parameters.Length > 2)
-                        {
-                            map.Notes = param.Substring(parameters[0].Length + parameters[1].Length);
-                        }
-                        map.DownloadURL = parameters[1];
-                        MapModule.mapList.Add(map);
-                        MapModule.savePersistentData();
-                        return string.Format("Map '{0}' added.", map.Filename);
+                        map.Notes = parameters.Last();
                     }
                 }
-                return "Invalid parameters for !add. Syntax: !add <mapname> <url> (notes)";
+                else if (parameters.Length > 1) //If its not uploaded check if a URL was there
+                {
+                    parameters = param.Split(new char[] { ' ' }, 3);
+
+                    map.DownloadURL = parameters[1];
+                    if (parameters.Length > 2)
+                    {
+                        map.Notes = parameters.Last();
+                    }
+                }
+                else //If a url isn't there lets return an error
+                {
+                    return "Your map isn't uploaded! Please use include the url with the syntax: !add <mapname> <url> (notes)";
+                }
+
+                MapModule.mapList.Add(map);
+                MapModule.savePersistentData();
+                return string.Format("Map '{0}' added.", map.Filename);
+
             }
         }
 
@@ -160,7 +186,7 @@ namespace SteamBotLite
                         pmResponse += mapLine;
                     }
                 }
-                
+
                 // PM map list to the caller.
                 if (maps.Count != 0)
                     userhandler.steamConnectionHandler.SteamFriends.SendChatMessage(sender, EChatEntryType.ChatMsg, pmResponse);
@@ -234,7 +260,7 @@ namespace SteamBotLite
                 }
                 return "Invalid parameters for !delete. Syntax: !delete <mapname>";
             }
-            
+
         }
 
         private class Wipe : MapCommand
@@ -242,7 +268,7 @@ namespace SteamBotLite
             public Wipe(VBot bot, MapModule mapMod) : base(bot, "!wipe", mapMod) { }
             protected override string exec(SteamID sender, string param)
             {
-                MapModule.mapList.Clear(); 
+                MapModule.mapList.Clear();
                 //MapModule.mapList = new List<Map>(); //OLd Maplist code
                 MapModule.savePersistentData();
                 return "The map list has been DELETED.";
