@@ -270,7 +270,7 @@ namespace SteamBotLite
                     }
                     else
                     {
-                        if ((deletedMap.Submitter.Equals(sender.ToString())) /*|| (userhandler.usersModule.admincheck(sender))*/)
+                        if ((deletedMap.Submitter.Equals(sender.ToString())) || (userhandler.usersModule.admincheck(sender)))
                         {
                             MapModule.mapList.Remove(deletedMap);
                             MapModule.savePersistentData();
