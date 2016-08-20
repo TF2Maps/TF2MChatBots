@@ -199,7 +199,7 @@ namespace SteamBotLite
                     pmResponse = "";
                     for (int i = 0; i < maps.Count; i++)
                     {
-                        string mapLine = string.Format("{0} // {1}", maps[i].Filename, maps[i].DownloadURL);
+                        string mapLine = string.Format("{0} // {1} // {2} ({3})", maps[i].Filename, maps[i].DownloadURL , maps[i].Submitter , userhandler.steamConnectionHandler.SteamFriends.GetFriendPersonaName(new SteamID(maps[i].Submitter)));
 
                         if (!string.IsNullOrEmpty(maps[i].Notes))
                             mapLine += "\nNotes: " + maps[i].Notes;
