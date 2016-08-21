@@ -126,7 +126,16 @@ namespace SteamBotLite
             if ((T.GetType() != null) & (T.BaseType.ToString().Equals("SteamBotLite.BaseModule"))) //Then we check its valid AND if its a base of userhandler
             {                
                 BaseModule module =  (BaseModule)Activator.CreateInstance(T, new object[] { this, jsconfig });
-                if (!ModuleList.Contains(module)) //Check if this actually works
+                bool AlreadyExists = false;
+
+                foreach (BaseModule ExistingModule in ModuleList)
+                {
+                    if (ExistingModule.GetType() == module.GetType())
+                    {
+                        AlreadyExists = true;
+                    }
+                }
+                if (!AlreadyExists)
                 {
                     ModuleList.Add(module);
                 }
@@ -141,7 +150,10 @@ namespace SteamBotLite
             {
                 foreach (BaseCommand c in module.commands)
                     if (Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
+                    {
                         response = c.run(Sender, Message);
+                        return response;
+                    }
             }
 
             if (usersModule.admincheck(Sender)) //Verifies that it is a moderator, Can you please check if the "ISAdmin" is being used correctly? 
@@ -151,7 +163,10 @@ namespace SteamBotLite
                 {
                     foreach (BaseCommand c in module.adminCommands)
                         if (Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
+                        {
                             response = c.run(Sender, Message);
+                            return response;
+                        }
                 }
             }
             return response;
