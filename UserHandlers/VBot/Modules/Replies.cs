@@ -13,7 +13,7 @@ namespace SteamBotLite
        
         public string SaveDataFile; 
 
-        public RepliesModule(VBot bot, Dictionary<string, object> config) : base(bot, config)
+        public RepliesModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
             
             SaveDataFile = this.GetType().Name + ".json";

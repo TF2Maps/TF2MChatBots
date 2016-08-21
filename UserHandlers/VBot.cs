@@ -34,6 +34,9 @@ namespace SteamBotLite
         public List<BaseCommand> chatCommands = new List<BaseCommand>();
         public List<BaseCommand> chatAdminCommands = new List<BaseCommand>();
 
+        // Loading Config
+        Dictionary<string, object> jsconfig = JsonConvert.DeserializeObject<Dictionary<string, object>>(System.IO.File.ReadAllText(@"config.json"));
+
         /// <summary>
         /// Do not try using steamfriends, steamuser and all that since it'll be uninitialised at this point 
         /// </summary>
@@ -43,8 +46,7 @@ namespace SteamBotLite
             Console.WriteLine("Vbot Initialised");
             Console.WriteLine("Loading modules and stuff");
             
-            // Loading Config
-            Dictionary<string, object> jsconfig = JsonConvert.DeserializeObject<Dictionary<string, object>>(System.IO.File.ReadAllText(@"config.json"));
+            
             GroupChatID = ulong.Parse((string)jsconfig["GroupchatID"]);
             GroupChatSID = new SteamID(GroupChatID);
             try {
@@ -52,16 +54,15 @@ namespace SteamBotLite
             } catch { };
              
             // loading modules
-            motdModule = new MotdModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["MotdModule"].ToString()));
+            motdModule = new MotdModule(this, jsconfig);
 
-            mapModule = new MapModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["MapModule"].ToString()));
-            mapModule.mapList.CollectionChanged += OnMaplistchange;
+            mapModule = new MapModule(this, jsconfig);
 
-            serverModule = new ServerModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["ServerModule"].ToString()));
-            usersModule = new UsersModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["usersModule"].ToString()));
-            replyModule = new RepliesModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["ReplyModule"].ToString()));
-            adminmodule = new AdminModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["AdminModule"].ToString()));
-            searchModule = new SearchModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["AdminModule"].ToString()));
+            serverModule = new ServerModule(this, jsconfig);
+            usersModule = new UsersModule(this, jsconfig);
+            replyModule = new RepliesModule(this, jsconfig);
+            adminmodule = new AdminModule(this, jsconfig);
+            searchModule = new SearchModule(this, jsconfig);
 
             ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule,adminmodule,searchModule};
 
@@ -119,7 +120,7 @@ namespace SteamBotLite
                 ModuleList.RemoveAt(EntryToRemove);
             }
         }
-        public void Enablemodule()
+        public void Enablemodule(string ModuleToRemove)
         {
 
         }
