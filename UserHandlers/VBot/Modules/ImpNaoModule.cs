@@ -13,12 +13,13 @@ namespace SteamBotLite
         public ImpNaoModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
             loadPersistentData();
-
+            /*
             commands.Add(new Add(bot, this));
             commands.Add(new Maps(bot, this));
             commands.Add(new Update(bot, this));
             commands.Add(new Delete(bot, this));
             adminCommands.Add(new Wipe(bot, this));
+            */
         }
 
         public override string getPersistentData()
@@ -76,16 +77,16 @@ namespace SteamBotLite
 
                 var values = new Dictionary<string, string>
                         {
-                            { "filename", "hello" },
-                            { "url", "world" }
+                            { "name", "hello" },
+                            { "link", "world" },
+                            { "password", "elpsykongeroo"}
                         };
                 string twent = JsonConvert.SerializeObject(values);
 
-                var content = new FormUrlEncodedContent(values);
-
                 HttpContent Content = new StringContent(JsonConvert.SerializeObject(values));
 
-                var response = await client.PostAsync("http://carbidegames.com/impnao/api/maps", content);
+
+                var response = await client.PostAsync("http://carbidegames.com/impnao/api/maps", Content);
 
                 var responseString = await response.Content.ReadAsStringAsync();
             }
