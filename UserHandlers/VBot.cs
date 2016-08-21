@@ -28,6 +28,8 @@ namespace SteamBotLite
         RepliesModule replyModule;
         AdminModule adminmodule;
         SearchModule searchModule;
+        ImpNaoModule impnaomodule;
+
         public UsersModule usersModule;
 
         public List<BaseModule> ModuleList;
@@ -63,8 +65,9 @@ namespace SteamBotLite
             replyModule = new RepliesModule(this, jsconfig);
             adminmodule = new AdminModule(this, jsconfig);
             searchModule = new SearchModule(this, jsconfig);
+            impnaomodule = new ImpNaoModule(this, jsconfig);
 
-            ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule,adminmodule,searchModule};
+            ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule,adminmodule,searchModule,impnaomodule};
 
             
             
