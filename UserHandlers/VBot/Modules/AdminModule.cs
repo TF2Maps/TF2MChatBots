@@ -106,7 +106,7 @@ namespace SteamBotLite
             protected override string exec(SteamID sender, string param)
             {
                 botty.Enablemodule(param);
-                return "Removing Module...";
+                return "Adding Module...";
             }
 
         }
