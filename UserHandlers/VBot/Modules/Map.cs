@@ -29,6 +29,7 @@ namespace SteamBotLite
             ServerMapListUrl = config["ServerMapListUrl"].ToString();
             MaxMapNumber = int.Parse(config["MaxMapList"].ToString());
             Console.WriteLine("URL list is now {0} and maximum map number {1}", ServerMapListUrl, MaxMapNumber);
+            mapList.CollectionChanged += bot.OnMaplistchange;
 
             commands.Add(new Add(bot, this));
             commands.Add(new Maps(bot, this));

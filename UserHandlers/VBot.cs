@@ -66,7 +66,8 @@ namespace SteamBotLite
 
             ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule,adminmodule,searchModule};
 
-            serverModule.ServerUpdated += mapModule.HandleEvent;
+            
+            
 
             Console.WriteLine("All Loaded");
         }
@@ -171,8 +172,18 @@ namespace SteamBotLite
         }
         public void OnMaplistchange(object sender = null, NotifyCollectionChangedEventArgs args = null)
         {
+            Console.WriteLine("Event Fired");
             steamConnectionHandler.SteamFriends.SetPersonaName("[" + mapModule.mapList.Count + "]" + Username);            
         }
+        public void ServerUpdated(object sender, ServerModule.ServerInfo args)
+        {
+            Console.WriteLine("Entered VBot");
+            if (mapModule != null)
+            {
+                mapModule.HandleEvent(sender, args);
+            }
+        }
+
 
         public override void ChatMemberInfo(SteamFriends.ChatMemberInfoCallback callback)
         {
