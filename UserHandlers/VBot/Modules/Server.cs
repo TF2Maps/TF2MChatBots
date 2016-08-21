@@ -50,7 +50,7 @@ namespace SteamBotLite
             public string tag;
             public int playerCount;
             public int capacity;
-            public string currentMap;
+            public string currentMap = "";
 
             public ServerInfo(IPEndPoint serverIP, string tag)
             {
@@ -82,12 +82,12 @@ namespace SteamBotLite
 
                 if (serverstate != null)
                 {
-
-                    Console.WriteLine(string.Format("New Map is {0} Old one is {1} and the player count is {2} went from {3}", serverstate.currentMap, serverList[x].currentMap, serverstate.playerCount, serverList[x].playerCount));
-                    if ((serverList[x].currentMap != server.currentMap) && (serverstate.playerCount > 3))
+                    Console.WriteLine(string.Format("New Map is {0} Oldy one is {1} and the player count is {2} went from {3}", serverstate.currentMap, serverList[x].currentMap, serverstate.playerCount, serverList[x].playerCount));
+                    
+                    if (!(serverList[x].currentMap.Equals(serverstate.currentMap)) && (serverstate.playerCount > 3))
                     {
+                        ServerUpdated(this, serverstate);
                         serverList[x].update(serverstate);
-                        ServerUpdated(this, server);
                         userhandler.steamConnectionHandler.SteamFriends.SendChatRoomMessage(userhandler.GroupChatSID, EChatEntryType.ChatMsg, serverstate.ToString()); 
                     }
                 }
