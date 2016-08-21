@@ -18,6 +18,7 @@ namespace SteamBotLite
             SteamBot = bot;
             adminCommands.Add(new Reboot(bot, this));
             adminCommands.Add(new Rename(bot, this));
+            adminCommands.Add(new RemoveModule(bot, this));
         }
 
         public override string getPersistentData()
@@ -59,12 +60,31 @@ namespace SteamBotLite
             protected override string exec(SteamID sender, string param)
             {
                 string[] command = param.Split(new char[] { ' ' }, 2);
-                if (command.Length > 1)
+                if (command.Length > 0)
                 {
                     module.SteamBot.Username = command[1];
                     return "Renamed";
                 }
                 return "There was an error with that name";
+            }
+
+        }
+        
+        private class RemoveModule : BaseCommand
+        {
+            // Command to query if a server is active
+            AdminModule module;
+            VBot botty;
+
+            public RemoveModule(VBot bot, AdminModule module) : base(bot, "!ModuleRemove")
+            {
+                this.module = module;
+                botty = bot;
+            }
+            protected override string exec(SteamID sender, string param)
+            {
+                botty.Disablemodule(param);
+                return "Removing Module...";
             }
 
         }

@@ -25,8 +25,7 @@ namespace SteamBotLite
                 commands.Add(new Reply(bot, this, Responses));
             }
             adminCommands.Add(new ReplyAdd(bot, this));
-            adminCommands.Add(new ReplyRemove(bot, this));
-            adminCommands.Add(new Reply(bot, this, new KeyValuePair<string, string>("!PathTest", ModuleSavedDataFilePath())));
+            adminCommands.Add(new ReplyRemove(bot, this));            
         }
 
         public override string getPersistentData()
@@ -87,7 +86,7 @@ namespace SteamBotLite
                 {
                     values.Add(command[0],command[1]);
                     System.IO.File.WriteAllText(replymodule.SaveDataFile, JsonConvert.SerializeObject(values));
-                    userhandler.chatCommands.Add(new Reply(userhandler, replymodule, new KeyValuePair<string, string>(command[0], command[1])));               
+                    replymodule.commands.Add(new Reply(userhandler, replymodule, new KeyValuePair<string, string>(command[0], command[1])));          
                     return "Reply Added";
                 }
 
@@ -112,9 +111,8 @@ namespace SteamBotLite
                 {
                     values.Remove(command[0]);
                     System.IO.File.WriteAllText(replymodule.SaveDataFile, JsonConvert.SerializeObject(values));
-                    
-                    BaseCommand ReplyToRemove = userhandler.chatCommands.FirstOrDefault(x => x.command == command[0]);
-                    userhandler.chatCommands.Remove(ReplyToRemove);
+                    BaseCommand ReplyToRemove = replymodule.commands.FirstOrDefault(x => x.command == command[0]);
+                    replymodule.commands.Remove(ReplyToRemove);
                     return "Reply Removed";
                 }
 

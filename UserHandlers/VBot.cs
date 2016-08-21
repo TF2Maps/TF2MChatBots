@@ -67,14 +67,8 @@ namespace SteamBotLite
 
             serverModule.ServerUpdated += mapModule.HandleEvent;
 
-            // loading module commands
-            foreach (BaseModule module in ModuleList)
-            {
-                chatCommands.AddRange(module.commands);
-                chatAdminCommands.AddRange(module.adminCommands);
-            }
-
-           
+            Disablemodule("SteamBotLite.SearchModule");
+            
             Console.WriteLine("All Loaded");
         }
 
@@ -82,6 +76,7 @@ namespace SteamBotLite
         {
             OnMaplistchange();
 
+            
             steamConnectionHandler.SteamFriends.SetPersonaName("V2Bot");
             if (Autojoin)
                 steamConnectionHandler.SteamFriends.JoinChat(GroupChatSID);
@@ -103,21 +98,52 @@ namespace SteamBotLite
             if (response != null)
                 steamConnectionHandler.SteamFriends.SendChatRoomMessage(GroupChatSID, EChatEntryType.ChatMsg, response);
         }
+        public void Disablemodule(string ModuleToRemove)
+        {
+            int x = 0;
+            int EntryToRemove = 0;
+            bool RemoveModule = false;
+            foreach (BaseModule Module in ModuleList)
+            {
+                Console.WriteLine(Module.GetType().ToString());
+                if (Module.GetType().ToString().Equals(ModuleToRemove))
+                {
+                    EntryToRemove = x;
+                    RemoveModule = true;
+                }
+                x++;
+            }
+            if (RemoveModule)
+            {
+                ModuleList[EntryToRemove] = null;
+                ModuleList.RemoveAt(EntryToRemove);
+            }
+        }
+        public void Enablemodule()
+        {
+
+        }
+
 
         public string ChatMessageHandler(SteamID Sender , string Message)
         {
             string response = null;
-
-            foreach (BaseCommand c in chatCommands)
-                if (Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
-                    response = c.run(Sender, Message);
+            foreach (BaseModule module in ModuleList)
+            {
+                foreach (BaseCommand c in module.commands)
+                    if (Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
+                        response = c.run(Sender, Message);
+            }
 
             if (usersModule.admincheck(Sender)) //Verifies that it is a moderator, Can you please check if the "ISAdmin" is being used correctly? 
             {
                 Console.WriteLine("ADMIN SPOKE");
-                foreach (BaseCommand c in chatAdminCommands)
-                    if (Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
-                        response = c.run(Sender, Message);
+                foreach (BaseModule module in ModuleList)
+                {
+                    foreach (BaseCommand c in module.adminCommands)
+                        if (Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
+                            response = c.run(Sender, Message);
+                }
             }
             return response;
         }
