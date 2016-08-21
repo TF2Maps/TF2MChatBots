@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Collections.Specialized;
 
+
 namespace SteamBotLite
 {
 
@@ -46,7 +47,6 @@ namespace SteamBotLite
             Console.WriteLine("Vbot Initialised");
             Console.WriteLine("Loading modules and stuff");
             
-            
             GroupChatID = ulong.Parse((string)jsconfig["GroupchatID"]);
             GroupChatSID = new SteamID(GroupChatID);
             try {
@@ -68,8 +68,6 @@ namespace SteamBotLite
 
             serverModule.ServerUpdated += mapModule.HandleEvent;
 
-            Disablemodule("SteamBotLite.SearchModule");
-            
             Console.WriteLine("All Loaded");
         }
 
