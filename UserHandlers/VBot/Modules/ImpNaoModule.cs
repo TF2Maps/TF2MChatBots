@@ -76,12 +76,14 @@ namespace SteamBotLite
 
                 var values = new Dictionary<string, string>
                         {
-                            { "thing1", "hello" },
-                            { "thing2", "world" }
+                            { "filename", "hello" },
+                            { "url", "world" }
                         };
                 string twent = JsonConvert.SerializeObject(values);
 
                 var content = new FormUrlEncodedContent(values);
+
+                HttpContent Content = new StringContent(JsonConvert.SerializeObject(values));
 
                 var response = await client.PostAsync("http://carbidegames.com/impnao/api/maps", content);
 
