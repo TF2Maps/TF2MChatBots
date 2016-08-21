@@ -18,7 +18,7 @@ namespace SteamBotLite
         private BaseTask serverUpdate;
         bool chatIsNotified = true;
 
-        public ServerModule(VBot bot, Dictionary<string, object> config) : base(bot, config)
+        public ServerModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
             serverList = new List<ServerInfo>();
 

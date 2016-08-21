@@ -22,7 +22,7 @@ namespace SteamBotLite
 
 
 
-        public MapModule(VBot bot, Dictionary<string, object> config) : base(bot, config)
+        public MapModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
             loadPersistentData();
 

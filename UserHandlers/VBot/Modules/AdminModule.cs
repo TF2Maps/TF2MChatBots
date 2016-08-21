@@ -13,7 +13,7 @@ namespace SteamBotLite
        
         VBot SteamBot;
 
-        public AdminModule(VBot bot, Dictionary<string, object> config) : base(bot, config)
+        public AdminModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
             SteamBot = bot;
             adminCommands.Add(new Reboot(bot, this));
