@@ -36,11 +36,12 @@ namespace SteamBotLite
 
             // loading commands
             foreach (ServerInfo server in serverList)
-                commands.Add(new Status(bot, server));
+                commands.Add(new Status(bot, server,this));
 
             commands.Add(new Active(bot, this));
 
             serverUpdate = new BaseTask(updateInterval, new System.Timers.ElapsedEventHandler(SyncServerInfo));
+            ServerUpdated += bot.ServerUpdated;
         }
 
         public class ServerInfo : EventArgs
@@ -162,10 +163,13 @@ namespace SteamBotLite
         {
             // Automaticaly generated status command for each server under the config
             protected ServerInfo server;
+            ServerModule servermodule;
 
-            public Status(VBot bot, ServerInfo server) : base(bot, "!" + server.tag + "server")
+            public Status(VBot bot, ServerInfo server, ServerModule module) : base(bot, "!" + server.tag + "server")
             {
                 this.server = server;
+                servermodule = module;
+
             }
             protected override string exec(SteamID sender, string param)
             {
@@ -173,6 +177,7 @@ namespace SteamBotLite
                 if (status != null)
                 {
                     server.update(status);
+                    servermodule.ServerUpdated(this, server);
                     return server.ToString();
                 }
                 else
