@@ -22,6 +22,8 @@ namespace SteamBotLite
         
         protected VBot userhandler;
 
+        public bool DeletableModule = true;
+
         private Dictionary<string, object> ConfigFilePath = JsonConvert.DeserializeObject<Dictionary<string, object>>(System.IO.File.ReadAllText(@"config.json"));
         public Dictionary<string, object> config;
 

@@ -114,15 +114,23 @@ namespace SteamBotLite
                 }
                 x++;
             }
-            if (RemoveModule)
+            if (RemoveModule && ModuleList[EntryToRemove].DeletableModule)
             {
                 ModuleList[EntryToRemove] = null;
                 ModuleList.RemoveAt(EntryToRemove);
             }
         }
-        public void Enablemodule(string ModuleToRemove)
+        public void Enablemodule(string ModuleToAdd)
         {
-
+            Type T = Type.GetType("SteamBotLite." + ModuleToAdd); //We attempt to translate the string to an existing type
+            if ((T.GetType() != null) & (T.BaseType.ToString().Equals("SteamBotLite.BaseModule"))) //Then we check its valid AND if its a base of userhandler
+            {                
+                BaseModule module =  (BaseModule)Activator.CreateInstance(T, new object[] { this, jsconfig });
+                if (!ModuleList.Contains(module)) //Check if this actually works
+                {
+                    ModuleList.Add(module);
+                }
+            }
         }
 
 

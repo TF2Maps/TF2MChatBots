@@ -15,10 +15,12 @@ namespace SteamBotLite
 
         public AdminModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
+            DeletableModule = false;
             SteamBot = bot;
             adminCommands.Add(new Reboot(bot, this));
             adminCommands.Add(new Rename(bot, this));
             adminCommands.Add(new RemoveModule(bot, this));
+            adminCommands.Add(new AddModule(bot, this));
             adminCommands.Add(new GetAllModules(bot, this));
         }
 
@@ -85,6 +87,25 @@ namespace SteamBotLite
             protected override string exec(SteamID sender, string param)
             {
                 botty.Disablemodule(param);
+                return "Removing Module...";
+            }
+
+        }
+
+        private class AddModule : BaseCommand
+        {
+            // Command to query if a server is active
+            AdminModule module;
+            VBot botty;
+
+            public AddModule(VBot bot, AdminModule module) : base(bot, "!ModuleAdd")
+            {
+                this.module = module;
+                botty = bot;
+            }
+            protected override string exec(SteamID sender, string param)
+            {
+                botty.Enablemodule(param);
                 return "Removing Module...";
             }
 
