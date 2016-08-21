@@ -19,6 +19,7 @@ namespace SteamBotLite
             adminCommands.Add(new Reboot(bot, this));
             adminCommands.Add(new Rename(bot, this));
             adminCommands.Add(new RemoveModule(bot, this));
+            adminCommands.Add(new GetAllModules(bot, this));
         }
 
         public override string getPersistentData()
@@ -85,6 +86,30 @@ namespace SteamBotLite
             {
                 botty.Disablemodule(param);
                 return "Removing Module...";
+            }
+
+        }
+
+        private class GetAllModules : BaseCommand
+        {
+            // Command to query if a server is active
+            AdminModule module;
+            VBot botty;
+
+            public GetAllModules(VBot bot, AdminModule module) : base(bot, "!ModuleList")
+            {
+                this.module = module;
+                botty = bot;
+            }
+            protected override string exec(SteamID sender, string param)
+            {
+                string Response = "";
+                foreach (BaseModule ModuleEntry in botty.ModuleList)
+                {
+                    Response += ModuleEntry.GetType().Name.ToString() + " ";
+                }
+                botty.Disablemodule(param);
+                return Response;
             }
 
         }

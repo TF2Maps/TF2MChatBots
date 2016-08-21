@@ -29,7 +29,7 @@ namespace SteamBotLite
         SearchModule searchModule;
         public UsersModule usersModule;
 
-        List<BaseModule> ModuleList;
+        public List<BaseModule> ModuleList;
 
         public List<BaseCommand> chatCommands = new List<BaseCommand>();
         public List<BaseCommand> chatAdminCommands = new List<BaseCommand>();
@@ -106,7 +106,7 @@ namespace SteamBotLite
             foreach (BaseModule Module in ModuleList)
             {
                 Console.WriteLine(Module.GetType().ToString());
-                if (Module.GetType().ToString().Equals(ModuleToRemove))
+                if (Module.GetType().Name.ToString().Equals(ModuleToRemove))
                 {
                     EntryToRemove = x;
                     RemoveModule = true;
