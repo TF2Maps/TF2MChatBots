@@ -86,8 +86,8 @@ namespace SteamBotLite
                     
                     if (!(serverList[x].currentMap.Equals(serverstate.currentMap)) && (serverstate.playerCount > 3))
                     {
-                        ServerUpdated(this, serverstate);
                         serverList[x].update(serverstate);
+                        ServerUpdated(this, serverstate);
                         userhandler.steamConnectionHandler.SteamFriends.SendChatRoomMessage(userhandler.GroupChatSID, EChatEntryType.ChatMsg, serverstate.ToString()); 
                     }
                 }
