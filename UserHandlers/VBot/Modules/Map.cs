@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 using SteamKit2;
 using Newtonsoft.Json;
@@ -20,7 +21,7 @@ namespace SteamBotLite
         int MaxMapNumber = 10;
         string ServerMapListUrl;
 
-
+        VBot vbot;
 
         public MapModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
@@ -29,15 +30,24 @@ namespace SteamBotLite
             ServerMapListUrl = config["ServerMapListUrl"].ToString();
             MaxMapNumber = int.Parse(config["MaxMapList"].ToString());
             Console.WriteLine("URL list is now {0} and maximum map number {1}", ServerMapListUrl, MaxMapNumber);
-            mapList.CollectionChanged += bot.OnMaplistchange;
+
+            userhandler = bot;
+
+            mapList.CollectionChanged += MapChange;
 
             commands.Add(new Add(bot, this));
             commands.Add(new Maps(bot, this));
             commands.Add(new Update(bot, this));
+            commands.Add(new UpdateName(bot, this));
             commands.Add(new Delete(bot, this));
             commands.Add(new UploadCheck(bot, ServerMapListUrl));
             adminCommands.Add(new Wipe(bot, this));
         }
+
+        void MapChange (object sender, NotifyCollectionChangedEventArgs args)
+            {
+            userhandler.OnMaplistchange(mapList.Count, sender, args);
+            }
 
         public class Map
         {
@@ -108,6 +118,21 @@ namespace SteamBotLite
             protected override string exec(SteamID sender, string param)
             {
                 return SearchClass.CheckDataExistsOnWebPage(ServerMapListURL, param).ToString(); 
+            }
+        }
+
+        private sealed class UpdateName : BaseCommand
+        {
+            MapModule mapmodule;
+            public UpdateName(VBot bot, MapModule module) : base(bot, "!nameupdate")
+            {
+                mapmodule = module;
+            }
+            protected override string exec(SteamID sender, string param)
+            {
+                NotifyCollectionChangedEventArgs args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
+                userhandler.OnMaplistchange(mapmodule.mapList.Count, sender, args);
+                return "Name has been updated";
             }
         }
 
