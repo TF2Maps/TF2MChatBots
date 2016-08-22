@@ -1,23 +1,28 @@
-﻿
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Net.Http;
 using SteamKit2;
 using Newtonsoft.Json;
 using System.Linq;
+using System.Collections.ObjectModel;
+
 namespace SteamBotLite
 {
     class ImpNaoModule : BaseModule
     {
-        
+        public ObservableCollection<ImpNaoMap> MapListCache = new ObservableCollection<ImpNaoMap>();
+
         public ImpNaoModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
             loadPersistentData();
             AutoLoadModule = false;
-
+            MapListCache.CollectionChanged += bot.OnMaplistchange;
+            
             commands.Add(new Add(bot, this));
             commands.Add(new Maps(bot, this));
-            commands.Add(new Delete(bot, this));/*
+            commands.Add(new Delete(bot, this));
+            /*
             commands.Add(new Update(bot, this));
             adminCommands.Add(new Wipe(bot, this));
             */
@@ -34,11 +39,20 @@ namespace SteamBotLite
 
         public override string getPersistentData()
         {
-            return null;
+            return JsonConvert.SerializeObject(MapListCache);
         }
 
         public override void loadPersistentData()
         {
+            try
+            {
+                MapListCache = JsonConvert.DeserializeObject<ObservableCollection<ImpNaoMap>>(System.IO.File.ReadAllText(ModuleSavedDataFilePath()));
+                
+            }
+            catch
+            {
+                Console.WriteLine("Error Loading Map Cache List");
+            }
         }
 
         public void HandleEvent(object sender, ServerModule.ServerInfo args)
@@ -69,7 +83,7 @@ namespace SteamBotLite
                 return SearchClass.CheckDataExistsOnWebPage(Website, MapName); //TODO develop method to check website
             }
 
-            public Add(VBot bot, ImpNaoModule Impnaomodule) : base(bot, "!impadd", Impnaomodule) {
+            public Add(VBot bot, ImpNaoModule Impnaomodule) : base(bot, "!add", Impnaomodule) {
                 impnaomodule = Impnaomodule;
             }
 
@@ -122,12 +136,20 @@ namespace SteamBotLite
 
         private class Maps : MapCommand
         {
-            public Maps(VBot bot, ImpNaoModule impnaomodule) : base(bot, "!impmaps", impnaomodule) { }
+            ImpNaoModule impnaomodule;
+            public Maps(VBot bot, ImpNaoModule module) : base(bot, "!maps", module)
+            {
+                impnaomodule = module;
+            }
             protected override string exec(SteamID sender, string param)
             {
                 string ImpNaoPage = SearchClass.GetWebPageAsString("http://carbidegames.com/impnao/api/maps");
-                List <ImpNaoMap> mapList = JsonConvert.DeserializeObject<List<ImpNaoMap>>(ImpNaoPage);
-
+                ObservableCollection<ImpNaoMap> mapList = JsonConvert.DeserializeObject<ObservableCollection<ImpNaoMap>>(ImpNaoPage);
+                if (mapList.Count > 0)
+                {
+                    impnaomodule.MapListCache = mapList;
+                    impnaomodule.savePersistentData();
+                }
                 string chatResponse = "";
                 string pmResponse = "";
                 int maxMaps = 10;
@@ -163,6 +185,47 @@ namespace SteamBotLite
             }
         }
 
+        private class MapCache : MapCommand
+        {
+            ImpNaoModule impnaomodule;
+            public MapCache(VBot bot, ImpNaoModule module) : base(bot, "!mapscache", module)
+            {
+                impnaomodule = module;
+            }
+            protected override string exec(SteamID sender, string param)
+            {
+                ObservableCollection< ImpNaoMap> mapList = impnaomodule.MapListCache;
+
+                string chatResponse = "";
+                string pmResponse = "";
+                int maxMaps = 10;
+
+                chatResponse = string.Join(" , ", mapList.Select(x => x.name));
+                if (mapList.Count > maxMaps)
+                    chatResponse += string.Format(" (and {0} more...)", mapList.Count - maxMaps);
+
+                // Build the private response.
+                pmResponse = "";
+                for (int i = 0; i < mapList.Count; i++)
+                {
+                    string mapLine = string.Format("{0} // {1} // {2} ({3})", mapList[i].name, mapList[i].link, userhandler.steamConnectionHandler.SteamFriends.GetFriendPersonaName(new SteamID(mapList[i].Submitter)), mapList[i].Submitter);
+
+                    if (!string.IsNullOrEmpty(mapList[i].Notes))
+                        mapLine += "\nNotes: " + mapList[i].Notes;
+
+                    if (i < mapList.Count - 1)
+                        mapLine += "\n";
+
+                    pmResponse += mapLine;
+                }
+                // PM map list to the caller.
+                if (mapList.Count != 0)
+                    userhandler.steamConnectionHandler.SteamFriends.SendChatMessage(sender, EChatEntryType.ChatMsg, pmResponse);
+
+                return chatResponse;
+            }
+        }
+
         private class Update : MapCommand
         {
             public Update(VBot bot, ImpNaoModule impnaomodule) : base(bot, "!update", impnaomodule) { }
@@ -176,7 +239,7 @@ namespace SteamBotLite
         private class Delete : MapCommand
         {
             ImpNaoModule impnaomodule;
-            public Delete(VBot bot, ImpNaoModule module) : base(bot, "!impdelete", module)
+            public Delete(VBot bot, ImpNaoModule module) : base(bot, "!delete", module)
             {
                 impnaomodule = module;
             }
