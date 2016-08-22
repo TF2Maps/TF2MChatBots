@@ -13,7 +13,8 @@ namespace SteamBotLite
         public ImpNaoModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
             loadPersistentData();
-            
+            AutoLoadModule = false;
+
             commands.Add(new Add(bot, this));
             commands.Add(new Maps(bot, this));
             commands.Add(new Delete(bot, this));/*
@@ -113,10 +114,6 @@ namespace SteamBotLite
             using (var client = new HttpClient())
             {
                 
-                HttpContent Content = new StringContent((Map));
-
-                string url = "http://carbidegames.com/impnao/api/maps/" + Map;
-
                 var response = await client.DeleteAsync("http://carbidegames.com/impnao/api/maps/" + Map);
 
                 var responseString = await response.Content.ReadAsStringAsync();
