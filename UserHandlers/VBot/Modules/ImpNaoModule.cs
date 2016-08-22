@@ -120,11 +120,15 @@ namespace SteamBotLite
                 
 
                 var responseString = await response.Content.ReadAsStringAsync();
+                
             }
         }
 
-        public async Task DeleteMapOnline(string Map)
+        public async Task DeleteMapOnline(string Map , SteamID user)
         {
+            
+
+
             using (var client = new HttpClient())
             {
                 
@@ -245,8 +249,36 @@ namespace SteamBotLite
             }
             protected override string exec(SteamID sender, string param)
             {
-                string[] parameters = param.Split(new char[] { ' ' }, 2);
-                impnaomodule.DeleteMapOnline(parameters[0]);
+                string ImpNaoPage = SearchClass.GetWebPageAsString("http://carbidegames.com/impnao/api/maps");
+                ObservableCollection<ImpNaoMap> mapList = JsonConvert.DeserializeObject<ObservableCollection<ImpNaoMap>>(ImpNaoPage);
+
+                string[] parameters = param.Split(' ');
+
+                if (parameters.Length > 0)
+                {
+                    ImpNaoMap deletedMap = mapList.FirstOrDefault(x => x.name == parameters[0]);
+
+                    if (deletedMap == null)
+                    {
+                        return string.Format("Map '{0}' was not found.", parameters[0]);
+                    }
+                    else
+                    {
+                        if ((deletedMap.password.Equals(sender.ToString())) || (userhandler.usersModule.admincheck(sender)))
+                        {
+                            impnaomodule.DeleteMapOnline(parameters[0], sender);
+                            return string.Format("Map '{0}' DELETED.", deletedMap.name);
+                        }
+                        else
+                        {
+                            return string.Format("You do not have permission to edit map '{0}'.", deletedMap.name);
+                        }
+                    }
+                }
+
+
+                
+              
                 return "Completed";
             }
 
