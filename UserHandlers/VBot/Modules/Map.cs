@@ -52,6 +52,7 @@ namespace SteamBotLite
         public class Map
         {
             public string Submitter { get; set; }
+            public string SubmitterName { get; set; }
             public string Filename { get; set; }
             public string DownloadURL { get; set; }
             public string Notes { get; set; }
@@ -140,6 +141,7 @@ namespace SteamBotLite
 
         private class Add : MapCommand
         {
+            
             public bool uploadcheck(string MapName, string Website)
             {
                 return SearchClass.CheckDataExistsOnWebPage(Website, MapName); //TODO develop method to check website
@@ -153,6 +155,7 @@ namespace SteamBotLite
 
                 Map map = new Map();
                 map.Submitter = sender.ToString();
+                map.SubmitterName = userhandler.steamConnectionHandler.SteamFriends.GetFriendPersonaName(sender);
                 map.Filename = parameters[0];
                 map.Notes = "No Notes";
 
@@ -225,7 +228,7 @@ namespace SteamBotLite
                     pmResponse = "";
                     for (int i = 0; i < maps.Count; i++)
                     {
-                        string mapLine = string.Format("{0} // {1} // {2} ({3})", maps[i].Filename, maps[i].DownloadURL , userhandler.steamConnectionHandler.SteamFriends.GetFriendPersonaName(new SteamID(maps[i].Submitter)), maps[i].Submitter);
+                        string mapLine = string.Format("{0} // {1} // {2} ({3})", maps[i].Filename, maps[i].DownloadURL , maps[i].SubmitterName, maps[i].Submitter);
 
                         if (!string.IsNullOrEmpty(maps[i].Notes))
                             mapLine += "\nNotes: " + maps[i].Notes;
