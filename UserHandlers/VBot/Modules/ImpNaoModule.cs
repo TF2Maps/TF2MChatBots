@@ -6,6 +6,7 @@ using SteamKit2;
 using Newtonsoft.Json;
 using System.Linq;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 namespace SteamBotLite
 {
@@ -16,17 +17,23 @@ namespace SteamBotLite
         public ImpNaoModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
             loadPersistentData();
-            AutoLoadModule = false;
-            MapListCache.CollectionChanged += bot.OnMaplistchange;
+            MapListCache.CollectionChanged += MapChange;
             
             commands.Add(new Add(bot, this));
             commands.Add(new Maps(bot, this));
             commands.Add(new Delete(bot, this));
+            commands.Add(new UpdateName(bot, this));
             /*
             commands.Add(new Update(bot, this));
             adminCommands.Add(new Wipe(bot, this));
             */
         }
+
+        void MapChange(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            userhandler.OnMaplistchange(MapListCache.Count, sender, args);
+        }
+
 
         public class ImpNaoMap
         {
@@ -57,6 +64,21 @@ namespace SteamBotLite
 
         public void HandleEvent(object sender, ServerModule.ServerInfo args)
         {
+        }
+
+        private sealed class UpdateName : BaseCommand
+        {
+            ImpNaoModule mapmodule;
+            public UpdateName(VBot bot, ImpNaoModule module) : base(bot, "!nameupdate")
+            {
+                mapmodule = module;
+            }
+            protected override string exec(SteamID sender, string param)
+            {
+                NotifyCollectionChangedEventArgs args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
+                userhandler.OnMaplistchange(mapmodule.MapListCache.Count, sender, args);
+                return "Name has been updated";
+            }
         }
 
         // The abstract command for motd

@@ -57,29 +57,20 @@ namespace SteamBotLite
              
             // loading modules
             motdModule = new MotdModule(this, jsconfig);
-
             mapModule = new MapModule(this, jsconfig);
-
             serverModule = new ServerModule(this, jsconfig);
             usersModule = new UsersModule(this, jsconfig);
             replyModule = new RepliesModule(this, jsconfig);
             adminmodule = new AdminModule(this, jsconfig);
             searchModule = new SearchModule(this, jsconfig);
-            impnaomodule = new ImpNaoModule(this, jsconfig);
 
-            ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule,adminmodule,searchModule,impnaomodule};
-
-            
-            
+            ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule,adminmodule,searchModule};
 
             Console.WriteLine("All Loaded");
         }
 
         public override void OnLoginCompleted()
         {
-            OnMaplistchange();
-
-            
             steamConnectionHandler.SteamFriends.SetPersonaName("V2Bot");
             if (Autojoin)
                 steamConnectionHandler.SteamFriends.JoinChat(GroupChatSID);
@@ -173,10 +164,12 @@ namespace SteamBotLite
             }
             return response;
         }
-        public void OnMaplistchange(object sender = null, NotifyCollectionChangedEventArgs args = null)
+        public void OnMaplistchange(int MapCount, object sender = null, NotifyCollectionChangedEventArgs args = null)
         {
+            Console.WriteLine("DOOT DODO DOOOOO");
             Console.WriteLine("Event Fired");
-            steamConnectionHandler.SteamFriends.SetPersonaName("[" + mapModule.mapList.Count + "]" + Username);            
+
+            steamConnectionHandler.SteamFriends.SetPersonaName("[" + MapCount + "]" + Username);            
         }
         public void ServerUpdated(object sender, ServerModule.ServerInfo args)
         {
