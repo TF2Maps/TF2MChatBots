@@ -70,7 +70,14 @@ namespace SteamBotLite
         /// </summary>
         public void Tick()
         {
-            manager.RunCallbacks();
+            try
+            {
+                manager.RunCallbacks();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception Handled: {0}", ex);
+            }
         }
         public SteamConnectionHandler(SteamBotData BotData, int BotID)
         {
@@ -139,7 +146,7 @@ namespace SteamBotLite
             //We will pass some down to the UserHandler instead, as these manage users not the connection
             manager.Subscribe<SteamFriends.FriendMsgCallback>(UserHandlerClass.OnMessage);
             manager.Subscribe<SteamFriends.ChatMsgCallback>(UserHandlerClass.OnChatRoomMessage);
-            manager.Subscribe < SteamFriends.ChatActionResultCallback>(chatmemberinfo);
+            manager.Subscribe < SteamFriends.ChatMemberInfoCallback>(UserHandlerClass.ChatMemberInfo);
            
             // This callback is triggered when the steam servers wish for the client to store the sentry file
             manager.Subscribe<SteamUser.UpdateMachineAuthCallback>(OnMachineAuth);
@@ -257,7 +264,7 @@ namespace SteamBotLite
         /// </summary>
         void Reconnect()
         {
-            SteamDirectory.Initialize().Wait(); //Update internal list that is heavily used before attempting login. And wait 2 Seconds to avoid Spam
+            SteamDirectory.Initialize().Wait(15); //Update internal list that is heavily used before attempting login. And wait 2 Seconds to avoid Spam
             steamClient.Connect(); //Lets try and log back in
         }
         /// <summary>
