@@ -40,6 +40,8 @@ namespace SteamBotLite
         {
             steamConnectionHandler.ResetConnection(steamConnectionHandler.SteamBotLiteLoginData, steamConnectionHandler.ID);
         }
-        
+        public abstract void ClanStateCallback(SteamFriends.ClanStateCallback callback);
+        public abstract void ChatMemberInfo(SteamFriends.ChatMemberInfoCallback callback);
+
     }
 }
