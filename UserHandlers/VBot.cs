@@ -56,18 +56,7 @@ namespace SteamBotLite
             } catch { };
              
             // loading modules
-<<<<<<< HEAD
-            motdModule = new MotdModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["MotdModule"].ToString()));
 
-            mapModule = new MapModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["MapModule"].ToString()));
-            mapModule.mapList.CollectionChanged += OnMaplistchange;
-
-            serverModule = new ServerModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["ServerModule"].ToString()));
-            usersModule = new UsersModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["UsersModule"].ToString()));
-            replyModule = new RepliesModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["RepliesModule"].ToString()));
-            adminmodule = new AdminModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["AdminModule"].ToString()));
-            searchModule = new SearchModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["AdminModule"].ToString()));
-=======
             motdModule = new MotdModule(this, jsconfig);
             mapModule = new MapModule(this, jsconfig);
             serverModule = new ServerModule(this, jsconfig);
@@ -75,7 +64,7 @@ namespace SteamBotLite
             replyModule = new RepliesModule(this, jsconfig);
             adminmodule = new AdminModule(this, jsconfig);
             searchModule = new SearchModule(this, jsconfig);
->>>>>>> Module_Independence
+
 
             ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule,adminmodule,searchModule};
 
