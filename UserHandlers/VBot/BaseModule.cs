@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using Newtonsoft.Json;
 
 namespace SteamBotLite
 {
@@ -21,12 +22,15 @@ namespace SteamBotLite
         
         protected VBot userhandler;
 
-        private Dictionary<string, object> config;
+        public bool DeletableModule = true;
 
-        public BaseModule(VBot bot, Dictionary<string, object> config)
+        private Dictionary<string, object> ConfigFilePath = JsonConvert.DeserializeObject<Dictionary<string, object>>(System.IO.File.ReadAllText(@"config.json"));
+        public Dictionary<string, object> config;
+
+        public BaseModule(VBot bot, Dictionary<string, object> Jsconfig)
         {
-            this.userhandler = bot;
-            this.config = config;
+            this.config = JsonConvert.DeserializeObject<Dictionary<string, object>>(Jsconfig[this.GetType().Name].ToString());
+            this.userhandler = bot;            
             commands = new List<BaseCommand>();
             adminCommands = new List<BaseCommand>();
             tasks = new List<BaseTask>();

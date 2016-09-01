@@ -18,7 +18,7 @@ namespace SteamBotLite
         private BaseTask serverUpdate;
         bool chatIsNotified = true;
 
-        public ServerModule(VBot bot, Dictionary<string, object> config) : base(bot, config)
+        public ServerModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
             serverList = new List<ServerInfo>();
 
@@ -36,11 +36,12 @@ namespace SteamBotLite
 
             // loading commands
             foreach (ServerInfo server in serverList)
-                commands.Add(new Status(bot, server));
+                commands.Add(new Status(bot, server,this));
 
             commands.Add(new Active(bot, this));
 
             serverUpdate = new BaseTask(updateInterval, new System.Timers.ElapsedEventHandler(SyncServerInfo));
+            ServerUpdated += bot.ServerUpdated;
         }
 
         public class ServerInfo : EventArgs
@@ -49,7 +50,7 @@ namespace SteamBotLite
             public string tag;
             public int playerCount;
             public int capacity;
-            public string currentMap;
+            public string currentMap = "";
 
             public ServerInfo(IPEndPoint serverIP, string tag)
             {
@@ -81,12 +82,12 @@ namespace SteamBotLite
 
                 if (serverstate != null)
                 {
-
-                    Console.WriteLine(string.Format("New Map is {0} Old one is {1} and the player count is {2} went from {3}", serverstate.currentMap, serverList[x].currentMap, serverstate.playerCount, serverList[x].playerCount));
-                    if ((serverList[x].currentMap != server.currentMap) && (serverstate.playerCount > 3))
+                    Console.WriteLine(string.Format("New Map is {0} Oldy one is {1} and the player count is {2} went from {3}", serverstate.currentMap, serverList[x].currentMap, serverstate.playerCount, serverList[x].playerCount));
+                    
+                    if (!(serverList[x].currentMap.Equals(serverstate.currentMap)) && (serverstate.playerCount > 3))
                     {
                         serverList[x].update(serverstate);
-                        ServerUpdated(this, server);
+                        ServerUpdated(this, serverstate);
                         userhandler.steamConnectionHandler.SteamFriends.SendChatRoomMessage(userhandler.GroupChatSID, EChatEntryType.ChatMsg, serverstate.ToString()); 
                     }
                 }
@@ -162,10 +163,13 @@ namespace SteamBotLite
         {
             // Automaticaly generated status command for each server under the config
             protected ServerInfo server;
+            ServerModule servermodule;
 
-            public Status(VBot bot, ServerInfo server) : base(bot, "!" + server.tag + "server")
+            public Status(VBot bot, ServerInfo server, ServerModule module) : base(bot, "!" + server.tag + "server")
             {
                 this.server = server;
+                servermodule = module;
+
             }
             protected override string exec(SteamID sender, string param)
             {
@@ -173,6 +177,7 @@ namespace SteamBotLite
                 if (status != null)
                 {
                     server.update(status);
+                    servermodule.ServerUpdated(this, server);
                     return server.ToString();
                 }
                 else

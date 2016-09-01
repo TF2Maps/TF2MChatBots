@@ -16,6 +16,7 @@ namespace SteamBotLite
 
         public UsersModule(VBot bot, Dictionary<string, object> config) : base(bot, config)
         {
+            DeletableModule = false;
             loadPersistentData();
         }
 

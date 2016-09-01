@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Collections.Specialized;
 
+
 namespace SteamBotLite
 {
 
@@ -27,12 +28,17 @@ namespace SteamBotLite
         RepliesModule replyModule;
         AdminModule adminmodule;
         SearchModule searchModule;
+        ImpNaoModule impnaomodule;
+
         public UsersModule usersModule;
 
-        List<BaseModule> ModuleList;
+        public List<BaseModule> ModuleList;
 
         public List<BaseCommand> chatCommands = new List<BaseCommand>();
         public List<BaseCommand> chatAdminCommands = new List<BaseCommand>();
+
+        // Loading Config
+        Dictionary<string, object> jsconfig = JsonConvert.DeserializeObject<Dictionary<string, object>>(System.IO.File.ReadAllText(@"config.json"));
 
         /// <summary>
         /// Do not try using steamfriends, steamuser and all that since it'll be uninitialised at this point 
@@ -43,8 +49,6 @@ namespace SteamBotLite
             Console.WriteLine("Vbot Initialised");
             Console.WriteLine("Loading modules and stuff");
             
-            // Loading Config
-            Dictionary<string, object> jsconfig = JsonConvert.DeserializeObject<Dictionary<string, object>>(System.IO.File.ReadAllText(@"config.json"));
             GroupChatID = ulong.Parse((string)jsconfig["GroupchatID"]);
             GroupChatSID = new SteamID(GroupChatID);
             try {
@@ -52,6 +56,7 @@ namespace SteamBotLite
             } catch { };
              
             // loading modules
+<<<<<<< HEAD
             motdModule = new MotdModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["MotdModule"].ToString()));
 
             mapModule = new MapModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["MapModule"].ToString()));
@@ -62,26 +67,23 @@ namespace SteamBotLite
             replyModule = new RepliesModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["RepliesModule"].ToString()));
             adminmodule = new AdminModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["AdminModule"].ToString()));
             searchModule = new SearchModule(this, JsonConvert.DeserializeObject<Dictionary<string, object>>(jsconfig["AdminModule"].ToString()));
+=======
+            motdModule = new MotdModule(this, jsconfig);
+            mapModule = new MapModule(this, jsconfig);
+            serverModule = new ServerModule(this, jsconfig);
+            usersModule = new UsersModule(this, jsconfig);
+            replyModule = new RepliesModule(this, jsconfig);
+            adminmodule = new AdminModule(this, jsconfig);
+            searchModule = new SearchModule(this, jsconfig);
+>>>>>>> Module_Independence
 
             ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule,adminmodule,searchModule};
 
-            serverModule.ServerUpdated += mapModule.HandleEvent;
-
-            // loading module commands
-            foreach (BaseModule module in ModuleList)
-            {
-                chatCommands.AddRange(module.commands);
-                chatAdminCommands.AddRange(module.adminCommands);
-            }
-
-           
             Console.WriteLine("All Loaded");
         }
 
         public override void OnLoginCompleted()
         {
-            OnMaplistchange();
-
             steamConnectionHandler.SteamFriends.SetPersonaName("V2Bot");
             if (Autojoin)
                 steamConnectionHandler.SteamFriends.JoinChat(GroupChatSID);
@@ -103,28 +105,94 @@ namespace SteamBotLite
             if (response != null)
                 steamConnectionHandler.SteamFriends.SendChatRoomMessage(GroupChatSID, EChatEntryType.ChatMsg, response);
         }
+        public void Disablemodule(string ModuleToRemove)
+        {
+            int x = 0;
+            int EntryToRemove = 0;
+            bool RemoveModule = false;
+            foreach (BaseModule Module in ModuleList)
+            {
+                Console.WriteLine(Module.GetType().ToString());
+                if (Module.GetType().Name.ToString().Equals(ModuleToRemove))
+                {
+                    EntryToRemove = x;
+                    RemoveModule = true;
+                }
+                x++;
+            }
+            if (RemoveModule && ModuleList[EntryToRemove].DeletableModule)
+            {
+                ModuleList[EntryToRemove] = null;
+                ModuleList.RemoveAt(EntryToRemove);
+            }
+        }
+        public void Enablemodule(string ModuleToAdd)
+        {
+            Type T = Type.GetType("SteamBotLite." + ModuleToAdd); //We attempt to translate the string to an existing type
+            if ((T.GetType() != null) & (T.BaseType.ToString().Equals("SteamBotLite.BaseModule"))) //Then we check its valid AND if its a base of userhandler
+            {                
+                BaseModule module =  (BaseModule)Activator.CreateInstance(T, new object[] { this, jsconfig });
+                bool AlreadyExists = false;
+
+                foreach (BaseModule ExistingModule in ModuleList)
+                {
+                    if (ExistingModule.GetType() == module.GetType())
+                    {
+                        AlreadyExists = true;
+                    }
+                }
+                if (!AlreadyExists)
+                {
+                    ModuleList.Add(module);
+                }
+            }
+        }
+
 
         public string ChatMessageHandler(SteamID Sender , string Message)
         {
             string response = null;
-
-            foreach (BaseCommand c in chatCommands)
-                if (Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
-                    response = c.run(Sender, Message);
+            foreach (BaseModule module in ModuleList)
+            {
+                foreach (BaseCommand c in module.commands)
+                    if (Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
+                    {
+                        response = c.run(Sender, Message);
+                        return response;
+                    }
+            }
 
             if (usersModule.admincheck(Sender)) //Verifies that it is a moderator, Can you please check if the "ISAdmin" is being used correctly? 
             {
                 Console.WriteLine("ADMIN SPOKE");
-                foreach (BaseCommand c in chatAdminCommands)
-                    if (Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
-                        response = c.run(Sender, Message);
+                foreach (BaseModule module in ModuleList)
+                {
+                    foreach (BaseCommand c in module.adminCommands)
+                        if (Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
+                        {
+                            response = c.run(Sender, Message);
+                            return response;
+                        }
+                }
             }
             return response;
         }
-        public void OnMaplistchange(object sender = null, NotifyCollectionChangedEventArgs args = null)
+        public void OnMaplistchange(int MapCount, object sender = null, NotifyCollectionChangedEventArgs args = null)
         {
-            steamConnectionHandler.SteamFriends.SetPersonaName("[" + mapModule.mapList.Count + "]" + Username);            
+            Console.WriteLine("DOOT DODO DOOOOO");
+            Console.WriteLine("Event Fired");
+
+            steamConnectionHandler.SteamFriends.SetPersonaName("[" + MapCount + "]" + Username);            
         }
+        public void ServerUpdated(object sender, ServerModule.ServerInfo args)
+        {
+            Console.WriteLine("Entered VBot");
+            if (mapModule != null)
+            {
+                mapModule.HandleEvent(sender, args);
+            }
+        }
+
 
         public override void ChatMemberInfo(SteamFriends.ChatMemberInfoCallback callback)
         {

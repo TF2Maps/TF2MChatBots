@@ -26,7 +26,7 @@ namespace SteamBotLite
                 Console.WriteLine("Error Loading SearchModule");
             }
         }
-        public SearchModule(VBot bot, Dictionary<string, object> config) : base(bot, config)
+        public SearchModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
             loadPersistentData();
             foreach (SearchClassEntry Entry in Searches)
