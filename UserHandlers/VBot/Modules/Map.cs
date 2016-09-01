@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 using SteamKit2;
 using Newtonsoft.Json;
@@ -20,9 +21,9 @@ namespace SteamBotLite
         int MaxMapNumber = 10;
         string ServerMapListUrl;
 
+        VBot vbot;
 
-
-        public MapModule(VBot bot, Dictionary<string, object> config) : base(bot, config)
+        public MapModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
             loadPersistentData();
 
@@ -30,17 +31,28 @@ namespace SteamBotLite
             MaxMapNumber = int.Parse(config["MaxMapList"].ToString());
             Console.WriteLine("URL list is now {0} and maximum map number {1}", ServerMapListUrl, MaxMapNumber);
 
+            userhandler = bot;
+
+            mapList.CollectionChanged += MapChange;
+
             commands.Add(new Add(bot, this));
             commands.Add(new Maps(bot, this));
             commands.Add(new Update(bot, this));
+            commands.Add(new UpdateName(bot, this));
             commands.Add(new Delete(bot, this));
             commands.Add(new UploadCheck(bot, ServerMapListUrl));
             adminCommands.Add(new Wipe(bot, this));
         }
 
+        void MapChange (object sender, NotifyCollectionChangedEventArgs args)
+            {
+            userhandler.OnMaplistchange(mapList.Count, sender, args);
+            }
+
         public class Map
         {
             public string Submitter { get; set; }
+            public string SubmitterName { get; set; }
             public string Filename { get; set; }
             public string DownloadURL { get; set; }
             public string Notes { get; set; }
@@ -110,10 +122,26 @@ namespace SteamBotLite
             }
         }
 
+        private sealed class UpdateName : BaseCommand
+        {
+            MapModule mapmodule;
+            public UpdateName(VBot bot, MapModule module) : base(bot, "!nameupdate")
+            {
+                mapmodule = module;
+            }
+            protected override string exec(SteamID sender, string param)
+            {
+                NotifyCollectionChangedEventArgs args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
+                userhandler.OnMaplistchange(mapmodule.mapList.Count, sender, args);
+                return "Name has been updated";
+            }
+        }
+
         // The commands
 
         private class Add : MapCommand
         {
+            
             public bool uploadcheck(string MapName, string Website)
             {
                 return SearchClass.CheckDataExistsOnWebPage(Website, MapName); //TODO develop method to check website
@@ -127,6 +155,7 @@ namespace SteamBotLite
 
                 Map map = new Map();
                 map.Submitter = sender.ToString();
+                map.SubmitterName = userhandler.steamConnectionHandler.SteamFriends.GetFriendPersonaName(sender);
                 map.Filename = parameters[0];
                 map.Notes = "No Notes";
 
@@ -204,7 +233,7 @@ namespace SteamBotLite
                     pmResponse = "";
                     for (int i = 0; i < maps.Count; i++)
                     {
-                        string mapLine = string.Format("{0} // {1} // {2} ({3})", maps[i].Filename, maps[i].DownloadURL , userhandler.steamConnectionHandler.SteamFriends.GetFriendPersonaName(new SteamID(maps[i].Submitter)), maps[i].Submitter);
+                        string mapLine = string.Format("{0} // {1} // {2} ({3})", maps[i].Filename, maps[i].DownloadURL , maps[i].SubmitterName, maps[i].Submitter);
 
                         if (!string.IsNullOrEmpty(maps[i].Notes))
                             mapLine += "\nNotes: " + maps[i].Notes;
