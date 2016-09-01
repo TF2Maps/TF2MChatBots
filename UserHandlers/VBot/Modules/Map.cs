@@ -130,6 +130,11 @@ namespace SteamBotLite
                 map.Filename = parameters[0];
                 map.Notes = "No Notes";
 
+                if (parameters[0].Length == 0)
+                {
+                    return "Invalid parameters for !add. Syntax: !add <mapname> <url> <notes>";
+                }
+
                 if (parameters[0].Any(c => char.IsUpper(c)) )
                 {
                     return "Your Map is rejected as it includes an uppercase letter";
