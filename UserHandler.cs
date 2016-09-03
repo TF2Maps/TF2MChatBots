@@ -7,41 +7,39 @@ using SteamKit2;
 
 namespace SteamBotLite
 {
-    public abstract class UserHandler 
+    public abstract class UserHandler
     {
-        /// <summary>
-        /// Our Logon Details, which may be useful later
-        /// </summary>
-        public SteamUser.LogOnDetails LogonDetails;
         /// <summary>
         /// The SteamConnectionhandler that will act as the bridge between Steam and the Userhandler
         /// </summary>
-        public SteamConnectionHandler steamConnectionHandler { get; set; }
+        public ApplicationInterface appinterface { get; set; }
 
         /// <summary>
         /// Sets the SteamConnectionHandler to Bot
         /// </summary>
         /// <param name="SteamConnectionHandler"></param>
-        public UserHandler(SteamConnectionHandler SteamConnectionHandler)
+        public UserHandler(ApplicationInterface SteamConnectionHandler)
         {
-            steamConnectionHandler = SteamConnectionHandler;
+            appinterface = SteamConnectionHandler;
         }
-        
-        public abstract void OnMessage(SteamFriends.FriendMsgCallback msg);
-        public abstract void OnChatRoomMessage(SteamFriends.ChatMsgCallback msg);
+
+        public abstract void ProcessChatRoomMessage(ChatRoomIdentifier chatroomidentifier, UserIdentifier useridentifier, string Message);
+        public abstract void ProcessPrivateMessage(UserIdentifier useridentifier, string Message);
+
         /// <summary>
         /// This Void Runs when the Bot has successfully logged into steam and is ready to interact
         /// </summary>
         public abstract void OnLoginCompleted();
+
+        public abstract void ChatMemberInfo(UserIdentifier useridentifier, bool MemberInfo); //TODO make this an object, not a bool
+
+
         /// <summary>
         /// Reboot the connection with steam
         /// </summary>
-        public void Reboot ()
+        public void Reboot()
         {
-            steamConnectionHandler.ResetConnection(steamConnectionHandler.SteamBotLiteLoginData, steamConnectionHandler.ID);
+            appinterface.Reboot();
         }
-        public abstract void ClanStateCallback(SteamFriends.ClanStateCallback callback);
-        public abstract void ChatMemberInfo(SteamFriends.ChatMemberInfoCallback callback);
-
     }
 }

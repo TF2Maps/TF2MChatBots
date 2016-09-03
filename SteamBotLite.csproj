@@ -56,12 +56,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApplicationInterface.cs" />
     <Compile Include="BotSavedData.cs" />
-    <Compile Include="SteamConnectionHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SteamInterface.cs" />
     <Compile Include="UserHandler.cs" />
-    <Compile Include="UserHandlers\SearchBot.cs" />
     <Compile Include="UserHandlers\SearchBot\SearchClass.cs" />
     <Compile Include="UserHandlers\VBot.cs" />
     <Compile Include="UserHandlers\VBot\BaseCommand.cs" />

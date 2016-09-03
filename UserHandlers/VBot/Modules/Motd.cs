@@ -12,7 +12,7 @@ namespace SteamBotLite
     {
         public int postCount {get; private set;}
         public string message {get; private set;}
-        public SteamID setter {get; private set;}
+        public UserIdentifier setter {get; private set;}
 
         private BaseTask motdPost;
 
@@ -68,9 +68,9 @@ namespace SteamBotLite
         {
             if (message != null && !message.Equals(string.Empty))
             {
-                string currentName = userhandler.steamConnectionHandler.SteamFriends.GetPersonaName();
+                string currentName = userhandler.appinterface.GetUsername();
                 //bot.SteamFriends.SetPersonaName("MOTD");
-                userhandler.steamConnectionHandler.SteamFriends.SendChatRoomMessage(userhandler.GroupChatSID, EChatEntryType.ChatMsg, message);
+                userhandler.appinterface.SendChatRoomMessage(userhandler.GroupChatSID, message);                
                 //bot.SteamFriends.SetPersonaName(bot.DisplayName);
                 postCount++;
                 if (postCount > 24)
@@ -96,7 +96,7 @@ namespace SteamBotLite
         private class Get : MotdCommand
         {
             public Get(VBot bot, MotdModule motd) : base(bot, "!Motd", motd) { }
-            protected override string exec(SteamID sender, string param)
+            protected override string exec(UserIdentifier sender, string param)
             {
                 if (motd.postCount >= 24){
                     motd.message = null;
@@ -112,7 +112,7 @@ namespace SteamBotLite
         private class Set : MotdCommand
         {
             public Set(VBot bot, MotdModule motd) : base(bot, "!SetMotd", motd) { }
-            protected override string exec(SteamID sender, string param)
+            protected override string exec(UserIdentifier sender, string param)
             {
                 if (param == String.Empty)
                     return "Make sure to include a MOTD to display!";
@@ -131,10 +131,10 @@ namespace SteamBotLite
         private class Remove : MotdCommand
         {
             public Remove(VBot bot, MotdModule motd) : base(bot, "!RemoveMotd", motd) { }
-            protected override string exec(SteamID sender, string param)
+            protected override string exec(UserIdentifier sender, string param)
             {
                 motd.message = null;
-                motd.setter = null;
+                //motd.setter = null; //TODO FIX
                 motd.postCount = 0;
                 motd.savePersistentData();
                 return "Removed MOTD";
@@ -144,7 +144,7 @@ namespace SteamBotLite
         private class Tick : MotdCommand
         {
             public Tick(VBot bot, MotdModule motd) : base(bot, "!MotdTick", motd) { }
-            protected override string exec(SteamID sender, string param)
+            protected override string exec(UserIdentifier sender, string param)
             {
                 return "MOTD displayed " + motd.postCount + " times";
             }
@@ -153,7 +153,7 @@ namespace SteamBotLite
         private class Setter : MotdCommand
         {
             public Setter(VBot bot, MotdModule motd) : base(bot, "!MotdSetter", motd) { }
-            protected override string exec(SteamID sender, string param)
+            protected override string exec(UserIdentifier sender, string param)
             {
                 return "MOTD set by " + motd.setter;
             }
