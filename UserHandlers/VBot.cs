@@ -1,5 +1,4 @@
 using System;
-using SteamKit2;
 using System.Timers;
 using System.Collections.Generic;
 using Newtonsoft.Json;
@@ -12,7 +11,7 @@ namespace SteamBotLite
     class VBot : UserHandler
     {
         ulong GroupChatID;
-        public SteamID GroupChatSID;
+        public ChatRoomIdentifier GroupChatSID;
         double interval = 60000;
         readonly int InitialGhostCheck = 10;
         int GhostCheck = 480;
@@ -44,13 +43,13 @@ namespace SteamBotLite
         /// Do not try using steamfriends, steamuser and all that since it'll be uninitialised at this point 
         /// </summary>
         /// <param name="SteamConnectionHandler"></param>
-        public VBot(SteamConnectionHandler SteamConnectionHandler) : base(SteamConnectionHandler)
+        public VBot(ApplicationInterface appinterface) : base(appinterface)
         {
             Console.WriteLine("Vbot Initialised");
             Console.WriteLine("Loading modules and stuff");
             
             GroupChatID = ulong.Parse((string)jsconfig["GroupchatID"]);
-            GroupChatSID = new SteamID(GroupChatID);
+            GroupChatSID = new ChatRoomIdentifier(GroupChatID);
             try {
                 Autojoin = Convert.ToBoolean(jsconfig["AutoJoin"]);
             } catch { };
@@ -73,27 +72,30 @@ namespace SteamBotLite
 
         public override void OnLoginCompleted()
         {
-            steamConnectionHandler.SteamFriends.SetPersonaName("V2Bot");
+           // OnMaplistchange();
+
+            appinterface.SetUsername("InterFaceBot");
             if (Autojoin)
-                steamConnectionHandler.SteamFriends.JoinChat(GroupChatSID);
+                appinterface.EnterChatRoom(GroupChatSID);
             InitTimer();
-            Console.WriteLine("{0} User: {1} Is now online", steamConnectionHandler.ID, steamConnectionHandler.LoginData.Username); //Lets tell the User we're now online
+            Console.WriteLine("UserHandler: {0} ApplicationInterface: {1} Is now online", this.GetType(), this.appinterface.GetType());
         }
 
-        public override void OnMessage(SteamFriends.FriendMsgCallback ChatMsg) //This is an example of using older methods for cross-compatibility, by converting the new format to the older one
+        public override void ProcessPrivateMessage(UserIdentifier useridentifier, string Message) //This is an example of using older methods for cross-compatibility, by converting the new format to the older one
         {
-            string response = ChatMessageHandler(ChatMsg.Sender, ChatMsg.Message);
+            string response = ChatMessageHandler(useridentifier, Message);
             if (response != null)
-                steamConnectionHandler.SteamFriends.SendChatMessage(ChatMsg.Sender, EChatEntryType.ChatMsg, response);
+                appinterface.SendPrivateMessage(useridentifier, response);
         }
-        public override void OnChatRoomMessage(SteamFriends.ChatMsgCallback ChatMsg) //This is an example of using older methods for cross-compatibility, by converting the new format to the older one
+        public override void ProcessChatRoomMessage(ChatRoomIdentifier chatroomidentifier, UserIdentifier useridentifier, string Message) //This is an example of using older methods for cross-compatibility, by converting the new format to the older one
         {
             GhostCheck = InitialGhostCheck;
             CrashCheck = 0;
-            string response = ChatMessageHandler(ChatMsg.ChatterID, ChatMsg.Message);
+            string response = ChatMessageHandler(useridentifier, Message);
             if (response != null)
-                steamConnectionHandler.SteamFriends.SendChatRoomMessage(GroupChatSID, EChatEntryType.ChatMsg, response);
+                appinterface.SendChatRoomMessage(chatroomidentifier, response);
         }
+
         public void Disablemodule(string ModuleToRemove)
         {
             int x = 0;
@@ -138,7 +140,7 @@ namespace SteamBotLite
         }
 
 
-        public string ChatMessageHandler(SteamID Sender , string Message)
+        public string ChatMessageHandler(UserIdentifier Sender , string Message)
         {
             string response = null;
             foreach (BaseModule module in ModuleList)
@@ -168,10 +170,7 @@ namespace SteamBotLite
         }
         public void OnMaplistchange(int MapCount, object sender = null, NotifyCollectionChangedEventArgs args = null)
         {
-            Console.WriteLine("DOOT DODO DOOOOO");
-            Console.WriteLine("Event Fired");
-
-            steamConnectionHandler.SteamFriends.SetPersonaName("[" + MapCount + "]" + Username);            
+            appinterface.SetUsername("[" + MapCount + "]" + Username);            
         }
         public void ServerUpdated(object sender, ServerModule.ServerInfo args)
         {
@@ -183,18 +182,9 @@ namespace SteamBotLite
         }
 
 
-        public override void ChatMemberInfo(SteamFriends.ChatMemberInfoCallback callback)
+        public override void ChatMemberInfo(UserIdentifier useridentifier, bool AdminStatus)
         {
-            if (callback.StateChangeInfo.StateChange != EChatMemberStateChange.Entered)
-            {
-                Console.WriteLine("User left chat");
-                return;
-            }
-            else
-            {
-                Console.WriteLine("Callback Fired");
-                usersModule.updateUserInfo(callback);
-            }
+            usersModule.updateUserInfo(useridentifier, AdminStatus);
         }
         /// <summary>
         /// The Main Timer's method, executed per tick
@@ -209,8 +199,8 @@ namespace SteamBotLite
             {
                 GhostCheck = InitialGhostCheck;
                 CrashCheck += 1;
-                steamConnectionHandler.SteamFriends.LeaveChat(new SteamID(GroupChatSID));
-                steamConnectionHandler.SteamFriends.JoinChat(new SteamID(GroupChatSID));
+                appinterface.LeaveChatroom(GroupChatSID);
+                appinterface.EnterChatRoom(GroupChatSID);
             }
             if (CrashCheck >= 4)
             {
@@ -230,9 +220,5 @@ namespace SteamBotLite
             Tick.Start();
         }
 
-        public override void ClanStateCallback(SteamFriends.ClanStateCallback callback)
-        {
-            
-        }
     }
 }

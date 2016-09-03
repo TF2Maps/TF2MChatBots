@@ -11,7 +11,7 @@ namespace SteamBotLite
 {
     class Program
     {
-        
+        /*
         static void Main(string[] args)
         {
             
@@ -43,6 +43,36 @@ namespace SteamBotLite
                 foreach (SteamConnectionHandler Connection in SteamConnections)
                 {
                     Connection.Tick();
+                }
+                System.Threading.Thread.Sleep(100);
+            }
+        }
+        */
+        static void Main(string[] args)
+        {
+            List<ApplicationInterface> Bots = new List<ApplicationInterface>();
+            SteamBotData[] SteamBotLoginData = JsonConvert.DeserializeObject<SteamBotData[]>(File.ReadAllText("settings.json")); //Get the data about each bot alongside their info from the JSON file
+
+            int ID = 0;
+
+            foreach (SteamBotData Entry in SteamBotLoginData) //We create an instance of each Bot and add it to the list
+            {
+                if (Entry.Userhandler != null) //We check if the UserHandler has been set before adding it
+                {
+                    Bots.Add(new SteamInterface(Entry, ID)); //This loads the bot, then adds it to the list
+                }
+                else
+                {
+                    Console.WriteLine("Failed to load {0} because of an invalid BotControlClass", Entry.username); //Warn the user the bot isn't loaded
+                }
+                ID++;
+            }
+            bool Running = true;
+            while (Running)
+            {
+                foreach (ApplicationInterface Bot in Bots)
+                {
+                    Bot.tick();
                 }
                 System.Threading.Thread.Sleep(100);
             }

@@ -85,9 +85,9 @@ namespace SteamBotLite
 
             if (map != null)
             {
-                SteamID Submitter = new SteamID(map.Submitter);
+                UserIdentifier Submitter = new UserIdentifier(map.Submitter);
                 Console.WriteLine("Found map, sending message to {0}", Submitter);
-                userhandler.steamConnectionHandler.SteamFriends.SendChatMessage(Submitter, EChatEntryType.ChatMsg, string.Format("Map {0} is being tested on the {1} server and has been DELETED.", map.Filename, args.tag));
+                userhandler.appinterface.SendPrivateMessage(Submitter, string.Format("Map {0} is being tested on the {1} server and has been DELETED.", map.Filename, args.tag));               
                 mapList.Remove(map);
                 Console.WriteLine("Map {0} is being tested on the {1} server and has been DELETED.", map.Filename, args.tag);
                 savePersistentData();
@@ -116,7 +116,7 @@ namespace SteamBotLite
             {
                 ServerMapListURL = Website;
             }
-            protected override string exec(SteamID sender, string param)
+            protected override string exec(UserIdentifier sender, string param)
             {
                 return SearchClass.CheckDataExistsOnWebPage(ServerMapListURL, param).ToString(); 
             }
@@ -129,7 +129,7 @@ namespace SteamBotLite
             {
                 mapmodule = module;
             }
-            protected override string exec(SteamID sender, string param)
+            protected override string exec(UserIdentifier sender, string param)
             {
                 NotifyCollectionChangedEventArgs args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
                 userhandler.OnMaplistchange(mapmodule.mapList.Count, sender, args);
@@ -149,13 +149,13 @@ namespace SteamBotLite
 
             public Add(VBot bot, MapModule mapModule) : base(bot, "!add", mapModule) { }
 
-            protected override string exec(SteamID sender, string param)
+            protected override string exec(UserIdentifier sender, string param)
             {
                 string[] parameters = param.Split(new char[] { ' ' }, 2);
 
                 Map map = new Map();
                 map.Submitter = sender.ToString();
-                map.SubmitterName = userhandler.steamConnectionHandler.SteamFriends.GetFriendPersonaName(sender);
+                map.SubmitterName = userhandler.appinterface.GetOthersUsername(sender);
                 map.Filename = parameters[0];
                 map.Notes = "No Notes";
 
@@ -206,7 +206,7 @@ namespace SteamBotLite
         private class Maps : MapCommand
         {
             public Maps(VBot bot, MapModule mapMod) : base(bot, "!maps", mapMod) { }
-            protected override string exec(SteamID sender, string param)
+            protected override string exec(UserIdentifier sender, string param)
             {
                 var maps = MapModule.mapList;
                 int maxMaps = MapModule.MaxMapNumber;
@@ -247,7 +247,7 @@ namespace SteamBotLite
 
                 // PM map list to the caller.
                 if (maps.Count != 0)
-                    userhandler.steamConnectionHandler.SteamFriends.SendChatMessage(sender, EChatEntryType.ChatMsg, pmResponse);
+                    userhandler.appinterface.SendPrivateMessage(sender, pmResponse);
 
                 return chatResponse;
             }
@@ -256,7 +256,7 @@ namespace SteamBotLite
         private class Update : MapCommand
         {
             public Update(VBot bot, MapModule mapMod) : base(bot, "!update", mapMod) { }
-            protected override string exec(SteamID sender, string param)
+            protected override string exec(UserIdentifier sender, string param)
             {
                 string[] parameters = param.Split(' ');
 
@@ -290,7 +290,7 @@ namespace SteamBotLite
         private class Delete : MapCommand
         {
             public Delete(VBot bot, MapModule mapMod) : base(bot, "!delete", mapMod) { }
-            protected override string exec(SteamID sender, string param)
+            protected override string exec(UserIdentifier sender, string param)
             {
                 string[] parameters = param.Split(' ');
 
@@ -324,7 +324,7 @@ namespace SteamBotLite
         private class Wipe : MapCommand
         {
             public Wipe(VBot bot, MapModule mapMod) : base(bot, "!wipe", mapMod) { }
-            protected override string exec(SteamID sender, string param)
+            protected override string exec(UserIdentifier sender, string param)
             {
                 MapModule.mapList.Clear();
                 //MapModule.mapList = new List<Map>(); //OLd Maplist code
