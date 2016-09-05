@@ -223,8 +223,7 @@ namespace SteamBotLite
         void OnFriendsList(SteamFriends.FriendsListCallback callback)
         {
             // at this point, the client has received it's friends list
-
-            UserHandlerClass.OnLoginCompleted(); //Lets fire off the method now that SteamConnectionHandler is we're 100% configured 
+            base.AnnounceLoginCompleted();         
         }
         /// <summary>
         /// Now that we're logged in, lets go online so we can properly interact on steamfriends.
@@ -377,6 +376,8 @@ namespace SteamBotLite
 
             Console.WriteLine("Done!");
         }
+        //TODO Lets Turn the following four into events, so errors aren't thrown if a userhandler doesn't exist 
+
 
         /// <summary>
         /// Callback fires when we log out
@@ -389,12 +390,23 @@ namespace SteamBotLite
 
         void ReceivePrivateMessage(SteamFriends.FriendMsgCallback callback)
         {
-            UserHandlerClass.ProcessPrivateMessage(new UserIdentifier(callback.Sender), callback.Message);
+            MessageProcessEventData NewMessageData = new MessageProcessEventData();
+            NewMessageData.Message = callback.Message;
+            NewMessageData.Sender = new UserIdentifier(callback.Sender);
+            base.PrivateMessageProcessEvent(NewMessageData);
+
+            // UserHandlerClass.ProcessPrivateMessage(new UserIdentifier(callback.Sender), callback.Message);
         }
 
         void ReceiveChatMessage(SteamFriends.ChatMsgCallback callback)
         {
-            UserHandlerClass.ProcessChatRoomMessage(new ChatRoomIdentifier(callback.ChatRoomID), new UserIdentifier(callback.ChatterID), callback.Message);
+            MessageProcessEventData NewMessageData = new MessageProcessEventData();
+            NewMessageData.Message = callback.Message;
+            NewMessageData.Chatroom = new ChatRoomIdentifier(callback.ChatRoomID);
+            NewMessageData.Sender = new UserIdentifier(callback.ChatterID);
+            base.ChatRoomMessageProcessEvent(NewMessageData);
+
+           // UserHandlerClass.ProcessChatRoomMessage(new ChatRoomIdentifier(callback.ChatRoomID), new UserIdentifier(callback.ChatterID), callback.Message);
         }
 
         void Chatmemberinfo(SteamFriends.ChatMemberInfoCallback callback)
@@ -407,22 +419,26 @@ namespace SteamBotLite
             {
                 if (callback.StateChangeInfo.MemberInfo.Permissions.HasFlag(EChatPermission.MemberDefault))
                 {
-                    UserHandlerClass.ChatMemberInfo(new UserIdentifier(callback.StateChangeInfo.ChatterActedOn), true);
+                    ChatMemberInfoProcessEvent(new UserIdentifier(callback.StateChangeInfo.ChatterActedOn), true);
                 }
                 else
                 {
-                    UserHandlerClass.ChatMemberInfo(new UserIdentifier(callback.StateChangeInfo.ChatterActedOn), false);
+                    ChatMemberInfoProcessEvent(new UserIdentifier(callback.StateChangeInfo.ChatterActedOn), false);
                 }
             }
         }
 
         public override void SendChatRoomMessage(ChatRoomIdentifier chatroomidentifier, string Message)
         {
+          
             SteamFriends.SendChatRoomMessage((SteamID)(chatroomidentifier.identifier), EChatEntryType.ChatMsg, Message);
         }
 
         public override void SendPrivateMessage(UserIdentifier useridentifier, string Message)
         {
+            ;
+
+
             SteamFriends.SendChatMessage((SteamID)useridentifier.identifier, EChatEntryType.ChatMsg, Message);
         }
 
