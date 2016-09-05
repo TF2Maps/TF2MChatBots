@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Net.Http;
-using SteamKit2;
+
 using Newtonsoft.Json;
 using System.Linq;
 using System.Collections.ObjectModel;
