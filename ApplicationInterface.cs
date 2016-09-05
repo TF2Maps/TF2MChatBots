@@ -60,7 +60,7 @@ namespace SteamBotLite
 
         public abstract class ApplicationInterface
     {
-        public UserHandler Userhandler;
+        
 
         public abstract void SendChatRoomMessage(ChatRoomIdentifier chatroomidentifier, string Message);
         public abstract void SendPrivateMessage(UserIdentifier useridentifier, string Message);
@@ -70,7 +70,7 @@ namespace SteamBotLite
         public abstract void ReceivePrivateMessage(UserIdentifier useridentifier, string Message);
         */
 
-        event EventHandler<MessageProcessEventData> ChatRoomMessageEvent;
+        public event EventHandler<MessageProcessEventData> ChatRoomMessageEvent;
         
         //The event-invoking method that derived classes can override.
         protected virtual void ChatRoomMessageProcessEvent(MessageProcessEventData e)
@@ -85,7 +85,7 @@ namespace SteamBotLite
             }
         }
 
-        event EventHandler<MessageProcessEventData> PrivateMessageEvent;
+        public event EventHandler<MessageProcessEventData> PrivateMessageEvent;
 
         //The event-invoking method that derived classes can override.
         protected virtual void PrivateMessageProcessEvent(MessageProcessEventData e)
@@ -121,7 +121,7 @@ namespace SteamBotLite
             // Make a temporary copy of the event to avoid possibility of
             // a race condition if the last subscriber unsubscribes
             // immediately after the null check and before the event is raised.
-            EventHandler<Tuple<UserIdentifier, bool>> handler = ChatMemberInfoEvent;
+            EventHandler handler = AnnounceLoginCompletedEvent;
             if (handler != null)
             {
                 AnnounceLoginCompletedEvent(this , null);

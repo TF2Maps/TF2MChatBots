@@ -51,10 +51,7 @@ namespace SteamBotLite
         /// </summary>
         string LoginKeyFile;
 
-        /// <summary>
-        /// The UserHandlerClass that will be loaded and interact with users
-        /// </summary>
-        public UserHandler UserHandlerClass;
+        
 
         SteamClient steamClient;
         public SteamUser steamUser;
@@ -111,7 +108,7 @@ namespace SteamBotLite
                 LoginData.Password = null;
             }
 
-            UserHandlerClass = LoadUserHandler(BotData.Userhandler); //Lets load the UserHandler of our Bot now so we can assign it data
+           
 
             // create our steamclient instance
             steamClient = new SteamClient(System.Net.Sockets.ProtocolType.Tcp);
@@ -168,16 +165,7 @@ namespace SteamBotLite
 
         }
 
-        /// <summary>
-        /// Load the given userHandler
-        /// </summary>
-        /// <param UserHandlerClassType="The Class Type of the UserHandler"></param>
-        /// <returns></returns>
-        UserHandler LoadUserHandler(Type HandlerType)
-        {
-            return (UserHandler)Activator.CreateInstance(
-                    HandlerType, new object[] { this }); //We load it up with the type we were given, and pass this class onto it
-        }
+       
         /// <summary>
         /// Callback fired when get get chat member info 
         /// </summary>
@@ -223,7 +211,8 @@ namespace SteamBotLite
         void OnFriendsList(SteamFriends.FriendsListCallback callback)
         {
             // at this point, the client has received it's friends list
-            base.AnnounceLoginCompleted();         
+            Console.WriteLine("Logon?");
+            AnnounceLoginCompleted();         
         }
         /// <summary>
         /// Now that we're logged in, lets go online so we can properly interact on steamfriends.

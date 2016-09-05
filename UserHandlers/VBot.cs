@@ -63,17 +63,16 @@ namespace SteamBotLite
             replyModule = new RepliesModule(this, jsconfig);
             adminmodule = new AdminModule(this, jsconfig);
             searchModule = new SearchModule(this, jsconfig);
-
-
+            
             ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule,adminmodule,searchModule};
 
             Console.WriteLine("All Loaded");
         }
 
-        public override void OnLoginCompleted()
+        public override void OnLoginCompleted(object sender, EventArgs e)
         {
-           // OnMaplistchange();
-
+            // OnMaplistchange();
+            Console.WriteLine(Autojoin);
             appinterface.SetUsername("InterFaceBot");
             if (Autojoin)
                 appinterface.EnterChatRoom(GroupChatSID);
@@ -81,19 +80,20 @@ namespace SteamBotLite
             Console.WriteLine("UserHandler: {0} ApplicationInterface: {1} Is now online", this.GetType(), this.appinterface.GetType());
         }
 
-        public override void ProcessPrivateMessage(UserIdentifier useridentifier, string Message) //This is an example of using older methods for cross-compatibility, by converting the new format to the older one
+        public override void ProcessPrivateMessage(object sender, MessageProcessEventData e) //This is an example of using older methods for cross-compatibility, by converting the new format to the older one
         {
-            string response = ChatMessageHandler(useridentifier, Message);
+            Console.WriteLine(e.Message);
+            string response = ChatMessageHandler(e.Sender, e.Message);
             if (response != null)
-                appinterface.SendPrivateMessage(useridentifier, response);
+                appinterface.SendPrivateMessage(e.Sender, response);
         }
-        public override void ProcessChatRoomMessage(ChatRoomIdentifier chatroomidentifier, UserIdentifier useridentifier, string Message) //This is an example of using older methods for cross-compatibility, by converting the new format to the older one
+        public override void ProcessChatRoomMessage(object sender, MessageProcessEventData e)
         {
             GhostCheck = InitialGhostCheck;
             CrashCheck = 0;
-            string response = ChatMessageHandler(useridentifier, Message);
+            string response = ChatMessageHandler(e.Sender, e.Message);
             if (response != null)
-                appinterface.SendChatRoomMessage(chatroomidentifier, response);
+                appinterface.SendChatRoomMessage(e.Chatroom, response);
         }
 
         public void Disablemodule(string ModuleToRemove)
