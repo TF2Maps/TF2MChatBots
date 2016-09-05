@@ -80,13 +80,14 @@ namespace SteamBotLite
                 System.Threading.Thread.Sleep(100);
             }
         }
-        void CreateMultiUserHandler(SteamBotData botdata)
+        void ProperSetup(SteamBotData botdata)
         {
-            SteamInterface NewInterface = new SteamInterface(botdata, 1);
+            SteamInterface steaminterface = new SteamInterface(botdata, 1);
             SteamInterface NewInterface2 = new SteamInterface(botdata, 2);
 
-            VBot Bot1 = new VBot(NewInterface);
-            VBot Bot2 = new VBot(NewInterface);
+            VBot Bot1 = new VBot(steaminterface);
+
+
 
         }
 
