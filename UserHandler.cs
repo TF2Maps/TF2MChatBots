@@ -21,16 +21,18 @@ namespace SteamBotLite
         public UserHandler(ApplicationInterface SteamConnectionHandler)
         {
             appinterface = SteamConnectionHandler;
+            appinterface.AnnounceLoginCompletedEvent += OnLoginCompleted;
+            appinterface.PrivateMessageEvent += ProcessPrivateMessage;
+            appinterface.ChatRoomMessageEvent += ProcessChatRoomMessage;
         }
 
-        public abstract void ProcessChatRoomMessage(ChatRoomIdentifier chatroomidentifier, UserIdentifier useridentifier, string Message);
-        public abstract void ProcessPrivateMessage(UserIdentifier useridentifier, string Message);
+        public abstract void ProcessChatRoomMessage(object sender, MessageProcessEventData e);
 
-        /// <summary>
-        /// This Void Runs when the Bot has successfully logged into steam and is ready to interact
-        /// </summary>
-        public abstract void OnLoginCompleted();
+        public abstract void ProcessPrivateMessage(object sender, MessageProcessEventData e);
 
+        public abstract void OnLoginCompleted(object sender, EventArgs e);
+
+        
         public abstract void ChatMemberInfo(UserIdentifier useridentifier, bool MemberInfo); //TODO make this an object, not a bool
 
 
