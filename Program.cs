@@ -50,6 +50,7 @@ namespace SteamBotLite
         */
         static void Main(string[] args)
         {
+            
             List<ApplicationInterface> Bots = new List<ApplicationInterface>();
             SteamBotData[] SteamBotLoginData = JsonConvert.DeserializeObject<SteamBotData[]>(File.ReadAllText("settings.json")); //Get the data about each bot alongside their info from the JSON file
 

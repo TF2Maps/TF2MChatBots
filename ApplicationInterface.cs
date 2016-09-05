@@ -53,6 +53,8 @@ namespace SteamBotLite
    
     public abstract class ApplicationInterface
     {
+        public UserHandler Userhandler;
+
         public abstract void SendChatRoomMessage(ChatRoomIdentifier chatroomidentifier, string Message);
         public abstract void SendPrivateMessage(UserIdentifier useridentifier, string Message);
 
