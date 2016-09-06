@@ -16,8 +16,7 @@ namespace SteamBotLite
 
         public List<ServerInfo> serverList;
         private BaseTask serverUpdate;
-        bool chatIsNotified = true;
-
+       
         public ServerModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
             serverList = new List<ServerInfo>();
@@ -163,7 +162,7 @@ namespace SteamBotLite
         private sealed class Status : BaseCommand
         {
             // Automaticaly generated status command for each server under the config
-            protected ServerInfo server;
+            ServerInfo server;
             ServerModule servermodule;
 
             public Status(VBot bot, ServerInfo server, ServerModule module) : base(bot, "!" + server.tag + "server")

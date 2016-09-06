@@ -17,7 +17,6 @@ namespace SteamBotLite
         {
             
             return Path.Combine(userhandler.GetType().Name, this.GetType().Name + ".json");
-            return this.GetType().Name + ".json";
         }
         
         protected VBot userhandler;

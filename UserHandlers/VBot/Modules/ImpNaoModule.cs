@@ -205,9 +205,6 @@ namespace SteamBotLite
                 return chatResponse;
 
 
-
-
-                return "Completed";
             }
         }
 
