@@ -23,7 +23,6 @@ namespace SteamBotLite
             appinterface.AnnounceLoginCompletedEvent += OnLoginCompleted;
             appinterface.PrivateMessageEvent += ProcessPrivateMessage;
             appinterface.ChatRoomMessageEvent += ProcessChatRoomMessage;
-            Console.WriteLine("Reminder That your Reboot method has not been implemented");
         }
 
         public abstract void ProcessChatRoomMessage(object sender, MessageProcessEventData e);
