@@ -382,6 +382,7 @@ namespace SteamBotLite
             MessageProcessEventData NewMessageData = new MessageProcessEventData();
             NewMessageData.ReceivedMessage = callback.Message;
             NewMessageData.Sender = new UserIdentifier(callback.Sender);
+            NewMessageData.Sender.DisplayName = SteamFriends.GetFriendPersonaName(callback.Sender);
             base.PrivateMessageProcessEvent(NewMessageData);
 
             // UserHandlerClass.ProcessPrivateMessage(new UserIdentifier(callback.Sender), callback.Message);
@@ -393,6 +394,7 @@ namespace SteamBotLite
             NewMessageData.ReceivedMessage = callback.Message;
             NewMessageData.Chatroom = new ChatRoomIdentifier(callback.ChatRoomID);
             NewMessageData.Sender = new UserIdentifier(callback.ChatterID);
+            NewMessageData.Sender.DisplayName = SteamFriends.GetFriendPersonaName(callback.ChatterID);
             base.ChatRoomMessageProcessEvent(NewMessageData);
 
            // UserHandlerClass.ProcessChatRoomMessage(new ChatRoomIdentifier(callback.ChatRoomID), new UserIdentifier(callback.ChatterID), callback.Message);
@@ -454,7 +456,7 @@ namespace SteamBotLite
         }
 
 
-        public override void Reboot()
+        public override void Reboot(object sender , EventArgs e)
         {
             Console.WriteLine("A REBOOT WAS ATTEMPTED");
         }
