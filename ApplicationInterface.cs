@@ -75,8 +75,10 @@ namespace SteamBotLite
             userhandler.SendChatRoomMessageEvent += SendChatRoomMessage;
             userhandler.SendPrivateMessageEvent += SendPrivateMessage;
             userhandler.SetUsernameEvent += SetUsername;
+            userhandler.RebootEvent += Reboot;
 
         }
+
 
         /* I beleive there is no benefit to making this role mandatory
         public abstract void ReceiveChatRoomMessage(ChatRoomIdentifier chatroomidentifier, string Message);
@@ -146,7 +148,7 @@ namespace SteamBotLite
         public abstract void EnterChatRoom (object sender, ChatRoomIdentifier chatroomidentifier);
         public abstract void LeaveChatroom (object sender, ChatRoomIdentifier chatroomidentifier);
 
-        public abstract void Reboot();
+        public abstract void Reboot(object sender, EventArgs e);
 
         public abstract void SetUsername(object sender, string Username);
         public abstract string GetUsername();
