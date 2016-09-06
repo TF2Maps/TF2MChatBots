@@ -54,43 +54,20 @@ namespace SteamBotLite
             List<ApplicationInterface> Bots = new List<ApplicationInterface>();
             List<UserHandler> UserHandlers = new List<UserHandler>();
             SteamBotData[] SteamBotLoginData = JsonConvert.DeserializeObject<SteamBotData[]>(File.ReadAllText("settings.json")); //Get the data about each bot alongside their info from the JSON file
+            SteamBotData Entry = SteamBotLoginData[0];
 
-            int ID = 0;
-
-            foreach (SteamBotData Entry in SteamBotLoginData) //We create an instance of each Bot and add it to the list
-            {
-                if (Entry.Userhandler != null) //We check if the UserHandler has been set before adding it
-                {
-                    Bots.Add(new SteamInterface(Entry, ID)); //This loads the bot, then adds it to the list                    
-                    UserHandlers.Add(new VBot(Bots[Bots.Count -1]));
-                }
-                else
-                {
-                    Console.WriteLine("Failed to load {0} because of an invalid BotControlClass", Entry.username); //Warn the user the bot isn't loaded
-                }
-                ID++;
-            }
+            VBot VbotHandler = new VBot();
+            SteamInterface SteamPlatformInterface = new SteamInterface(Entry, 0);
+            VbotHandler.AssignAppInterface(SteamPlatformInterface);
+            SteamPlatformInterface.AssignUserHandler(VbotHandler);
+            
             bool Running = true;
             while (Running)
             {
-                foreach (ApplicationInterface Bot in Bots)
-                {
-                    Bot.tick();
-                }
+                SteamPlatformInterface.tick();
                 System.Threading.Thread.Sleep(100);
             }
         }
-        void ProperSetup(SteamBotData botdata)
-        {
-            SteamInterface steaminterface = new SteamInterface(botdata, 1);
-            SteamInterface NewInterface2 = new SteamInterface(botdata, 2);
-
-            VBot Bot1 = new VBot(steaminterface);
-
-
-
-        }
-
     }
 }
     

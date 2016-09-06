@@ -68,9 +68,8 @@ namespace SteamBotLite
         {
             if (message != null && !message.Equals(string.Empty))
             {
-                string currentName = userhandler.appinterface.GetUsername();
                 //bot.SteamFriends.SetPersonaName("MOTD");
-                userhandler.appinterface.SendChatRoomMessage(userhandler.GroupChatSID, message);                
+                userhandler.SendChatRoomMessageProcessEvent(new MessageProcessEventData { Chatroom = userhandler.GroupChatSID, ReplyMessage = message });
                 //bot.SteamFriends.SetPersonaName(bot.DisplayName);
                 postCount++;
                 if (postCount > 24)

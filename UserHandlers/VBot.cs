@@ -43,7 +43,7 @@ namespace SteamBotLite
         /// Do not try using steamfriends, steamuser and all that since it'll be uninitialised at this point 
         /// </summary>
         /// <param name="SteamConnectionHandler"></param>
-        public VBot(ApplicationInterface appinterface) : base(appinterface)
+        public VBot() 
         {
             Console.WriteLine("Vbot Initialised");
             Console.WriteLine("Loading modules and stuff");
@@ -73,27 +73,28 @@ namespace SteamBotLite
         {
             // OnMaplistchange();
             Console.WriteLine(Autojoin);
-            appinterface.SetUsername("InterFaceBot");
+            base.SetUsernameEventProcess("InterfaceBot");
             if (Autojoin)
-                appinterface.EnterChatRoom(GroupChatSID);
+                base.FireChatRoomEvent(ChatroomEventEnum.EnterChat , GroupChatSID );
             InitTimer();
-            Console.WriteLine("UserHandler: {0} ApplicationInterface: {1} Is now online", this.GetType(), this.appinterface.GetType());
+            Console.WriteLine("UserHandler: {0} Has Loaded", this.GetType());
         }
 
         public override void ProcessPrivateMessage(object sender, MessageProcessEventData e) //This is an example of using older methods for cross-compatibility, by converting the new format to the older one
         {
-            Console.WriteLine(e.Message);
-            string response = ChatMessageHandler(e.Sender, e.Message);
-            if (response != null)
-                appinterface.SendPrivateMessage(e.Sender, response);
+            Console.WriteLine(e.ReceivedMessage);
+            e.ReplyMessage = ChatMessageHandler(e.Sender, e.ReceivedMessage);
+            if (e.ReplyMessage != null)
+                base.SendPrivateMessageProcessEvent(e);
         }
+
         public override void ProcessChatRoomMessage(object sender, MessageProcessEventData e)
         {
             GhostCheck = InitialGhostCheck;
             CrashCheck = 0;
-            string response = ChatMessageHandler(e.Sender, e.Message);
-            if (response != null)
-                appinterface.SendChatRoomMessage(e.Chatroom, response);
+            e.ReplyMessage = ChatMessageHandler(e.Sender, e.ReceivedMessage);
+            if (e.ReplyMessage != null)
+                base.SendChatRoomMessageProcessEvent(e);
         }
 
         public void Disablemodule(string ModuleToRemove)
@@ -170,7 +171,7 @@ namespace SteamBotLite
         }
         public void OnMaplistchange(int MapCount, object sender = null, NotifyCollectionChangedEventArgs args = null)
         {
-            appinterface.SetUsername("[" + MapCount + "]" + Username);            
+            base.SetUsernameEventProcess("[" + MapCount + "]" + Username);         
         }
         public void ServerUpdated(object sender, ServerModule.ServerInfo args)
         {
@@ -199,8 +200,8 @@ namespace SteamBotLite
             {
                 GhostCheck = InitialGhostCheck;
                 CrashCheck += 1;
-                appinterface.LeaveChatroom(GroupChatSID);
-                appinterface.EnterChatRoom(GroupChatSID);
+                FireChatRoomEvent(ChatroomEventEnum.LeaveChat, GroupChatSID);
+                FireChatRoomEvent(ChatroomEventEnum.EnterChat, GroupChatSID);
             }
             if (CrashCheck >= 4)
             {
