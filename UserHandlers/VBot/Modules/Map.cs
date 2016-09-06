@@ -21,8 +21,6 @@ namespace SteamBotLite
         int MaxMapNumber = 10;
         string ServerMapListUrl;
 
-        VBot vbot;
-
         public MapModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
             loadPersistentData();
