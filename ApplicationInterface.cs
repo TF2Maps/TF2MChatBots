@@ -33,10 +33,11 @@ namespace SteamBotLite
     /// </summary>
     public struct UserIdentifier
     {
-        public UserIdentifier(object Identification, object rank = null , object additionaldata = null)
+        public UserIdentifier(object Identification, object rank = null , object additionaldata = null, string displayname = "Unknown")
         {
             identifier = Identification;
             Rank = rank; //TODO check if this throws an error
+            DisplayName = displayname;
             if (additionaldata != null)
             {
                 extradata = additionaldata;
@@ -49,21 +50,33 @@ namespace SteamBotLite
         public object Rank;
         public object identifier;
         public object extradata;
+        public string DisplayName;
     }
 
     public class MessageProcessEventData : EventArgs
     {
         public UserIdentifier Sender;
         public ChatRoomIdentifier Chatroom;
-        public string Message;        
+        public string ReceivedMessage;
+        public string ReplyMessage;       
     }
 
         public abstract class ApplicationInterface
     {
         
 
-        public abstract void SendChatRoomMessage(ChatRoomIdentifier chatroomidentifier, string Message);
-        public abstract void SendPrivateMessage(UserIdentifier useridentifier, string Message);
+        public abstract void SendChatRoomMessage(object sender, MessageProcessEventData messagedata);
+        public abstract void SendPrivateMessage(object sender, MessageProcessEventData messagedata);
+
+        public void AssignUserHandler(UserHandler userhandler)
+        {
+            userhandler.ChatRoomJoin += EnterChatRoom;
+            userhandler.ChatRoomLeave += LeaveChatroom;
+            userhandler.SendChatRoomMessageEvent += SendChatRoomMessage;
+            userhandler.SendPrivateMessageEvent += SendPrivateMessage;
+            userhandler.SetUsernameEvent += SetUsername;
+
+        }
 
         /* I beleive there is no benefit to making this role mandatory
         public abstract void ReceiveChatRoomMessage(ChatRoomIdentifier chatroomidentifier, string Message);
@@ -130,15 +143,15 @@ namespace SteamBotLite
 
         public abstract void ReceiveChatMemberInfo(UserIdentifier useridentifier, bool AdminStatus);
 
-        public abstract void EnterChatRoom (ChatRoomIdentifier chatroomidentifier);
-        public abstract void LeaveChatroom (ChatRoomIdentifier chatroomidentifier);
+        public abstract void EnterChatRoom (object sender, ChatRoomIdentifier chatroomidentifier);
+        public abstract void LeaveChatroom (object sender, ChatRoomIdentifier chatroomidentifier);
 
         public abstract void Reboot();
 
-        public abstract void SetUsername(string Username);
+        public abstract void SetUsername(object sender, string Username);
         public abstract string GetUsername();
 
-        public abstract string GetOthersUsername(UserIdentifier user);
+        public abstract string GetOthersUsername(object sender, UserIdentifier user);
 
         public abstract void tick();
 
@@ -151,7 +164,7 @@ namespace SteamBotLite
 
             set
             {
-               SetUsername(value);
+               SetUsername(this, value);
             }
         }
     }

@@ -188,7 +188,7 @@ namespace SteamBotLite
                 pmResponse = "";
                 for (int i = 0; i < mapList.Count; i++)
                 {
-                    string mapLine = string.Format("{0} // {1} // {2} ({3})", mapList[i].name, mapList[i].link, userhandler.appinterface.GetOthersUsername(new UserIdentifier(mapList[i].Submitter)), mapList[i].Submitter);
+                    string mapLine = string.Format("{0} // {1} // {2} ({3})", mapList[i].name, mapList[i].link, mapList[i].Submitter, "Unknown");
 
                     if (!string.IsNullOrEmpty(mapList[i].Notes))
                         mapLine += "\nNotes: " + mapList[i].Notes;
@@ -200,7 +200,7 @@ namespace SteamBotLite
                 }
                 // PM map list to the caller.
                 if (mapList.Count != 0)
-                    userhandler.appinterface.SendPrivateMessage(sender, pmResponse);
+                    userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData { Sender = sender, ReplyMessage = pmResponse });
 
                 return chatResponse;
 
@@ -234,7 +234,7 @@ namespace SteamBotLite
                 pmResponse = "";
                 for (int i = 0; i < mapList.Count; i++)
                 {
-                    string mapLine = string.Format("{0} // {1} // {2} ({3})", mapList[i].name, mapList[i].link, userhandler.appinterface.GetOthersUsername(new UserIdentifier(mapList[i].Submitter)), mapList[i].Submitter);
+                    string mapLine = string.Format("{0} // {1} // {2} ({3})", mapList[i].name, mapList[i].link, mapList[i].Submitter, "Unknown");
 
                     if (!string.IsNullOrEmpty(mapList[i].Notes))
                         mapLine += "\nNotes: " + mapList[i].Notes;
@@ -246,7 +246,7 @@ namespace SteamBotLite
                 }
                 // PM map list to the caller.
                 if (mapList.Count != 0)
-                    userhandler.appinterface.SendPrivateMessage(sender, pmResponse);
+                    userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData { Sender = sender, ReplyMessage = pmResponse });
 
                 return chatResponse;
             }

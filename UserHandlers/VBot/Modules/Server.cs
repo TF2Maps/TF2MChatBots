@@ -88,7 +88,8 @@ namespace SteamBotLite
                     {
                         serverList[x].update(serverstate);
                         ServerUpdated(this, serverstate);
-                        userhandler.appinterface.SendChatRoomMessage(userhandler.GroupChatSID,serverstate.ToString());
+                        userhandler.SendChatRoomMessageProcessEvent(new MessageProcessEventData { Chatroom = userhandler.GroupChatSID, ReplyMessage = serverstate.ToString() });
+                        
                     }
                 }
                 x++;
