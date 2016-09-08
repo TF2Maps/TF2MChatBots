@@ -28,15 +28,19 @@ namespace SteamBotLite
         public object extradata;
     }
 
+    
+
     /// <summary>
     /// The identification of the individual users
     /// </summary>
     public struct UserIdentifier
     {
-        public UserIdentifier(object Identification, object rank = null , object additionaldata = null, string displayname = "Unknown")
+        public enum UserAdminStatus { Unknown, Other, False, True };
+
+        public UserIdentifier(object Identification, UserAdminStatus Rank = UserAdminStatus.Unknown , object additionaldata = null, string displayname = "Unknown")
         {
             identifier = Identification;
-            Rank = rank; //TODO check if this throws an error
+            UserRank = Rank; //TODO check if this throws an error
             DisplayName = displayname;
             if (additionaldata != null)
             {
@@ -47,7 +51,7 @@ namespace SteamBotLite
                 extradata = null;
             }
         }
-        public object Rank;
+        public UserAdminStatus UserRank;
         public object identifier;
         public object extradata;
         public string DisplayName;
