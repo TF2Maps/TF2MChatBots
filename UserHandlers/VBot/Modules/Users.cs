@@ -60,7 +60,14 @@ namespace SteamBotLite
 
         public bool admincheck(UserIdentifier UserToVerify)
         {
-            return admins.Any(s => UserToVerify.Equals(s));
+            if (UserToVerify.UserRank == UserIdentifier.UserAdminStatus.True | (admins.Any(s => UserToVerify.Equals(s))))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
