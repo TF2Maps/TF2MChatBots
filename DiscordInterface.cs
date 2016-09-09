@@ -36,7 +36,7 @@ namespace SteamBotLite
                     User.UserRank = UserIdentifier.UserAdminStatus.False;
                 }
 
-                MessageProcessEventData Msg = new MessageProcessEventData();
+                MessageProcessEventData Msg = new MessageProcessEventData(this);
                 Msg.ReceivedMessage = e.Message.RawText;
                 Msg.Sender = User;
                 Msg.Chatroom = new ChatRoomIdentifier(e.Message.Channel);

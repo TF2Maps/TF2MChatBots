@@ -85,7 +85,7 @@ namespace SteamBotLite
             {
                 UserIdentifier Submitter = new UserIdentifier(map.Submitter);
                 Console.WriteLine("Found map, sending message to {0}", Submitter);
-                userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData { Sender = Submitter, ReplyMessage = string.Format("Map {0} is being tested on the {1} server and has been DELETED.", map.Filename, args.tag)});               
+                userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData(null) { Sender = Submitter, ReplyMessage = string.Format("Map {0} is being tested on the {1} server and has been DELETED.", map.Filename, args.tag)});               
                 mapList.Remove(map);
                 Console.WriteLine("Map {0} is being tested on the {1} server and has been DELETED.", map.Filename, args.tag);
                 savePersistentData();
@@ -247,7 +247,7 @@ namespace SteamBotLite
                 // PM map list to the caller.
                 if (maps.Count != 0)
                 {
-                    userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData { Sender = sender, ReplyMessage = pmResponse });
+                    userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData(null) { Sender = sender, ReplyMessage = pmResponse });
                 }
 
                 return chatResponse;

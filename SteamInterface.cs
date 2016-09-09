@@ -379,11 +379,10 @@ namespace SteamBotLite
 
         void ReceivePrivateMessage(SteamFriends.FriendMsgCallback callback)
         {
-            MessageProcessEventData NewMessageData = new MessageProcessEventData();
+            MessageProcessEventData NewMessageData = new MessageProcessEventData(this);
             NewMessageData.ReceivedMessage = callback.Message;
             NewMessageData.Sender = new UserIdentifier(callback.Sender);
             NewMessageData.Sender.DisplayName = SteamFriends.GetFriendPersonaName(callback.Sender);
-            NewMessageData.InterfaceHandler = this;
             base.PrivateMessageProcessEvent(NewMessageData);
 
             // UserHandlerClass.ProcessPrivateMessage(new UserIdentifier(callback.Sender), callback.Message);
@@ -391,12 +390,11 @@ namespace SteamBotLite
 
         void ReceiveChatMessage(SteamFriends.ChatMsgCallback callback)
         {
-            MessageProcessEventData NewMessageData = new MessageProcessEventData();
+            MessageProcessEventData NewMessageData = new MessageProcessEventData(this);
             NewMessageData.ReceivedMessage = callback.Message;
             NewMessageData.Chatroom = new ChatRoomIdentifier(callback.ChatRoomID);
             NewMessageData.Sender = new UserIdentifier(callback.ChatterID);
             NewMessageData.Sender.DisplayName = SteamFriends.GetFriendPersonaName(callback.ChatterID);
-            NewMessageData.InterfaceHandler = this;
             base.ChatRoomMessageProcessEvent(NewMessageData);
 
            // UserHandlerClass.ProcessChatRoomMessage(new ChatRoomIdentifier(callback.ChatRoomID), new UserIdentifier(callback.ChatterID), callback.Message);
