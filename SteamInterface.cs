@@ -52,7 +52,6 @@ namespace SteamBotLite
         string LoginKeyFile;
 
         
-
         SteamClient steamClient;
         public SteamUser steamUser;
         public SteamFriends SteamFriends;
@@ -76,8 +75,9 @@ namespace SteamBotLite
                 Console.WriteLine("Exception Handled: {0}", ex);
             }
         }
-        public SteamInterface(SteamBotData BotData, int BotID)
+        public SteamInterface(SteamBotData BotData, int BotID , ulong GroupChatID) : base(GroupChatID)
         {
+            MainChatRoom = new ChatRoomIdentifier(GroupChatID);
             ResetConnection(BotData, BotID);
         }
         /// <summary>
@@ -383,6 +383,7 @@ namespace SteamBotLite
             NewMessageData.ReceivedMessage = callback.Message;
             NewMessageData.Sender = new UserIdentifier(callback.Sender);
             NewMessageData.Sender.DisplayName = SteamFriends.GetFriendPersonaName(callback.Sender);
+            NewMessageData.InterfaceHandler = this;
             base.PrivateMessageProcessEvent(NewMessageData);
 
             // UserHandlerClass.ProcessPrivateMessage(new UserIdentifier(callback.Sender), callback.Message);
@@ -395,6 +396,7 @@ namespace SteamBotLite
             NewMessageData.Chatroom = new ChatRoomIdentifier(callback.ChatRoomID);
             NewMessageData.Sender = new UserIdentifier(callback.ChatterID);
             NewMessageData.Sender.DisplayName = SteamFriends.GetFriendPersonaName(callback.ChatterID);
+            NewMessageData.InterfaceHandler = this;
             base.ChatRoomMessageProcessEvent(NewMessageData);
 
            // UserHandlerClass.ProcessChatRoomMessage(new ChatRoomIdentifier(callback.ChatRoomID), new UserIdentifier(callback.ChatterID), callback.Message);
@@ -421,13 +423,31 @@ namespace SteamBotLite
 
         public override void SendChatRoomMessage(object sender, MessageProcessEventData messagedata)
         {
-          
-            SteamFriends.SendChatRoomMessage((SteamID)(messagedata.Chatroom.identifier), EChatEntryType.ChatMsg, messagedata.ReplyMessage);
+            try
+            {
+                SteamFriends.SendChatRoomMessage((SteamID)(messagedata.Chatroom.identifier), EChatEntryType.ChatMsg, messagedata.ReplyMessage);
+            }
+            catch
+            {
+                
+            }
         }
 
         public override void SendPrivateMessage(object sender, MessageProcessEventData messagedata)
         {
-            SteamFriends.SendChatMessage((SteamID)messagedata.Sender.identifier, EChatEntryType.ChatMsg, messagedata.ReplyMessage);
+            try
+            {
+                SteamFriends.SendChatMessage((SteamID)messagedata.Sender.identifier, EChatEntryType.ChatMsg, messagedata.ReplyMessage);
+            }
+            catch
+            {
+
+            }
+        }
+
+        public override void BroadCastMessage(object sender, string message)
+        {
+            SteamFriends.SendChatRoomMessage((SteamID)MainChatRoom.identifier, EChatEntryType.ChatMsg, message);
         }
 
         public override void EnterChatRoom(object sender, ChatRoomIdentifier chatroomidentifier)
@@ -465,5 +485,7 @@ namespace SteamBotLite
         {
             return SteamFriends.GetPersonaName();
         }
+
+        
     }
 }

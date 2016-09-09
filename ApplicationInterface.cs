@@ -62,15 +62,26 @@ namespace SteamBotLite
         public UserIdentifier Sender;
         public ChatRoomIdentifier Chatroom;
         public string ReceivedMessage;
-        public string ReplyMessage;       
+        public string ReplyMessage;
+        public ApplicationInterface InterfaceHandler;    
     }
 
         public abstract class ApplicationInterface
     {
+
+        public ChatRoomIdentifier MainChatRoom;
         
+
+        public ApplicationInterface(object MainChatroomIdentifier)
+        {
+            MainChatRoom = new ChatRoomIdentifier(MainChatroomIdentifier);
+        }
+
 
         public abstract void SendChatRoomMessage(object sender, MessageProcessEventData messagedata);
         public abstract void SendPrivateMessage(object sender, MessageProcessEventData messagedata);
+        public abstract void BroadCastMessage(object sender, string message);
+
 
         public void AssignUserHandler(UserHandler userhandler)
         {
@@ -80,7 +91,9 @@ namespace SteamBotLite
             userhandler.SendPrivateMessageEvent += SendPrivateMessage;
             userhandler.SetUsernameEvent += SetUsername;
             userhandler.RebootEvent += Reboot;
-
+            userhandler.BroadcastMessageEvent += BroadCastMessage;
+            userhandler.MainChatRoomJoin += EnterMainChatRoom;
+            userhandler.MainChatRoomLeave += LeaveMainChatroom;
         }
 
 
@@ -119,6 +132,8 @@ namespace SteamBotLite
             }
         }
 
+        
+
         event EventHandler<Tuple<UserIdentifier, bool>> ChatMemberInfoEvent;
         //The event-invoking method that derived classes can override.
         protected virtual void ChatMemberInfoProcessEvent(UserIdentifier e , bool isadmin)
@@ -151,6 +166,16 @@ namespace SteamBotLite
 
         public abstract void EnterChatRoom (object sender, ChatRoomIdentifier chatroomidentifier);
         public abstract void LeaveChatroom (object sender, ChatRoomIdentifier chatroomidentifier);
+
+        public void EnterMainChatRoom(object sender, EventArgs e)
+        {
+            EnterChatRoom(sender, MainChatRoom);
+        }
+
+        public void LeaveMainChatroom(object sender, EventArgs e)
+        {
+            LeaveChatroom(sender, MainChatRoom);
+        }
 
         public abstract void Reboot(object sender, EventArgs e);
 

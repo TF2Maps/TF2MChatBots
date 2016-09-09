@@ -10,8 +10,6 @@ namespace SteamBotLite
 
     class VBot : UserHandler
     {
-        ulong GroupChatID;
-        public ChatRoomIdentifier GroupChatSID;
         double interval = 60000;
         readonly int InitialGhostCheck = 10;
         int GhostCheck = 480;
@@ -48,12 +46,6 @@ namespace SteamBotLite
             Console.WriteLine("Vbot Initialised");
             Console.WriteLine("Loading modules and stuff");
             
-            GroupChatID = ulong.Parse((string)jsconfig["GroupchatID"]);
-            GroupChatSID = new ChatRoomIdentifier(GroupChatID);
-            try {
-                Autojoin = Convert.ToBoolean(jsconfig["AutoJoin"]);
-            } catch { };
-             
             // loading modules
 
             motdModule = new MotdModule(this, jsconfig);
@@ -75,26 +67,33 @@ namespace SteamBotLite
             Console.WriteLine(Autojoin);
             base.SetUsernameEventProcess("InterfaceBot");
             if (Autojoin)
-                base.FireChatRoomEvent(ChatroomEventEnum.EnterChat , GroupChatSID );
+                base.FireMainChatRoomEvent(ChatroomEventEnum.EnterChat);
             InitTimer();
             Console.WriteLine("UserHandler: {0} Has Loaded", this.GetType());
         }
 
         public override void ProcessPrivateMessage(object sender, MessageProcessEventData e) //This is an example of using older methods for cross-compatibility, by converting the new format to the older one
         {
-            Console.WriteLine(e.ReceivedMessage);
+            ApplicationInterface AppInterface = (ApplicationInterface)sender;
             e.ReplyMessage = ChatMessageHandler(e.Sender, e.ReceivedMessage);
             if (e.ReplyMessage != null)
+            {
+                //AppInterface.SendPrivateMessage(this, e);
                 base.SendPrivateMessageProcessEvent(e);
+            }
         }
 
         public override void ProcessChatRoomMessage(object sender, MessageProcessEventData e)
         {
+            ApplicationInterface AppInterface = (ApplicationInterface)sender;
             GhostCheck = InitialGhostCheck;
             CrashCheck = 0;
             e.ReplyMessage = ChatMessageHandler(e.Sender, e.ReceivedMessage);
             if (e.ReplyMessage != null)
+            {
+                //AppInterface.SendChatRoomMessage(this, e);
                 base.SendChatRoomMessageProcessEvent(e);
+            }
         }
 
         public void Disablemodule(string ModuleToRemove)
@@ -147,11 +146,13 @@ namespace SteamBotLite
             foreach (BaseModule module in ModuleList)
             {
                 foreach (BaseCommand c in module.commands)
+                { 
                     if (Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
                     {
                         response = c.run(Sender, Message);
                         return response;
                     }
+                }
             }
 
             if (usersModule.admincheck(Sender)) //Verifies that it is a moderator, Can you please check if the "ISAdmin" is being used correctly? 
@@ -200,8 +201,8 @@ namespace SteamBotLite
             {
                 GhostCheck = InitialGhostCheck;
                 CrashCheck += 1;
-                FireChatRoomEvent(ChatroomEventEnum.LeaveChat, GroupChatSID);
-                FireChatRoomEvent(ChatroomEventEnum.EnterChat, GroupChatSID);
+                FireMainChatRoomEvent(ChatroomEventEnum.LeaveChat);
+                FireMainChatRoomEvent(ChatroomEventEnum.EnterChat);
             }
             if (CrashCheck >= 4)
             {

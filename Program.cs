@@ -20,21 +20,44 @@ namespace SteamBotLite
             SteamBotData Entry = SteamBotLoginData[0];
 
             VBot VbotHandler = new VBot();
-            SteamInterface SteamPlatformInterface = new SteamInterface(Entry, 0);
-            
+            SteamInterface SteamPlatformInterface = new SteamInterface(Entry, 0, 103582791429594873);
+            DiscordInterface DiscordPlatformInterface = new DiscordInterface("MjIyMjA0MDQ2MjYwMzA1OTIy.CrQ1MA.StYrm9OA2qsJxWv9kcD0_GvwBlU", 50);
+            Console.WriteLine("Left the discordPlatnform");
+
+
+            /*
             VbotHandler.AssignAppInterface(SteamPlatformInterface);
             SteamPlatformInterface.AssignUserHandler(VbotHandler);
-
+            */
             ConsoleUserHandler consolehandler = new ConsoleUserHandler();
+
+            
+            AssignConnection(VbotHandler, DiscordPlatformInterface);
+            AssignConnection(VbotHandler, SteamPlatformInterface);
+            AssignConnection(consolehandler, DiscordPlatformInterface);
+
+            
             SteamPlatformInterface.AssignUserHandler(consolehandler);
             consolehandler.AssignAppInterface(SteamPlatformInterface);
+
+            Bots.Add(SteamPlatformInterface);
+            Bots.Add(DiscordPlatformInterface);
 
             bool Running = true;
             while (Running)
             {
-                SteamPlatformInterface.tick();
+                foreach (ApplicationInterface bot in Bots)
+                {
+                    bot.tick();
+                }
                 System.Threading.Thread.Sleep(100);
             }
+        }
+
+        public static void AssignConnection (UserHandler userhandler , ApplicationInterface applicationinterface)
+        {
+            userhandler.AssignAppInterface(applicationinterface);
+            applicationinterface.AssignUserHandler(userhandler);
         }
     }
 }

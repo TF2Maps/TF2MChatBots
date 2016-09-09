@@ -95,6 +95,49 @@ namespace SteamBotLite
             }
         }
 
+        public event EventHandler<EventArgs> MainChatRoomJoin;
+        public event EventHandler<EventArgs> MainChatRoomLeave;
+        public event EventHandler<EventArgs> MainChatRoomOther;
+        //The event-invoking method that derived classes can override.
+        protected virtual void FireMainChatRoomEvent(ChatroomEventEnum e)
+        {
+            EventHandler<EventArgs> handler;
+            switch (e)
+            {
+                case ChatroomEventEnum.EnterChat:
+                    handler = MainChatRoomJoin;
+                    break;
+                case ChatroomEventEnum.LeaveChat:
+                    handler = MainChatRoomLeave;
+                    break;
+                case ChatroomEventEnum.Other:
+                    handler = MainChatRoomOther;
+                    break;
+                default:
+                    handler = null;
+                    break;
+            }
+            if (handler != null)
+            {
+                handler(this, null);
+            }
+        }
+
+        public event EventHandler<string> BroadcastMessageEvent;
+
+        //The event-invoking method that derived classes can override.
+        public virtual void BroadcastMessageProcessEvent(string message)
+        {
+            // Make a temporary copy of the event to avoid possibility of
+            // a race condition if the last subscriber unsubscribes
+            // immediately after the null check and before the event is raised.
+            EventHandler<string> handler = BroadcastMessageEvent;
+            if (handler != null)
+            {
+                handler(this, message);
+            }
+        }
+
         public event EventHandler<MessageProcessEventData> SendPrivateMessageEvent;
 
         //The event-invoking method that derived classes can override.
