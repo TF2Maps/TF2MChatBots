@@ -246,8 +246,10 @@ namespace SteamBotLite
 
                 // PM map list to the caller.
                 if (maps.Count != 0)
+                {
                     userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData { Sender = sender, ReplyMessage = pmResponse });
-                
+                }
+
                 return chatResponse;
             }
         }
