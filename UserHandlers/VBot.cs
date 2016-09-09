@@ -78,21 +78,25 @@ namespace SteamBotLite
             e.ReplyMessage = ChatMessageHandler(e.Sender, e.ReceivedMessage);
             if (e.ReplyMessage != null)
             {
+                e.InterfaceHandlerDestination.SendPrivateMessage(this, e);
+                /*
                 //AppInterface.SendPrivateMessage(this, e);
+                e.InterfaceHandlerDestination.SendPrivateMessage(this, e);
                 base.SendPrivateMessageProcessEvent(e);
+                */
             }
         }
 
         public override void ProcessChatRoomMessage(object sender, MessageProcessEventData e)
         {
-            ApplicationInterface AppInterface = (ApplicationInterface)sender;
             GhostCheck = InitialGhostCheck;
             CrashCheck = 0;
             e.ReplyMessage = ChatMessageHandler(e.Sender, e.ReceivedMessage);
             if (e.ReplyMessage != null)
             {
+                e.InterfaceHandlerDestination.SendChatRoomMessage(this, e);
                 //AppInterface.SendChatRoomMessage(this, e);
-                base.SendChatRoomMessageProcessEvent(e);
+                //base.SendChatRoomMessageProcessEvent(e);
             }
         }
 

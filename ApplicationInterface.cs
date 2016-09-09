@@ -63,7 +63,11 @@ namespace SteamBotLite
         public ChatRoomIdentifier Chatroom;
         public string ReceivedMessage;
         public string ReplyMessage;
-        public ApplicationInterface InterfaceHandler;    
+        public ApplicationInterface InterfaceHandlerDestination;    
+        public MessageProcessEventData (ApplicationInterface interfacehandlerdestination)
+        {
+            InterfaceHandlerDestination = interfacehandlerdestination;
+        }
     }
 
         public abstract class ApplicationInterface
