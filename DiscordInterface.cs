@@ -25,7 +25,8 @@ namespace SteamBotLite
             Console.WriteLine(e.Message.RawText);
             if (!e.Message.IsAuthor)
             {
-                UserIdentifier User = new UserIdentifier(e.User);
+
+                UserIdentifier User = new UserIdentifier(e.User.Id);
                 User.DisplayName = e.User.Name;
                 if (e.User.ServerPermissions.Administrator)
                 {
