@@ -54,7 +54,6 @@ namespace SteamBotLite
             public string Filename { get; set; }
             public string DownloadURL { get; set; }
             public string Notes { get; set; }
-            public ApplicationInterface ApplicationInterfaceOrigin { get; set; }
         }
 
         public override string getPersistentData()
@@ -159,7 +158,7 @@ namespace SteamBotLite
                 map.SubmitterName = sender.Sender.DisplayName;
                 map.Filename = parameters[0];
                 map.Notes = "No Notes";
-                map.ApplicationInterfaceOrigin = sender.InterfaceHandlerDestination;
+               
 
                 if (parameters[0].Length == 0)
                 {
@@ -312,8 +311,8 @@ namespace SteamBotLite
                         {
                             MapModule.mapList.Remove(deletedMap);
                             MapModule.savePersistentData();
-                            deletedMap.ApplicationInterfaceOrigin.SendPrivateMessage(this, new MessageProcessEventData(null) { Sender = new UserIdentifier(deletedMap.Submitter), ReplyMessage = string.Format("Map has been deleted.") });
-                           // userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData(deletedMap.ApplicationInterfaceOrigin) { Sender = new UserIdentifier(deletedMap.Submitter), ReplyMessage = string.Format("Map has been deleted.") });
+                            //deletedMap.ApplicationInterfaceOrigin.SendPrivateMessage(this, new MessageProcessEventData(null) { Sender = new UserIdentifier(deletedMap.Submitter), ReplyMessage = string.Format("Map has been deleted.") });
+                            userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData(null) { Sender = new UserIdentifier(deletedMap.Submitter), ReplyMessage = string.Format("Map has been deleted.") });
                             return string.Format("Map '{0}' DELETED.", deletedMap.Filename);
                         }
                         else
