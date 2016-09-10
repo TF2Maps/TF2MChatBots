@@ -49,11 +49,12 @@ namespace SteamBotLite
 
         public class Map
         {
-            public string Submitter { get; set; }
+            public Object Submitter { get; set; }
             public string SubmitterName { get; set; }
             public string Filename { get; set; }
             public string DownloadURL { get; set; }
             public string Notes { get; set; }
+            public ApplicationInterface ApplicationInterfaceOrigin { get; set; }
         }
 
         public override string getPersistentData()
@@ -71,7 +72,8 @@ namespace SteamBotLite
             }
             catch
             {
-                Console.WriteLine("Error Loading Map List");
+                mapList = new ObservableCollection<Map>();
+                Console.WriteLine("Error Loading Map List, creating a new one and wiping the old");
             }
         }
 
@@ -114,7 +116,7 @@ namespace SteamBotLite
             {
                 ServerMapListURL = Website;
             }
-            protected override string exec(UserIdentifier sender, string param)
+            protected override string exec(MessageProcessEventData sender, string param)
             {
                 return SearchClass.CheckDataExistsOnWebPage(ServerMapListURL, param).ToString(); 
             }
@@ -127,7 +129,7 @@ namespace SteamBotLite
             {
                 mapmodule = module;
             }
-            protected override string exec(UserIdentifier sender, string param)
+            protected override string exec(MessageProcessEventData sender, string param)
             {
                 NotifyCollectionChangedEventArgs args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
                 userhandler.OnMaplistchange(mapmodule.mapList.Count, sender, args);
@@ -147,16 +149,17 @@ namespace SteamBotLite
 
             public Add(VBot bot, MapModule mapModule) : base(bot, "!add", mapModule) { }
 
-            protected override string exec(UserIdentifier sender, string param)
+            protected override string exec(MessageProcessEventData sender, string param)
             {
                 string[] parameters = param.Split(new char[] { ' ' }, 2);
 
                 Map map = new Map();
-                map.Submitter = sender.ToString();
+                map.Submitter = sender.Sender.identifier;
 
-                map.SubmitterName = sender.DisplayName;
+                map.SubmitterName = sender.Sender.DisplayName;
                 map.Filename = parameters[0];
                 map.Notes = "No Notes";
+                map.ApplicationInterfaceOrigin = sender.InterfaceHandlerDestination;
 
                 if (parameters[0].Length == 0)
                 {
@@ -205,7 +208,7 @@ namespace SteamBotLite
         private class Maps : MapCommand
         {
             public Maps(VBot bot, MapModule mapMod) : base(bot, "!maps", mapMod) { }
-            protected override string exec(UserIdentifier sender, string param)
+            protected override string exec(MessageProcessEventData sender, string param)
             {
                 var maps = MapModule.mapList;
                 int maxMaps = MapModule.MaxMapNumber;
@@ -247,7 +250,7 @@ namespace SteamBotLite
                 // PM map list to the caller.
                 if (maps.Count != 0)
                 {
-                    userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData(null) { Sender = sender, ReplyMessage = pmResponse });
+                    userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData(null) { Sender = sender.Sender, ReplyMessage = pmResponse });
                 }
 
                 return chatResponse;
@@ -257,7 +260,7 @@ namespace SteamBotLite
         private class Update : MapCommand
         {
             public Update(VBot bot, MapModule mapMod) : base(bot, "!update", mapMod) { }
-            protected override string exec(UserIdentifier sender, string param)
+            protected override string exec(MessageProcessEventData sender, string param)
             {
                 string[] parameters = param.Split(' ');
 
@@ -291,7 +294,7 @@ namespace SteamBotLite
         private class Delete : MapCommand
         {
             public Delete(VBot bot, MapModule mapMod) : base(bot, "!delete", mapMod) { }
-            protected override string exec(UserIdentifier sender, string param)
+            protected override string exec(MessageProcessEventData sender, string param)
             {
                 string[] parameters = param.Split(' ');
 
@@ -305,10 +308,12 @@ namespace SteamBotLite
                     }
                     else
                     {
-                        if ((deletedMap.Submitter.Equals(sender.ToString())) || (userhandler.usersModule.admincheck(sender)))
+                        if ((deletedMap.Submitter.Equals(sender.Sender.identifier)) || (userhandler.usersModule.admincheck(sender.Sender)))
                         {
                             MapModule.mapList.Remove(deletedMap);
                             MapModule.savePersistentData();
+                            deletedMap.ApplicationInterfaceOrigin.SendPrivateMessage(this, new MessageProcessEventData(null) { Sender = new UserIdentifier(deletedMap.Submitter), ReplyMessage = string.Format("Map has been deleted.") });
+                           // userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData(deletedMap.ApplicationInterfaceOrigin) { Sender = new UserIdentifier(deletedMap.Submitter), ReplyMessage = string.Format("Map has been deleted.") });
                             return string.Format("Map '{0}' DELETED.", deletedMap.Filename);
                         }
                         else
@@ -325,7 +330,7 @@ namespace SteamBotLite
         private class Wipe : MapCommand
         {
             public Wipe(VBot bot, MapModule mapMod) : base(bot, "!wipe", mapMod) { }
-            protected override string exec(UserIdentifier sender, string param)
+            protected override string exec(MessageProcessEventData sender, string param)
             {
                 MapModule.mapList.Clear();
                 //MapModule.mapList = new List<Map>(); //OLd Maplist code

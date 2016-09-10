@@ -75,7 +75,7 @@ namespace SteamBotLite
         public override void ProcessPrivateMessage(object sender, MessageProcessEventData e) //This is an example of using older methods for cross-compatibility, by converting the new format to the older one
         {
             ApplicationInterface AppInterface = (ApplicationInterface)sender;
-            e.ReplyMessage = ChatMessageHandler(e.Sender, e.ReceivedMessage);
+            e.ReplyMessage = ChatMessageHandler(e, e.ReceivedMessage);
             if (e.ReplyMessage != null)
             {
                 e.InterfaceHandlerDestination.SendPrivateMessage(this, e);
@@ -91,7 +91,7 @@ namespace SteamBotLite
         {
             GhostCheck = InitialGhostCheck;
             CrashCheck = 0;
-            e.ReplyMessage = ChatMessageHandler(e.Sender, e.ReceivedMessage);
+            e.ReplyMessage = ChatMessageHandler(e, e.ReceivedMessage);
             if (e.ReplyMessage != null)
             {
                 e.InterfaceHandlerDestination.SendChatRoomMessage(this, e);
@@ -144,7 +144,7 @@ namespace SteamBotLite
         }
 
 
-        public string ChatMessageHandler(UserIdentifier Sender , string Message)
+        public string ChatMessageHandler(MessageProcessEventData sender , string Message)
         {
             string response = null;
             foreach (BaseModule module in ModuleList)
@@ -153,13 +153,13 @@ namespace SteamBotLite
                 { 
                     if (Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
                     {
-                        response = c.run(Sender, Message);
+                        response = c.run(sender, Message);
                         return response;
                     }
                 }
             }
 
-            if (usersModule.admincheck(Sender)) //Verifies that it is a moderator, Can you please check if the "ISAdmin" is being used correctly? 
+            if (usersModule.admincheck(sender.Sender)) //Verifies that it is a moderator, Can you please check if the "ISAdmin" is being used correctly? 
             {
                 Console.WriteLine("ADMIN SPOKE");
                 foreach (BaseModule module in ModuleList)
@@ -167,7 +167,7 @@ namespace SteamBotLite
                     foreach (BaseCommand c in module.adminCommands)
                         if (Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
                         {
-                            response = c.run(Sender, Message);
+                            response = c.run(sender, Message);
                             return response;
                         }
                 }

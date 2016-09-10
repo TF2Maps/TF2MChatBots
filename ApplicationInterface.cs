@@ -37,7 +37,7 @@ namespace SteamBotLite
     {
         public enum UserAdminStatus { Unknown, Other, False, True };
 
-        public UserIdentifier(object Identification, UserAdminStatus Rank = UserAdminStatus.Unknown , object additionaldata = null, string displayname = "Unknown")
+        public UserIdentifier(object Identification,  UserAdminStatus Rank = UserAdminStatus.Unknown , object additionaldata = null, string displayname = "Unknown")
         {
             identifier = Identification;
             UserRank = Rank; //TODO check if this throws an error
