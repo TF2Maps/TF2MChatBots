@@ -73,7 +73,7 @@ namespace SteamBotLite
             {
                 mapmodule = module;
             }
-            protected override string exec(UserIdentifier sender, string param)
+            protected override string exec(MessageProcessEventData sender, string param)
             {
                 NotifyCollectionChangedEventArgs args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
                 userhandler.OnMaplistchange(mapmodule.MapListCache.Count, sender, args);
@@ -109,7 +109,7 @@ namespace SteamBotLite
                 impnaomodule = Impnaomodule;
             }
 
-            protected override string exec(UserIdentifier sender, string param)
+            protected override string exec(MessageProcessEventData sender, string param)
             {
                 string[] parameters = param.Split(new char[] { ' ' }, 2);
 
@@ -167,7 +167,7 @@ namespace SteamBotLite
             {
                 impnaomodule = module;
             }
-            protected override string exec(UserIdentifier sender, string param)
+            protected override string exec(MessageProcessEventData sender, string param)
             {
                 string ImpNaoPage = SearchClass.GetWebPageAsString("http://carbidegames.com/impnao/api/maps");
                 ObservableCollection<ImpNaoMap> mapList = JsonConvert.DeserializeObject<ObservableCollection<ImpNaoMap>>(ImpNaoPage);
@@ -200,7 +200,7 @@ namespace SteamBotLite
                 }
                 // PM map list to the caller.
                 if (mapList.Count != 0)
-                    userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData(null) { Sender = sender, ReplyMessage = pmResponse });
+                    userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData(null) { Sender = sender.Sender, ReplyMessage = pmResponse });
 
                 return chatResponse;
 
@@ -215,7 +215,7 @@ namespace SteamBotLite
             {
                 impnaomodule = module;
             }
-            protected override string exec(UserIdentifier sender, string param)
+            protected override string exec(MessageProcessEventData sender, string param)
             {
                 ObservableCollection< ImpNaoMap> mapList = impnaomodule.MapListCache;
 
@@ -243,7 +243,7 @@ namespace SteamBotLite
                 }
                 // PM map list to the caller.
                 if (mapList.Count != 0)
-                    userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData(null) { Sender = sender, ReplyMessage = pmResponse });
+                    userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData(null) { Sender = sender.Sender, ReplyMessage = pmResponse });
 
                 return chatResponse;
             }
@@ -252,7 +252,7 @@ namespace SteamBotLite
         private class Update : MapCommand
         {
             public Update(VBot bot, ImpNaoModule impnaomodule) : base(bot, "!update", impnaomodule) { }
-            protected override string exec(UserIdentifier sender, string param)
+            protected override string exec(MessageProcessEventData sender, string param)
             {
 
                 return "Completed";
@@ -266,7 +266,7 @@ namespace SteamBotLite
             {
                 impnaomodule = module;
             }
-            protected override string exec(UserIdentifier sender, string param)
+            protected override string exec(MessageProcessEventData sender, string param)
             {
                 string ImpNaoPage = SearchClass.GetWebPageAsString("http://carbidegames.com/impnao/api/maps");
                 ObservableCollection<ImpNaoMap> mapList = JsonConvert.DeserializeObject<ObservableCollection<ImpNaoMap>>(ImpNaoPage);
@@ -283,9 +283,9 @@ namespace SteamBotLite
                     }
                     else
                     {
-                        if ((deletedMap.password.Equals(sender.ToString())) || (userhandler.usersModule.admincheck(sender)))
+                        if ((deletedMap.password.Equals(sender.ToString())) || (userhandler.usersModule.admincheck(sender.Sender)))
                         {
-                            impnaomodule.DeleteMapOnline(parameters[0], sender);
+                            impnaomodule.DeleteMapOnline(parameters[0], sender.Sender);
                             return string.Format("Map '{0}' DELETED.", deletedMap.name);
                         }
                         else
@@ -306,7 +306,7 @@ namespace SteamBotLite
         private class Wipe : MapCommand
         {
             public Wipe(VBot bot, ImpNaoModule impnaomodule) : base(bot, "!wipe", impnaomodule) { }
-            protected override string exec(UserIdentifier sender, string param)
+            protected override string exec(MessageProcessEventData sender, string param)
             {
 
                 return "Completed";

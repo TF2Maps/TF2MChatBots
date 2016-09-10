@@ -170,7 +170,7 @@ namespace SteamBotLite
                 servermodule = module;
 
             }
-            protected override string exec(UserIdentifier sender, string param)
+            protected override string exec(MessageProcessEventData sender, string param)
             {
                 ServerInfo status = ServerQuery(server);
                 if (status != null)
@@ -194,7 +194,7 @@ namespace SteamBotLite
             {
                 this.module = module;
             }
-            protected override string exec(UserIdentifier sender, string param)
+            protected override string exec(MessageProcessEventData sender, string param)
             {
                 string activeServers = "";
                 foreach (ServerInfo server in module.serverList)
