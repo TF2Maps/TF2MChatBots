@@ -196,10 +196,12 @@ namespace SteamBotLite
                 {
                     return "Your map isn't uploaded! Please use include the url with the syntax: !add <mapname> <url> (notes)";
                 }
+                string Reply = string.Format("Map '{0}' added.", map.Filename);
 
                 MapModule.mapList.Add(map);
                 MapModule.savePersistentData();
-                return string.Format("Map '{0}' added.", map.Filename);
+                
+                return Reply;
 
             }
         }
@@ -311,8 +313,7 @@ namespace SteamBotLite
                         {
                             MapModule.mapList.Remove(deletedMap);
                             MapModule.savePersistentData();
-                            //deletedMap.ApplicationInterfaceOrigin.SendPrivateMessage(this, new MessageProcessEventData(null) { Sender = new UserIdentifier(deletedMap.Submitter), ReplyMessage = string.Format("Map has been deleted.") });
-                            userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData(null) { Sender = new UserIdentifier(deletedMap.Submitter), ReplyMessage = string.Format("Map has been deleted.") });
+                            userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData(null) { Sender = new UserIdentifier(deletedMap.Submitter), ReplyMessage = string.Format("Your map {0} has been deleted from the map list",deletedMap.Filename) });
                             return string.Format("Map '{0}' DELETED.", deletedMap.Filename);
                         }
                         else

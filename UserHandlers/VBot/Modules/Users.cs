@@ -11,8 +11,8 @@ namespace SteamBotLite
 {
     class UsersModule : BaseModule
     {
-        public List<UserIdentifier> admins = new List<UserIdentifier>();
-        public List<UserIdentifier> bans = new List<UserIdentifier>();
+        public List<object> admins = new List<object>();
+        public List<object> bans = new List<object>();
 
         public UsersModule(VBot bot, Dictionary<string, object> config) : base(bot, config)
         {
@@ -22,7 +22,7 @@ namespace SteamBotLite
 
         public override string getPersistentData()
         {
-            Dictionary<string, List<UserIdentifier>> data = new Dictionary<string, List<UserIdentifier>>();
+            Dictionary<string, List<object>> data = new Dictionary<string, List<object>>();
             data.Add("admins", admins);
             data.Add("bans", bans);
             return JsonConvert.SerializeObject(data);
@@ -32,8 +32,8 @@ namespace SteamBotLite
         {
             try
             {
-                Dictionary<string, List<UserIdentifier>> data;
-                data = JsonConvert.DeserializeObject<Dictionary<string, List<UserIdentifier>>>(System.IO.File.ReadAllText(this.GetType().Name + ".json"));
+                Dictionary<string, List<object>> data;
+                data = JsonConvert.DeserializeObject<Dictionary<string, List<object>>>(System.IO.File.ReadAllText(this.GetType().Name + ".json"));
                 admins = data["admins"];
                 bans = data["bans"];
             }
@@ -47,20 +47,20 @@ namespace SteamBotLite
                 Console.WriteLine("Admin entered");
                 if (!admins.Any(s => info.Equals(s))) //if an admin is not in the list
                 {
-                    admins.Add(info);
+                    admins.Add(info.identifier);
                     savePersistentData();
                 }
             }
             else if (admins.Any(s => info.Equals(s))) //if it's not an admin but he's in the list
             {
-                admins.Remove(info);
+                admins.Remove(info.identifier);
                 savePersistentData();
             }
         }
 
         public bool admincheck(UserIdentifier UserToVerify)
         {
-            if (UserToVerify.UserRank == UserIdentifier.UserAdminStatus.True | (admins.Any(s => UserToVerify.Equals(s))))
+            if (UserToVerify.UserRank == UserIdentifier.UserAdminStatus.True | (admins.Any(s => UserToVerify.identifier.ToString().Equals(s))))
             {
                 return true;
             }

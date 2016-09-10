@@ -65,7 +65,7 @@ namespace SteamBotLite
         {
             // OnMaplistchange();
             Console.WriteLine(Autojoin);
-            base.SetUsernameEventProcess("InterfaceBot");
+            base.SetUsernameEventProcess("V3Bot");
             if (Autojoin)
                 base.FireMainChatRoomEvent(ChatroomEventEnum.EnterChat);
             InitTimer();
@@ -75,15 +75,11 @@ namespace SteamBotLite
         public override void ProcessPrivateMessage(object sender, MessageProcessEventData e) //This is an example of using older methods for cross-compatibility, by converting the new format to the older one
         {
             ApplicationInterface AppInterface = (ApplicationInterface)sender;
+            e.InterfaceHandlerDestination = AppInterface;
             e.ReplyMessage = ChatMessageHandler(e, e.ReceivedMessage);
             if (e.ReplyMessage != null)
             {
                 e.InterfaceHandlerDestination.SendPrivateMessage(this, e);
-                /*
-                //AppInterface.SendPrivateMessage(this, e);
-                e.InterfaceHandlerDestination.SendPrivateMessage(this, e);
-                base.SendPrivateMessageProcessEvent(e);
-                */
             }
         }
 
