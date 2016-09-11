@@ -39,6 +39,7 @@ namespace SteamBotLite
             commands.Add(new UpdateName(bot, this));
             commands.Add(new Delete(bot, this));
             commands.Add(new UploadCheck(bot, ServerMapListUrl));
+            commands.Add(new Insert(bot, this));
             adminCommands.Add(new Wipe(bot, this));
         }
 
@@ -206,6 +207,82 @@ namespace SteamBotLite
             }
         }
 
+        private class Insert : MapCommand
+        {
+
+            public bool uploadcheck(string MapName, string Website)
+            {
+                return SearchClass.CheckDataExistsOnWebPage(Website, MapName); //TODO develop method to check website
+            }
+
+            public Insert(VBot bot, MapModule mapModule) : base(bot, "!insert", mapModule) { }
+
+            protected override string exec(MessageProcessEventData sender, string param)
+            {
+                string[] parameters = param.Split(new char[] { ' ' }, 3);
+                int index;
+
+                if (parameters[0].Length == 0)
+                {
+                    return "Invalid parameters for !insert. Syntax: !insert <index> <mapname> <url> <notes>";
+                }
+                try
+                {
+                    index = int.Parse(parameters[0]);
+                }
+                catch
+                {
+                    return "Invalid parameters for !insert. Syntax: !insert <index> <mapname> <url> <notes>";
+                }
+                Map map = new Map();
+                map.Submitter = sender.Sender.identifier.ToString();
+
+                map.SubmitterName = sender.Sender.DisplayName;
+                map.Filename = parameters[1];
+                map.Notes = "No Notes";
+
+                if (parameters[1].Any(c => char.IsUpper(c)))
+                {
+                    return "Your Map is rejected as it includes an uppercase letter";
+                }
+                if (parameters[1].Length > 27) //TODO make this the actually needed number
+                {
+                    return "Your Map is rejected for having a filename too long";
+                }
+
+                if (uploadcheck(map.Filename, MapModule.ServerMapListUrl)) //Check if the map is uploaded
+                {
+                    map.DownloadURL = "Uploaded";
+                    if (parameters.Length > 1)
+                    {
+                        map.Notes = parameters.Last();
+                    }
+                }
+                else if (parameters.Length > 2) //If its not uploaded check if a URL was there
+                {
+                    parameters = param.Split(new char[] { ' ' }, 4);
+
+                    map.DownloadURL = parameters[2];
+                    if (parameters.Length > 3)
+                    {
+                        map.Notes = parameters.Last();
+                    }
+                }
+                else //If a url isn't there lets return an error
+                {
+                    return "Your map isn't uploaded! Please use include the url with the syntax: !add <mapname> <url> (notes)";
+                }
+                string Reply = string.Format("Map '{0}' added.", map.Filename);
+
+                MapModule.mapList.Insert(index, map);
+
+                MapModule.savePersistentData();
+
+                return Reply;
+
+            }
+        }
+
         private class Maps : MapCommand
         {
             public Maps(VBot bot, MapModule mapMod) : base(bot, "!maps", mapMod) { }
@@ -265,28 +342,39 @@ namespace SteamBotLite
             {
                 string[] parameters = param.Split(' ');
 
-                if (parameters.Length < 1)
+                if (parameters.Length < 2)
                 {
                     return string.Format("Invalid parameters for !update. Syntax: !update <mapname> (url)");
                 }
                 else
                 {
-                    Map editedMap = MapModule.mapList.Where(x => x.Filename.Equals(parameters[0])).FirstOrDefault(); //Needs to be tested
-                    // Map editedMap = MapModule.mapList.Find(map => map.filename.Equals(parameters[0])); //OLD Map CODE
-                    if (editedMap.Submitter.Equals(sender.ToString()))
+                    int Index = 0;
+                    bool MapExists = false;
+                    foreach (Map Entry in MapModule.mapList)
                     {
-                        MapModule.mapList.Remove(editedMap);
-
-                        editedMap.Filename = parameters[1];
+                        if (Entry.Filename.Equals(parameters[0]) && (Entry.Submitter.ToString().Equals(sender.ToString()) | (userhandler.usersModule.admincheck(sender.Sender))))
+                        {
+                            MapExists = true;
+                            break;
+                        }
+                        else
+                        {
+                            Index++;
+                        }
+                    }
+                    if (MapExists)
+                    {
+                        MapModule.mapList[Index].Filename = parameters[1];
                         if (parameters.Length > 2)
-                            editedMap.DownloadURL = parameters[2];
-                        MapModule.mapList.Add(editedMap);
+                        {
+                            MapModule.mapList[Index].DownloadURL = parameters[2];
+                        }
                         MapModule.savePersistentData();
-                        return string.Format("Map '{0}' has been edited.", editedMap.Filename);
+                        return string.Format("Map renamed to'{0}'" , MapModule.mapList[Index].Filename );
                     }
                     else
                     {
-                        return string.Format("You cannot edit map '{0}' as you did not submit it.", editedMap.Filename);
+                        return string.Format("The map was not found or you don't have permission to edit it!");
                     }
                 }
             }

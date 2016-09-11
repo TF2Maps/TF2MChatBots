@@ -22,6 +22,7 @@ namespace SteamBotLite
             adminCommands.Add(new RemoveModule(bot, this));
             adminCommands.Add(new AddModule(bot, this));
             adminCommands.Add(new GetAllModules(bot, this));
+            adminCommands.Add(new Rejoin(bot, this));
         }
 
         public override string getPersistentData()
@@ -51,6 +52,25 @@ namespace SteamBotLite
             }
 
         }
+
+        private class Rejoin : BaseCommand
+        {
+            // Command to query if a server is active
+            AdminModule module;
+
+            public Rejoin(VBot bot, AdminModule module) : base(bot, "!Rejoin")
+            {
+                this.module = module;
+            }
+            protected override string exec(MessageProcessEventData sender, string param)
+            {
+                module.SteamBot.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.LeaveChat);
+                module.SteamBot.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.EnterChat);
+                return "Rejoined!";
+            }
+
+        }
+
         private class Rename : BaseCommand
         {
             // Command to query if a server is active

@@ -99,7 +99,7 @@ namespace SteamBotLite
         public event EventHandler<EventArgs> MainChatRoomLeave;
         public event EventHandler<EventArgs> MainChatRoomOther;
         //The event-invoking method that derived classes can override.
-        protected virtual void FireMainChatRoomEvent(ChatroomEventEnum e)
+        public virtual void FireMainChatRoomEvent(ChatroomEventEnum e)
         {
             EventHandler<EventArgs> handler;
             switch (e)
