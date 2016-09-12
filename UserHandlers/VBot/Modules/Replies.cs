@@ -49,7 +49,7 @@ namespace SteamBotLite
                 this.module = module;
                 this.reply = entry.Value;
             }
-            protected override string exec(SteamID sender, string param)
+            protected override string exec(MessageProcessEventData sender, string param)
             {
                 return (reply);
 
@@ -76,7 +76,7 @@ namespace SteamBotLite
             {
                 replymodule = repliesModule;
             }
-            protected override string exec(SteamID sender, string param)
+            protected override string exec(MessageProcessEventData sender, string param)
             {
                 string[] command = param.Split(new char[] { ' ' }, 2);
 
@@ -101,7 +101,7 @@ namespace SteamBotLite
             {
                 replymodule = repliesModule;
             }
-            protected override string exec(SteamID sender, string param)
+            protected override string exec(MessageProcessEventData sender, string param)
             {
                 string[] command = param.Split(new char[] { ' ' }, 2);
 

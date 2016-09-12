@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using SteamKit2;
+
 
 namespace SteamBotLite
 {
@@ -22,6 +22,7 @@ namespace SteamBotLite
             adminCommands.Add(new RemoveModule(bot, this));
             adminCommands.Add(new AddModule(bot, this));
             adminCommands.Add(new GetAllModules(bot, this));
+            adminCommands.Add(new Rejoin(bot, this));
         }
 
         public override string getPersistentData()
@@ -44,13 +45,32 @@ namespace SteamBotLite
             {
                 this.module = module;
             }
-            protected override string exec(SteamID sender, string param)
+            protected override string exec(MessageProcessEventData sender, string param)
             {
                 module.SteamBot.Reboot();
                 return "Rebooted";
             }
 
         }
+
+        private class Rejoin : BaseCommand
+        {
+            // Command to query if a server is active
+            AdminModule module;
+
+            public Rejoin(VBot bot, AdminModule module) : base(bot, "!Rejoin")
+            {
+                this.module = module;
+            }
+            protected override string exec(MessageProcessEventData sender, string param)
+            {
+                module.SteamBot.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.LeaveChat);
+                module.SteamBot.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.EnterChat);
+                return "Rejoined!";
+            }
+
+        }
+
         private class Rename : BaseCommand
         {
             // Command to query if a server is active
@@ -60,7 +80,7 @@ namespace SteamBotLite
             {
                 this.module = module;
             }
-            protected override string exec(SteamID sender, string param)
+            protected override string exec(MessageProcessEventData sender, string param)
             {
                 string[] command = param.Split(new char[] { ' ' }, 2);
                 if (command.Length > 0)
@@ -84,7 +104,7 @@ namespace SteamBotLite
                 this.module = module;
                 botty = bot;
             }
-            protected override string exec(SteamID sender, string param)
+            protected override string exec(MessageProcessEventData sender, string param)
             {
                 botty.Disablemodule(param);
                 return "Removing Module...";
@@ -103,7 +123,7 @@ namespace SteamBotLite
                 this.module = module;
                 botty = bot;
             }
-            protected override string exec(SteamID sender, string param)
+            protected override string exec(MessageProcessEventData sender, string param)
             {
                 botty.Enablemodule(param);
                 return "Adding Module...";
@@ -122,7 +142,7 @@ namespace SteamBotLite
                 this.module = module;
                 botty = bot;
             }
-            protected override string exec(SteamID sender, string param)
+            protected override string exec(MessageProcessEventData sender, string param)
             {
                 string Response = "";
                 foreach (BaseModule ModuleEntry in botty.ModuleList)
