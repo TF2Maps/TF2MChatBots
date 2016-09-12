@@ -11,43 +11,54 @@ namespace SteamBotLite
 {
     class Program
     {
-        
         static void Main(string[] args)
         {
             
-            SteamBotData[] Bots = JsonConvert.DeserializeObject<SteamBotData[]>(File.ReadAllText("settings.json")); //Get the data about each bot alongside their info from the JSON file
+            List<ApplicationInterface> Bots = new List<ApplicationInterface>();
+            List<UserHandler> UserHandlers = new List<UserHandler>();
+            SteamBotData[] SteamBotLoginData = JsonConvert.DeserializeObject<SteamBotData[]>(File.ReadAllText("settings.json")); //Get the data about each bot alongside their info from the JSON file
+            SteamBotData Entry = SteamBotLoginData[0];
 
-            List<SteamConnectionHandler> SteamConnections = new List<SteamConnectionHandler>(); //We make a list that'll contain our connections to steam
+            VBot VbotHandler = new VBot();
+            SteamInterface SteamPlatformInterface = new SteamInterface(Entry, 0, 103582791429594873);
+            DiscordInterface DiscordPlatformInterface = new DiscordInterface("MjIyMjA0MDQ2MjYwMzA1OTIy.CrQ1MA.StYrm9OA2qsJxWv9kcD0_GvwBlU", 50);
+            Console.WriteLine("Left the discordPlatnform");
 
-            int ID = 0;
 
-            foreach (SteamBotData Entry in Bots) //We create an instance of each Bot and add it to the list
-            {
-                if (Entry.Userhandler != null) //We check if the UserHandler has been set before adding it
-                {
-                    SteamConnections.Add(new SteamConnectionHandler(Entry,ID)); //This loads the bot, then adds it to the list
-                }
-                else
-                {
-                    Console.WriteLine("Failed to load {0} because of an invalid BotControlClass", Entry.username); //Warn the user the bot isn't loaded
-                }
-                ID++;
-            }
+            /*
+            VbotHandler.AssignAppInterface(SteamPlatformInterface);
+            SteamPlatformInterface.AssignUserHandler(VbotHandler);
+            */
+            ConsoleUserHandler consolehandler = new ConsoleUserHandler();
+
+            
+            AssignConnection(VbotHandler, DiscordPlatformInterface);
+            AssignConnection(VbotHandler, SteamPlatformInterface);
+            AssignConnection(consolehandler, DiscordPlatformInterface);
+
+            
+            SteamPlatformInterface.AssignUserHandler(consolehandler);
+            consolehandler.AssignAppInterface(SteamPlatformInterface);
+
+            Bots.Add(SteamPlatformInterface);
+            Bots.Add(DiscordPlatformInterface);
 
             bool Running = true;
-
-            //This loop iterates through each bot in the list, checking it's callbacks for anything to run 
-            while (Running) 
+            while (Running)
             {
-
-                foreach (SteamConnectionHandler Connection in SteamConnections)
+                foreach (ApplicationInterface bot in Bots)
                 {
-                    Connection.Tick();
+                    bot.tick();
                 }
                 System.Threading.Thread.Sleep(100);
             }
         }
 
+        public static void AssignConnection (UserHandler userhandler , ApplicationInterface applicationinterface)
+        {
+            userhandler.AssignAppInterface(applicationinterface);
+            applicationinterface.AssignUserHandler(userhandler);
+        }
     }
 }
     

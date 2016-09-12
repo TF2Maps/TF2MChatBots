@@ -11,8 +11,8 @@ namespace SteamBotLite
 {
     class UsersModule : BaseModule
     {
-        public List<string> admins = new List<string>();
-        public List<string> bans = new List<string>();
+        public List<object> admins = new List<object>();
+        public List<object> bans = new List<object>();
 
         public UsersModule(VBot bot, Dictionary<string, object> config) : base(bot, config)
         {
@@ -22,7 +22,7 @@ namespace SteamBotLite
 
         public override string getPersistentData()
         {
-            Dictionary<string, List<string>> data = new Dictionary<string, List<string>>();
+            Dictionary<string, List<object>> data = new Dictionary<string, List<object>>();
             data.Add("admins", admins);
             data.Add("bans", bans);
             return JsonConvert.SerializeObject(data);
@@ -32,41 +32,42 @@ namespace SteamBotLite
         {
             try
             {
-                Dictionary<string, List<string>> data; 
-                data = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(System.IO.File.ReadAllText(this.GetType().Name + ".json"));
+                Dictionary<string, List<object>> data;
+                data = JsonConvert.DeserializeObject<Dictionary<string, List<object>>>(System.IO.File.ReadAllText(this.GetType().Name + ".json"));
                 admins = data["admins"];
                 bans = data["bans"];
             }
             catch { }
         }
 
-        public void updateUserInfo(SteamFriends.ChatMemberInfoCallback info)
+        public void updateUserInfo(UserIdentifier info, bool IsAdmin)
         {
-            
-            string user = info.StateChangeInfo.ChatterActedOn.ToString();
-            EChatPermission status = info.StateChangeInfo.MemberInfo.Permissions;
-            Console.WriteLine("User {0} entred with status: {1}", info.StateChangeInfo.ChatterActedOn,info.StateChangeInfo.MemberInfo.Permissions);
-            
-            if (status.HasFlag(EChatPermission.MemberDefault))
+            if (IsAdmin)
             {
                 Console.WriteLine("Admin entered");
-                if (!admins.Any(s => user.Equals(s))) //if an admin is not in the list
+                if (!admins.Any(s => info.Equals(s))) //if an admin is not in the list
                 {
-                    admins.Add(user);
+                    admins.Add(info.identifier);
                     savePersistentData();
                 }
             }
-            else if (admins.Any(s => user.Equals(s))) //if it's not an admin but he's in the list
+            else if (admins.Any(s => info.Equals(s))) //if it's not an admin but he's in the list
             {
-                admins.Remove(user);
+                admins.Remove(info.identifier);
                 savePersistentData();
             }
-               
-
         }
-        public bool admincheck(SteamID UserToVerify)
+
+        public bool admincheck(UserIdentifier UserToVerify)
         {
-            return admins.Any(s => UserToVerify.ToString().Equals(s));
+            if (UserToVerify.UserRank == UserIdentifier.UserAdminStatus.True | (admins.Any(s => UserToVerify.identifier.ToString().Equals(s))))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
