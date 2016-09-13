@@ -11,12 +11,14 @@ namespace SteamBotLite
     public class DiscordInterface : ApplicationInterface
     {
         private DiscordClient _client;
-        string Token = "MjIyMjA0MDQ2MjYwMzA1OTIy.CrQ1MA.StYrm9OA2qsJxWv9kcD0_GvwBlU";
+        string Token;
 
-        public DiscordInterface(string token , ulong DiscordChatID) : base(DiscordChatID)
+        public DiscordInterface()
         {
+            Token = config["Token"].ToString();
+            
             _client = new DiscordClient();
-            ConnectionProcess(token, _client);
+            ConnectionProcess(Token, _client);
             _client.MessageReceived += _client_MessageReceived;
         }
 

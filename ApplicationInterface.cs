@@ -1,8 +1,10 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace SteamBotLite
 {
@@ -74,11 +76,12 @@ namespace SteamBotLite
     {
 
         public ChatRoomIdentifier MainChatRoom;
+        public Dictionary<string, object> config;
         
 
-        public ApplicationInterface(object MainChatroomIdentifier)
+        public ApplicationInterface()
         {
-            MainChatRoom = new ChatRoomIdentifier(MainChatroomIdentifier);
+            this.config = JsonConvert.DeserializeObject<Dictionary<string, object>>(System.IO.File.ReadAllText(Path.Combine("applicationconfigs" , this.GetType().Name.ToString() + ".json")));
         }
 
 
