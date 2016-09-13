@@ -39,7 +39,8 @@ namespace SteamBotLite
             commands.Add(new UpdateName(bot, this));
             commands.Add(new Delete(bot, this));
             commands.Add(new UploadCheck(bot, ServerMapListUrl));
-            commands.Add(new Insert(bot, this));
+            adminCommands.Add(new Insert(bot, this));
+            adminCommands.Add(new Reposition(bot, this));
             adminCommands.Add(new Wipe(bot, this));
         }
 
@@ -47,7 +48,7 @@ namespace SteamBotLite
             {
             userhandler.OnMaplistchange(mapList.Count, sender, args);
             }
-
+        
         public class Map
         {
             public Object Submitter { get; set; }
@@ -154,7 +155,7 @@ namespace SteamBotLite
                 string[] parameters = param.Split(new char[] { ' ' }, 2);
 
                 Map map = new Map();
-                map.Submitter = sender.Sender.identifier;
+                map.Submitter = sender.Sender.identifier.ToString();
 
                 map.SubmitterName = sender.Sender.DisplayName;
                 map.Filename = parameters[0];
@@ -335,6 +336,59 @@ namespace SteamBotLite
             }
         }
 
+        private class Reposition : MapCommand
+        {
+            public Reposition(VBot bot, MapModule mapMod) : base(bot, "!reposition", mapMod) { }
+            protected override string exec(MessageProcessEventData sender, string param)
+            {
+                string[] parameters = param.Split(' ');
+
+                if (parameters.Length < 2)
+                {
+                    return string.Format("Invalid parameters for !reposition. Syntax: !reposition <new position> <mapname>");
+                }
+                else
+                {
+                    int index;
+                    try
+                    {
+                        index = int.Parse(parameters[0]);
+                    }
+                    catch
+                    {
+                        return string.Format("Invalid parameters for !reposition. Syntax: !reposition <new position> <mapname>");
+                    }
+                    Map editedMap = null;
+                    foreach (Map entry in MapModule.mapList)
+                    {
+                        if (entry.Filename == parameters[1])
+                            editedMap = entry;
+
+                    }
+
+                    if (editedMap == null)
+                    {
+                        return "Map not found";
+                    }
+
+                    
+                    // Map editedMap = MapModule.mapList.Find(map => map.filename.Equals(parameters[0])); //OLD Map CODE
+                    if (editedMap.Submitter.Equals(sender.ToString()) | (userhandler.usersModule.admincheck(sender.Sender)))
+                    {
+                        MapModule.mapList.Remove(editedMap);
+                        MapModule.mapList.Insert(index, editedMap);
+                        MapModule.savePersistentData();
+                        return string.Format("Map '{0}' has been repositioned to {1}.", editedMap.Filename , index);
+                    }
+                    else
+                    {
+                        return string.Format("You cannot edit map '{0}' as you did not submit it.", editedMap.Filename);
+                    }
+                }
+            }
+        }
+
+
         private class Update : MapCommand
         {
             public Update(VBot bot, MapModule mapMod) : base(bot, "!update", mapMod) { }
@@ -397,7 +451,7 @@ namespace SteamBotLite
                     }
                     else
                     {
-                        if ((deletedMap.Submitter.Equals(sender.Sender.identifier)) || (userhandler.usersModule.admincheck(sender.Sender)))
+                        if ((deletedMap.Submitter.Equals(sender.Sender.identifier.ToString())) || (userhandler.usersModule.admincheck(sender.Sender)))
                         {
                             MapModule.mapList.Remove(deletedMap);
                             MapModule.savePersistentData();
