@@ -83,17 +83,16 @@ namespace SteamBotLite
             bool shouldrememberpass = (bool)config["ShouldRememberPassword"];
             SteamBotData SteamBotLoginData = new SteamBotData(user,pass, shouldrememberpass);
             MainChatRoom = new ChatRoomIdentifier(ulong.Parse(config["GroupChatID"].ToString()));
-            ResetConnection(SteamBotLoginData, 1);
+            ResetConnection(SteamBotLoginData);
         }
         /// <summary>
         /// Creates an instance of SteamConnectionHandler with the data given and logs in, also can be fired to reset the bot
         /// </summary>
         /// <param name="BotData"> Data involving the userhandler and what bot to load</param>
-        public void ResetConnection(SteamBotData BotData, int BotID)
+        public void ResetConnection(SteamBotData BotData)
         {
             Console.WriteLine("Loading New Connection");
             SteamBotLiteLoginData = BotData;
-            ID = BotID;
             pass = BotData.SavedPassword; //We'll save this now, so we can access it later for logging in if the loginkey fails
 
             LoginData = BotData.LoginData; //Lets save the login data
