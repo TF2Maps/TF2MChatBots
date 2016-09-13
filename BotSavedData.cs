@@ -5,23 +5,33 @@ using System.IO;
 
 namespace SteamBotLite
 {
-    public class SteamBotData
+    public struct SteamBotData
     {
+        public SteamBotData(string user,string pass , bool shouldrememberpass)
+        {
+            LoginData = new SteamUser.LogOnDetails();
+            LoginData.Password = pass;
+            LoginData.Username = user;
+
+            LoginData.ShouldRememberPassword = shouldrememberpass;
+
+            SavedUsername = user;
+            SavedPassword = pass;
+
+        }
+
         /// <summary>
         /// The LoginData that is sent to steam when we attempt to login
         /// </summary>
-        public SteamUser.LogOnDetails LoginData = new SteamUser.LogOnDetails();
+        public SteamUser.LogOnDetails LoginData;
 
         /// <summary>
         /// Incase the LoginKey is invalid, we save it here so we can later set the password again
         /// </summary>
         public string SavedPassword;
 
-        /// <summary>
-        /// The userhandler this bot utilises
-        /// </summary>
-        public Type Userhandler;
-
+        public string SavedUsername;
+        
         /// <summary>
         /// The login key allows us to login without SteamAuth
         /// Upon receiving the login Key, we set the password that is sent to steam as null as sending both wont work
@@ -41,7 +51,7 @@ namespace SteamBotLite
         /// <summary>
         /// The username used to log onto steam with
         /// </summary>
-    public string username
+        public string username
         {
             get
             {
@@ -50,7 +60,6 @@ namespace SteamBotLite
             set
             {
                 LoginData.Username = value;
-                Console.WriteLine("Username {0}", username);
             }
         }
         /// <summary>
@@ -87,24 +96,6 @@ namespace SteamBotLite
         /// The class of the Bot we want to run. There are checks to verify that it inherits the "UserHandler" class, as well as if it exists. 
         ///
         /// </summary>
-        public string BotControlClass
-        {
-            
-            get
-            {
-                return Userhandler.ToString(); //We return the Userhandler assigned
-            }
-            set
-            {
-                Type T = Type.GetType(value); //We attempt to translate the string to an existing type
-                if ((T.GetType() != null ) && (T.BaseType.ToString() == "SteamBotLite.UserHandler")) //Then we check its valid AND if its a base of userhandler
-                    {
-                    Userhandler = Type.GetType(value); //If we pass the checks, we set it to the Userhandler
-                    }
-                
-            }
-        }
-        
 
     }
 }

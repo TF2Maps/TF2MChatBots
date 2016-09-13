@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 using SteamKit2;
 using System.IO;
 using System.Security.Cryptography;
+using Newtonsoft.Json;
 
 namespace SteamBotLite
 {
     public class SteamInterface : ApplicationInterface
     {
-
+        
         /// <summary>
         /// We store this, in case we need to reboot
         /// </summary>
@@ -75,10 +76,14 @@ namespace SteamBotLite
                 Console.WriteLine("Exception Handled: {0}", ex);
             }
         }
-        public SteamInterface(SteamBotData BotData, int BotID , ulong GroupChatID) : base(GroupChatID)
+        public SteamInterface()
         {
-            MainChatRoom = new ChatRoomIdentifier(GroupChatID);
-            ResetConnection(BotData, BotID);
+            string user = config["username"].ToString();
+            string pass = config["password"].ToString();
+            bool shouldrememberpass = (bool)config["ShouldRememberPassword"];
+            SteamBotData SteamBotLoginData = new SteamBotData(user,pass, shouldrememberpass);
+            MainChatRoom = new ChatRoomIdentifier(ulong.Parse(config["GroupChatID"].ToString()));
+            ResetConnection(SteamBotLoginData, 1);
         }
         /// <summary>
         /// Creates an instance of SteamConnectionHandler with the data given and logs in, also can be fired to reset the bot

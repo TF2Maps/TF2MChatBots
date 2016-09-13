@@ -13,30 +13,21 @@ namespace SteamBotLite
     {
         static void Main(string[] args)
         {
-            
             List<ApplicationInterface> Bots = new List<ApplicationInterface>();
             List<UserHandler> UserHandlers = new List<UserHandler>();
-            SteamBotData[] SteamBotLoginData = JsonConvert.DeserializeObject<SteamBotData[]>(File.ReadAllText("settings.json")); //Get the data about each bot alongside their info from the JSON file
-            SteamBotData Entry = SteamBotLoginData[0];
-
+           
             VBot VbotHandler = new VBot();
-            SteamInterface SteamPlatformInterface = new SteamInterface(Entry, 0, 103582791429594873);
-            DiscordInterface DiscordPlatformInterface = new DiscordInterface("MjIyMjA0MDQ2MjYwMzA1OTIy.CrQ1MA.StYrm9OA2qsJxWv9kcD0_GvwBlU", 50);
+
+            SteamInterface SteamPlatformInterface = new SteamInterface();
+            DiscordInterface DiscordPlatformInterface = new DiscordInterface();
             Console.WriteLine("Left the discordPlatnform");
 
-
-            /*
-            VbotHandler.AssignAppInterface(SteamPlatformInterface);
-            SteamPlatformInterface.AssignUserHandler(VbotHandler);
-            */
             ConsoleUserHandler consolehandler = new ConsoleUserHandler();
 
-            
             AssignConnection(VbotHandler, DiscordPlatformInterface);
             AssignConnection(VbotHandler, SteamPlatformInterface);
             AssignConnection(consolehandler, DiscordPlatformInterface);
 
-            
             SteamPlatformInterface.AssignUserHandler(consolehandler);
             consolehandler.AssignAppInterface(SteamPlatformInterface);
 
