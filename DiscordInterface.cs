@@ -30,6 +30,7 @@ namespace SteamBotLite
 
                 UserIdentifier User = new UserIdentifier(e.User.Id);
                 User.DisplayName = e.User.Name;
+                User.extradata = e.User;
                 if (e.User.ServerPermissions.Administrator)
                 {
                     User.UserRank = UserIdentifier.UserAdminStatus.True;
@@ -42,6 +43,7 @@ namespace SteamBotLite
                 MessageProcessEventData Msg = new MessageProcessEventData(this);
                 Msg.ReceivedMessage = e.Message.RawText;
                 Msg.Sender = User;
+               
                 Msg.Chatroom = new ChatRoomIdentifier(e.Message.Channel);
                
                 if (e.Message.Channel != null)
@@ -118,15 +120,26 @@ namespace SteamBotLite
         {
             try
             {
-                User user = (User)messagedata.Sender.identifier;
-                user.SendMessage(messagedata.ReplyMessage);
+                User user = (User)messagedata.Sender.extradata;
+                Console.WriteLine("Casted Fine");
+                SendLargeMessage(user, messagedata.ReplyMessage);
             }
             catch
             {
-
+                Console.WriteLine("Casting Error");
             }
         }
+         
+        public async void SendLargeMessage (User user , string message)
+        {
+            while (message.Length > 1999)
+            {
+                await user.SendMessage(message.Substring(0, 1999));
+                message = message.Remove(0, 1999);
 
+            }
+            await user.SendMessage(message);
+        }
         public override void SetUsername(object sender, string Username)
         {
           //  _client.SetGame(Username);
