@@ -130,15 +130,15 @@ namespace SteamBotLite
             }
         }
          
-        public async void SendLargeMessage (User user , string message)
+        public void SendLargeMessage (User user , string message)
         {
             while (message.Length > 1999)
             {
-                await user.SendMessage(message.Substring(0, 1999));
+                user.SendMessage(message.Substring(0, 1999));
                 message = message.Remove(0, 1999);
 
             }
-            await user.SendMessage(message);
+            user.SendMessage(message);
         }
         public override void SetUsername(object sender, string Username)
         {
