@@ -57,7 +57,7 @@ namespace SteamBotLite
             searchModule = new SearchModule(this, jsconfig);
             
             ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule,adminmodule,searchModule};
-
+            InitTimer();
             Console.WriteLine("All Loaded");
         }
 

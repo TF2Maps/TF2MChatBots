@@ -83,6 +83,7 @@ namespace SteamBotLite
             bool shouldrememberpass = (bool)config["ShouldRememberPassword"];
             SteamBotData SteamBotLoginData = new SteamBotData(user,pass, shouldrememberpass);
             MainChatRoom = new ChatRoomIdentifier(ulong.Parse(config["GroupChatID"].ToString()));
+            LoginData = SteamBotLoginData.LoginData;
             ResetConnection(SteamBotLoginData);
         }
         /// <summary>
@@ -480,7 +481,8 @@ namespace SteamBotLite
 
         public override void Reboot(object sender , EventArgs e)
         {
-            Console.WriteLine("A REBOOT WAS ATTEMPTED");
+            ResetConnection(SteamBotLiteLoginData);
+            Console.WriteLine("Rebooting");
         }
 
         public override string GetUsername()
