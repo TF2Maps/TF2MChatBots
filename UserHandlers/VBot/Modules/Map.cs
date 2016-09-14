@@ -159,7 +159,7 @@ namespace SteamBotLite
 
                 map.SubmitterName = sender.Sender.DisplayName;
                 map.Filename = parameters[0];
-                map.Notes = "No Notes";
+                map.Notes = "";
                
 
                 if (parameters[0].Length == 0)
