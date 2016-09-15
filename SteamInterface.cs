@@ -450,7 +450,7 @@ namespace SteamBotLite
 
         public override void BroadCastMessage(object sender, string message)
         {
-            SteamFriends.SendChatRoomMessage((SteamID)MainChatRoom.identifier, EChatEntryType.ChatMsg, message);
+            SteamFriends.SendChatRoomMessage(new SteamID((ulong)MainChatRoom.identifier), EChatEntryType.ChatMsg, message);
         }
 
         public override void EnterChatRoom(object sender, ChatRoomIdentifier chatroomidentifier)
