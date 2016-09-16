@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Discord;
+using Newtonsoft.Json;
 
 namespace SteamBotLite
 {
@@ -12,10 +13,12 @@ namespace SteamBotLite
     {
         private DiscordClient _client;
         string Token;
+        ulong[] BroadCastChatrooms = new ulong[] { };
 
         public DiscordInterface()
         {
             Token = config["Token"].ToString();
+            BroadCastChatrooms = (ulong[])JsonConvert.DeserializeObject(config["BroadCastChatrooms"].ToString(),BroadCastChatrooms.GetType());
             
             _client = new DiscordClient();
             ConnectionProcess(Token, _client);
@@ -114,8 +117,6 @@ namespace SteamBotLite
             }
         }
 
-        
-
         public override void SendPrivateMessage(object sender, MessageProcessEventData messagedata)
         {
             try
@@ -145,8 +146,6 @@ namespace SteamBotLite
           //  _client.SetGame(Username);
         }
         
-
-
         public override void tick()
         {
             
@@ -154,8 +153,12 @@ namespace SteamBotLite
 
         public override void BroadCastMessage(object sender, string message)
         {
-                Channel channel = (Channel)MainChatRoom.identifier;
-                channel.SendMessage(message);
+                foreach (ulong chatroom in BroadCastChatrooms)
+            {
+                Channel Destination = _client.GetChannel(chatroom);
+                Destination.SendMessage(message);
+
+            }
         }
     }
 }

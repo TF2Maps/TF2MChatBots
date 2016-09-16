@@ -32,6 +32,7 @@ namespace SteamBotLite
             adminCommands.Add(new Set(bot, this));
             adminCommands.Add(new Remove(bot, this));
             adminCommands.Add(new SetExtended(bot, this));
+            adminCommands.Add(new Emulate(bot, this));
 
             motdPost = new BaseTask(updateInterval, new System.Timers.ElapsedEventHandler(MotdPost));
         }
@@ -105,10 +106,19 @@ namespace SteamBotLite
                     motd.message = null;
                     motd.postCount = 0;
                 }
-                if (motd.message != null)
-                    motd.postCount++;
 
                 return motd.message;
+            }
+        }
+
+        private class Emulate : MotdCommand
+        {
+            public Emulate(VBot bot, MotdModule motd) : base(bot, "!EmulateMotd", motd) { }
+            protected override string exec(MessageProcessEventData sender, string param)
+            {
+                
+                userhandler.BroadcastMessageProcessEvent(motd.message);
+                return "BroadCasted";
             }
         }
 
@@ -181,7 +191,7 @@ namespace SteamBotLite
 
         private class Tick : MotdCommand
         {
-            public Tick(VBot bot, MotdModule motd) : base(bot, "!MotdTick", motd) { }
+            public Tick(VBot bot, MotdModule motd) : base(bot, "!TickMotd", motd) { }
             protected override string exec(MessageProcessEventData sender, string param)
             {
                 return "MOTD displayed " + motd.postCount + " times and will display a total of " + motd.postCountLimit + " times in total";
@@ -190,7 +200,7 @@ namespace SteamBotLite
 
         private class Setter : MotdCommand
         {
-            public Setter(VBot bot, MotdModule motd) : base(bot, "!MotdSetter", motd) { }
+            public Setter(VBot bot, MotdModule motd) : base(bot, "!SetterMotd", motd) { }
             protected override string exec(MessageProcessEventData sender, string param)
             {
                 return "MOTD set by " + motd.setter;
