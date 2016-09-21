@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace SteamBotLite
 {
-    public class SteamInterface : ApplicationInterface
+    public abstract class SteamInterface : ApplicationInterface
     {
         
         /// <summary>

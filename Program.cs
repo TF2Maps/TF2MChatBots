@@ -18,21 +18,25 @@ namespace SteamBotLite
            
             VBot VbotHandler = new VBot();
 
-            SteamInterface SteamPlatformInterface = new SteamInterface();
-            DiscordInterface DiscordPlatformInterface = new DiscordInterface();
+            SteamInterface SteamPlatformInterface = new SteamAccountVBot();
+            DiscordInterface DiscordPlatformInterfaceFun = new DiscordAccountFun();
+            DiscordInterface DiscordPlatformInterfaceRelay = new DiscordAccountVBot();
             Console.WriteLine("Left the discordPlatnform");
 
             ConsoleUserHandler consolehandler = new ConsoleUserHandler();
 
-            AssignConnection(VbotHandler, DiscordPlatformInterface);
+            AssignConnection(VbotHandler, DiscordPlatformInterfaceRelay);
+            AssignConnection(VbotHandler, DiscordPlatformInterfaceFun);
             AssignConnection(VbotHandler, SteamPlatformInterface);
-            AssignConnection(consolehandler, DiscordPlatformInterface);
+
+            AssignConnection(consolehandler, DiscordPlatformInterfaceRelay);
 
             SteamPlatformInterface.AssignUserHandler(consolehandler);
             consolehandler.AssignAppInterface(SteamPlatformInterface);
 
             Bots.Add(SteamPlatformInterface);
-            Bots.Add(DiscordPlatformInterface);
+            Bots.Add(DiscordPlatformInterfaceRelay);
+            Bots.Add(DiscordPlatformInterfaceFun);
 
             bool Running = true;
             while (Running)
