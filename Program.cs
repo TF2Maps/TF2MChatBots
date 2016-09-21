@@ -11,33 +11,34 @@ namespace SteamBotLite
 {
     class Program
     {
+        
         static void Main(string[] args)
         {
-            List<ApplicationInterface> Bots = new List<ApplicationInterface>();
+            //Create userHandlers//
             List<UserHandler> UserHandlers = new List<UserHandler>();
-           
-            VBot VbotHandler = new VBot();
-
-            SteamInterface SteamPlatformInterface = new SteamAccountVBot();
-            DiscordInterface DiscordPlatformInterfaceFun = new DiscordAccountFun();
-            DiscordInterface DiscordPlatformInterfaceRelay = new DiscordAccountVBot();
-            Console.WriteLine("Left the discordPlatnform");
 
             ConsoleUserHandler consolehandler = new ConsoleUserHandler();
+            VBot VbotHandler = new VBot();
 
-            AssignConnection(VbotHandler, DiscordPlatformInterfaceRelay);
-            AssignConnection(VbotHandler, DiscordPlatformInterfaceFun);
-            AssignConnection(VbotHandler, SteamPlatformInterface);
+            // Create Interfaces//
+            List<ApplicationInterface> Bots = new List<ApplicationInterface>();
 
-            AssignConnection(consolehandler, DiscordPlatformInterfaceRelay);
-
-            SteamPlatformInterface.AssignUserHandler(consolehandler);
-            consolehandler.AssignAppInterface(SteamPlatformInterface);
+            SteamAccountVBot SteamPlatformInterface = new SteamAccountVBot();
+            DiscordAccountVFun DiscordPlatformInterfaceFun = new DiscordAccountVFun();
+            DiscordAccountVBot DiscordPlatformInterfaceRelay = new DiscordAccountVBot();
 
             Bots.Add(SteamPlatformInterface);
             Bots.Add(DiscordPlatformInterfaceRelay);
             Bots.Add(DiscordPlatformInterfaceFun);
 
+            //Link userhandlers and classes that are two way//
+            AssignConnection(VbotHandler, DiscordPlatformInterfaceRelay);
+            AssignConnection(VbotHandler, DiscordPlatformInterfaceFun);
+            AssignConnection(VbotHandler, SteamPlatformInterface);
+            AssignConnection(consolehandler, DiscordPlatformInterfaceRelay);
+            AssignConnection(consolehandler, SteamPlatformInterface);
+            
+            //Start looping and iterating//
             bool Running = true;
             while (Running)
             {
