@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 namespace SteamBotLite
 {
 
-    public class DiscordInterface : ApplicationInterface
+    public abstract class DiscordInterface : ApplicationInterface
     {
         private DiscordClient _client;
         string Token;
