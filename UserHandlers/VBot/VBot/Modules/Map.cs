@@ -392,7 +392,7 @@ namespace SteamBotLite
         private class Update : MapCommand
         {
             public Update(VBot bot, MapModule mapMod) : base(bot, "!update", mapMod) { }
-            protected override string exec(MessageProcessEventData sender, string param)
+            protected override string exec(MessageProcessEventData msg, string param)
             {
                 string[] parameters = param.Split(' ');
 
@@ -406,7 +406,7 @@ namespace SteamBotLite
                     bool MapExists = false;
                     foreach (Map Entry in MapModule.mapList)
                     {
-                        if (Entry.Filename.Equals(parameters[0]) && (Entry.Submitter.ToString().Equals(sender.ToString()) | (userhandler.usersModule.admincheck(sender.Sender))))
+                        if (Entry.Filename.Equals(parameters[0]) && (Entry.Submitter.ToString().Equals(msg.Sender.identifier.ToString()) | (userhandler.usersModule.admincheck(msg.Sender))))
                         {
                             MapExists = true;
                             break;
@@ -475,7 +475,6 @@ namespace SteamBotLite
             protected override string exec(MessageProcessEventData sender, string param)
             {
                 MapModule.mapList.Clear();
-                //MapModule.mapList = new List<Map>(); //OLd Maplist code
                 MapModule.savePersistentData();
                 return "The map list has been DELETED.";
             }
