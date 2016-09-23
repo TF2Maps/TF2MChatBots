@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 using SteamKit2;
 using System.IO;
 using Newtonsoft.Json;
+using System.Threading;
 
 namespace SteamBotLite
 {
     class Program
     {
-        
+
         static void Main(string[] args)
         {
             //Create userHandlers//
@@ -37,7 +38,15 @@ namespace SteamBotLite
             AssignConnection(VbotHandler, SteamPlatformInterface);
             AssignConnection(consolehandler, DiscordPlatformInterfaceRelay);
             AssignConnection(consolehandler, SteamPlatformInterface);
-            
+
+            Thread[] BotThreads = new Thread[] { };
+            for (int x = 0; x < Bots.Count; x++)
+            {
+                BotThreads[x] = new Thread(new ThreadStart(Bots[x].TickThread));
+                BotThreads[x].Start();
+            }
+            Console.WriteLine("reachedEnd");
+            Console.ReadKey();
             //Start looping and iterating//
             bool Running = true;
             while (Running)
@@ -55,6 +64,20 @@ namespace SteamBotLite
             userhandler.AssignAppInterface(applicationinterface);
             applicationinterface.AssignUserHandler(userhandler);
         }
+
+        public void DoWork(ApplicationInterface Bot)
+        {
+            bool Running = true;
+            while (Running)
+            {
+                Bot.tick();
+            }
+
+        }
+    }
+    class ApplicationInterfaceThread
+    {
+
     }
 }
     

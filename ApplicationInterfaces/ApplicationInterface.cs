@@ -193,6 +193,17 @@ namespace SteamBotLite
 
         public abstract void tick();
 
+        bool Running = true;
+
+        public void TickThread()
+        {
+            while (Running)
+            {
+                tick();
+            }
+
+        }
+
         public string Username
         {
             get
