@@ -25,14 +25,14 @@ namespace SteamBotLite
         {
             switch (CurrentGhostStatus)
             {
-                case (GhostStatus.ChatHasNotGhosted):
-                    CurrentGhostStatus = GhostStatus.Chatghosted; //Therefore if this method runs twice (10 minutes) we have a ghost
-                    break;
                 case (GhostStatus.Chatghosted):
                     FireMainChatRoomEvent(ChatroomEventEnum.LeaveChat);
                     FireMainChatRoomEvent(ChatroomEventEnum.EnterChat);
                     CurrentGhostStatus = GhostStatus.ChatHasNotGhosted;
                     CrashCheck++;
+                    break;
+                case (GhostStatus.ChatHasNotGhosted):
+                    CurrentGhostStatus = GhostStatus.Chatghosted; //Therefore if this method runs twice (10 minutes) we have a ghost
                     break;
                 case (GhostStatus.ChatCrashed):
                     break;
