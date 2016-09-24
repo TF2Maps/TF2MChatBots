@@ -39,23 +39,19 @@ namespace SteamBotLite
             AssignConnection(consolehandler, DiscordPlatformInterfaceRelay);
             AssignConnection(consolehandler, SteamPlatformInterface);
 
-            Thread[] BotThreads = new Thread[] { };
+            Thread[] BotThreads = new Thread[Bots.Count];
+            //Start looping and iterating//
             for (int x = 0; x < Bots.Count; x++)
             {
-                BotThreads[x] = new Thread(new ThreadStart(Bots[x].TickThread));
+                BotThreads[x] = new Thread(new ThreadStart(Bots[x].StartTickThreadLoop));
                 BotThreads[x].Start();
             }
-            Console.WriteLine("reachedEnd");
-            Console.ReadKey();
-            //Start looping and iterating//
+            
             bool Running = true;
+            
             while (Running)
             {
-                foreach (ApplicationInterface bot in Bots)
-                {
-                    bot.tick();
-                }
-                System.Threading.Thread.Sleep(100);
+                Console.ReadLine();
             }
         }
 

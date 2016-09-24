@@ -17,6 +17,8 @@ namespace SteamBotLite
 
         public DiscordInterface()
         {
+            TickThread = TickThreadState.Stopped;
+
             Token = config["Token"].ToString();
             BroadCastChatrooms = (ulong[])JsonConvert.DeserializeObject(config["BroadCastChatrooms"].ToString(),BroadCastChatrooms.GetType());
             
