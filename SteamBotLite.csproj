@@ -88,6 +88,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ApplicationInterfaces\Steam\SteamInterface.cs" />
+    <Compile Include="UserHandlers\GhostChecker\GhostChecker.cs" />
     <Compile Include="UserHandlers\UserHandler.cs" />
     <Compile Include="ApplicationInterfaces\Discord\Accounts\DiscordAccountVBot.cs" />
     <Compile Include="ApplicationInterfaces\Discord\Accounts\DiscordAccountVFun.cs" />
