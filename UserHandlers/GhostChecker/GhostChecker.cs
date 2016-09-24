@@ -5,9 +5,10 @@ namespace SteamBotLite
 {
     public class GhostChecker :UserHandler
     {
-        double interval = 60000;
-        readonly int InitialGhostCheck = 10;
-        int GhostCheck = 480;
+        
+        double interval = 300000; //Five Minutes
+        enum GhostStatus { Chatghosted, ChatHasNotGhosted , ChatCrashed};
+        GhostStatus CurrentGhostStatus = GhostStatus.ChatHasNotGhosted;
         int CrashCheck = 0;
         Timer Tick;
 
@@ -22,15 +23,21 @@ namespace SteamBotLite
         /// <param name="e"></param>
         void TickTasks(object sender, EventArgs e)
         {
-            GhostCheck--;
-            Console.WriteLine(string.Format("Ghostcheck = {0}"), GhostCheck);
-            if (GhostCheck <= 1)
+            switch (CurrentGhostStatus)
             {
-                GhostCheck = InitialGhostCheck;
-                CrashCheck += 1;
-                FireMainChatRoomEvent(ChatroomEventEnum.LeaveChat);
-                FireMainChatRoomEvent(ChatroomEventEnum.EnterChat);
+                case (GhostStatus.ChatHasNotGhosted):
+                    CurrentGhostStatus = GhostStatus.Chatghosted; //Therefore if this method runs twice (10 minutes) we have a ghost
+                    break;
+                case (GhostStatus.Chatghosted):
+                    FireMainChatRoomEvent(ChatroomEventEnum.LeaveChat);
+                    FireMainChatRoomEvent(ChatroomEventEnum.EnterChat);
+                    CurrentGhostStatus = GhostStatus.ChatHasNotGhosted;
+                    CrashCheck++;
+                    break;
+                case (GhostStatus.ChatCrashed):
+                    break;
             }
+            
             if (CrashCheck >= 4)
             {
                 CrashCheck = 0;
@@ -51,7 +58,7 @@ namespace SteamBotLite
 
         public override void ProcessChatRoomMessage(object sender, MessageProcessEventData e)
         {
-            GhostCheck = InitialGhostCheck;
+            CurrentGhostStatus = GhostStatus.ChatHasNotGhosted;
             CrashCheck = 0;
         }
 
