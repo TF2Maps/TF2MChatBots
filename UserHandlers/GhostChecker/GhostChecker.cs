@@ -7,7 +7,7 @@ namespace SteamBotLite
     {
         
         double interval = 300000; //Five Minutes
-        enum GhostStatus { Chatghosted, ChatHasNotGhosted , ChatCrashed};
+        enum GhostStatus { Chatghosted, ChatPotentiallyGhosted, ChatHasNotGhosted , ChatCrashed};
         GhostStatus CurrentGhostStatus = GhostStatus.ChatHasNotGhosted;
         int CrashCheck = 0;
         Timer Tick;
@@ -31,8 +31,11 @@ namespace SteamBotLite
                     CurrentGhostStatus = GhostStatus.ChatHasNotGhosted;
                     CrashCheck++;
                     break;
+                case (GhostStatus.ChatPotentiallyGhosted):
+                    CurrentGhostStatus = GhostStatus.Chatghosted;
+                    break;
                 case (GhostStatus.ChatHasNotGhosted):
-                    CurrentGhostStatus = GhostStatus.Chatghosted; //Therefore if this method runs twice (10 minutes) we have a ghost
+                    CurrentGhostStatus = GhostStatus.ChatPotentiallyGhosted; //Therefore if this method runs twice (10 minutes) we have a ghost
                     break;
                 case (GhostStatus.ChatCrashed):
                     break;
