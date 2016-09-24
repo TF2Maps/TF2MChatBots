@@ -41,7 +41,7 @@ namespace SteamBotLite
             {
                 this.SearchData = SearchEntry;
             }
-            protected override string exec(MessageProcessEventData sender, string param)
+            protected override string exec(MessageProcessEventData Msg, string param)
             {
                 return (SearchClass.Search(SearchData, param));
             }

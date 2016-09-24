@@ -72,7 +72,7 @@ namespace SteamBotLite
             Console.WriteLine("UserHandler: {0} Has Loaded", this.GetType());
         }
 
-        public override void ProcessPrivateMessage(object sender, MessageProcessEventData e) //This is an example of using older methods for cross-compatibility, by converting the new format to the older one
+        public override void ProcessPrivateMessage(object sender, MessageProcessEventData e) 
         {
             ApplicationInterface AppInterface = (ApplicationInterface)sender;
             e.InterfaceHandlerDestination = AppInterface;
@@ -140,7 +140,7 @@ namespace SteamBotLite
         }
 
 
-        public string ChatMessageHandler(MessageProcessEventData sender , string Message)
+        public string ChatMessageHandler(MessageProcessEventData Msg , string Message)
         {
             string response = null;
             foreach (BaseModule module in ModuleList)
@@ -149,13 +149,13 @@ namespace SteamBotLite
                 { 
                     if (Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
                     {
-                        response = c.run(sender, Message);
+                        response = c.run(Msg, Message);
                         return response;
                     }
                 }
             }
 
-            if (usersModule.admincheck(sender.Sender)) //Verifies that it is a moderator, Can you please check if the "ISAdmin" is being used correctly? 
+            if (usersModule.admincheck(Msg.Sender)) //Verifies that it is a moderator, Can you please check if the "ISAdmin" is being used correctly? 
             {
                 Console.WriteLine("ADMIN SPOKE");
                 foreach (BaseModule module in ModuleList)
@@ -163,7 +163,7 @@ namespace SteamBotLite
                     foreach (BaseCommand c in module.adminCommands)
                         if (Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
                         {
-                            response = c.run(sender, Message);
+                            response = c.run(Msg, Message);
                             return response;
                         }
                 }
