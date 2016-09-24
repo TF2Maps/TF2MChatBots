@@ -218,7 +218,7 @@ namespace SteamBotLite
 
             public Insert(VBot bot, MapModule mapModule) : base(bot, "!insert", mapModule) { }
 
-            protected override string exec(MessageProcessEventData sender, string param)
+            protected override string exec(MessageProcessEventData msg, string param)
             {
                 string[] parameters = param.Split(new char[] { ' ' }, 3);
                 int index;
@@ -236,11 +236,11 @@ namespace SteamBotLite
                     return "Invalid parameters for !insert. Syntax: !insert <index> <mapname> <url> <notes>";
                 }
                 Map map = new Map();
-                map.Submitter = sender.Sender.identifier.ToString();
+                map.Submitter = msg.Sender.identifier.ToString();
 
-                map.SubmitterName = sender.Sender.DisplayName;
+                map.SubmitterName = msg.Sender.DisplayName;
                 map.Filename = parameters[1];
-                map.Notes = "No Notes";
+                map.Notes = string.Format("Inserted in position {0} by {1} //", index, msg.Sender.identifier.ToString());
 
                 if (parameters[1].Any(c => char.IsUpper(c)))
                 {
@@ -256,7 +256,7 @@ namespace SteamBotLite
                     map.DownloadURL = "Uploaded";
                     if (parameters.Length > 1)
                     {
-                        map.Notes = parameters.Last();
+                        map.Notes += parameters.Last();
                     }
                 }
                 else if (parameters.Length > 2) //If its not uploaded check if a URL was there
@@ -266,7 +266,7 @@ namespace SteamBotLite
                     map.DownloadURL = parameters[2];
                     if (parameters.Length > 3)
                     {
-                        map.Notes = parameters.Last();
+                        map.Notes += parameters.Last();
                     }
                 }
                 else //If a url isn't there lets return an error
@@ -376,6 +376,7 @@ namespace SteamBotLite
                     if (editedMap.Submitter.Equals(sender.ToString()) | (userhandler.usersModule.admincheck(sender.Sender)))
                     {
                         MapModule.mapList.Remove(editedMap);
+                        editedMap.Notes += string.Format("Map repositioned to {0} by {1} // ", index , sender.Sender.identifier.ToString());
                         MapModule.mapList.Insert(index, editedMap);
                         MapModule.savePersistentData();
                         return string.Format("Map '{0}' has been repositioned to {1}.", editedMap.Filename , index);
