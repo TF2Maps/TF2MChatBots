@@ -20,6 +20,7 @@ namespace SteamBotLite
 
             ConsoleUserHandler consolehandler = new ConsoleUserHandler();
             VBot VbotHandler = new VBot();
+            GhostChecker ghostchecker = new GhostChecker();
 
             // Create Interfaces//
             List<ApplicationInterface> Bots = new List<ApplicationInterface>();
@@ -38,6 +39,7 @@ namespace SteamBotLite
             AssignConnection(VbotHandler, SteamPlatformInterface);
             AssignConnection(consolehandler, DiscordPlatformInterfaceRelay);
             AssignConnection(consolehandler, SteamPlatformInterface);
+            AssignConnection(ghostchecker, SteamPlatformInterface);
 
             Thread[] BotThreads = new Thread[Bots.Count];
             //Start looping and iterating//
@@ -70,10 +72,6 @@ namespace SteamBotLite
             }
 
         }
-    }
-    class ApplicationInterfaceThread
-    {
-
     }
 }
     
