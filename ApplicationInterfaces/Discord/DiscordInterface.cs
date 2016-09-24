@@ -155,10 +155,17 @@ namespace SteamBotLite
 
         public override void BroadCastMessage(object sender, string message)
         {
-                foreach (ulong chatroom in BroadCastChatrooms)
+            foreach (ulong chatroom in BroadCastChatrooms)
             {
-                Channel Destination = _client.GetChannel(chatroom);
-                Destination.SendMessage(message);
+                try
+                {
+                    Channel Destination = _client.GetChannel(chatroom);
+                    Destination.SendMessage(message);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
 
             }
         }

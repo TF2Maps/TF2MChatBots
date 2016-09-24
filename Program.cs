@@ -41,6 +41,8 @@ namespace SteamBotLite
             AssignConnection(consolehandler, SteamPlatformInterface);
             AssignConnection(ghostchecker, SteamPlatformInterface);
 
+            
+
             Thread[] BotThreads = new Thread[Bots.Count];
             //Start looping and iterating//
             for (int x = 0; x < Bots.Count; x++)
@@ -53,7 +55,11 @@ namespace SteamBotLite
             
             while (Running)
             {
-                Console.ReadLine();
+                string Message = Console.ReadLine();
+                foreach (ApplicationInterface bot in Bots)
+                {
+                    bot.BroadCastMessage(null, Message);
+                }
             }
         }
 
