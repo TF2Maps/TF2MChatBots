@@ -117,7 +117,7 @@ namespace SteamBotLite
             {
                 ServerMapListURL = Website;
             }
-            protected override string exec(MessageProcessEventData sender, string param)
+            protected override string exec(MessageProcessEventData Msg, string param)
             {
                 return SearchClass.CheckDataExistsOnWebPage(ServerMapListURL, param).ToString(); 
             }
@@ -130,10 +130,10 @@ namespace SteamBotLite
             {
                 mapmodule = module;
             }
-            protected override string exec(MessageProcessEventData sender, string param)
+            protected override string exec(MessageProcessEventData Msg, string param)
             {
                 NotifyCollectionChangedEventArgs args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
-                userhandler.OnMaplistchange(mapmodule.mapList.Count, sender, args);
+                userhandler.OnMaplistchange(mapmodule.mapList.Count, Msg, args);
                 return "Name has been updated";
             }
         }
@@ -150,14 +150,14 @@ namespace SteamBotLite
 
             public Add(VBot bot, MapModule mapModule) : base(bot, "!add", mapModule) { }
 
-            protected override string exec(MessageProcessEventData sender, string param)
+            protected override string exec(MessageProcessEventData Msg, string param)
             {
                 string[] parameters = param.Split(new char[] { ' ' }, 2);
 
                 Map map = new Map();
-                map.Submitter = sender.Sender.identifier.ToString();
+                map.Submitter = Msg.Sender.identifier.ToString();
 
-                map.SubmitterName = sender.Sender.DisplayName;
+                map.SubmitterName = Msg.Sender.DisplayName;
                 map.Filename = parameters[0];
                 map.Notes = "";
                
@@ -218,7 +218,7 @@ namespace SteamBotLite
 
             public Insert(VBot bot, MapModule mapModule) : base(bot, "!insert", mapModule) { }
 
-            protected override string exec(MessageProcessEventData sender, string param)
+            protected override string exec(MessageProcessEventData msg, string param)
             {
                 string[] parameters = param.Split(new char[] { ' ' }, 3);
                 int index;
@@ -236,11 +236,11 @@ namespace SteamBotLite
                     return "Invalid parameters for !insert. Syntax: !insert <index> <mapname> <url> <notes>";
                 }
                 Map map = new Map();
-                map.Submitter = sender.Sender.identifier.ToString();
+                map.Submitter = msg.Sender.identifier.ToString();
 
-                map.SubmitterName = sender.Sender.DisplayName;
+                map.SubmitterName = msg.Sender.DisplayName;
                 map.Filename = parameters[1];
-                map.Notes = "No Notes";
+                map.Notes = string.Format("Inserted in position {0} by {1} //", index, msg.Sender.identifier.ToString());
 
                 if (parameters[1].Any(c => char.IsUpper(c)))
                 {
@@ -256,7 +256,7 @@ namespace SteamBotLite
                     map.DownloadURL = "Uploaded";
                     if (parameters.Length > 1)
                     {
-                        map.Notes = parameters.Last();
+                        map.Notes += parameters.Last();
                     }
                 }
                 else if (parameters.Length > 2) //If its not uploaded check if a URL was there
@@ -266,7 +266,7 @@ namespace SteamBotLite
                     map.DownloadURL = parameters[2];
                     if (parameters.Length > 3)
                     {
-                        map.Notes = parameters.Last();
+                        map.Notes += parameters.Last();
                     }
                 }
                 else //If a url isn't there lets return an error
@@ -287,7 +287,7 @@ namespace SteamBotLite
         private class Maps : MapCommand
         {
             public Maps(VBot bot, MapModule mapMod) : base(bot, "!maps", mapMod) { }
-            protected override string exec(MessageProcessEventData sender, string param)
+            protected override string exec(MessageProcessEventData Msg, string param)
             {
                 var maps = MapModule.mapList;
                 int maxMaps = MapModule.MaxMapNumber;
@@ -329,7 +329,7 @@ namespace SteamBotLite
                 // PM map list to the caller.
                 if (maps.Count != 0)
                 {
-                    userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData(null) { Sender = sender.Sender, ReplyMessage = pmResponse });
+                    userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData(null) { Sender = Msg.Sender, ReplyMessage = pmResponse });
                 }
 
                 return chatResponse;
@@ -339,7 +339,7 @@ namespace SteamBotLite
         private class Reposition : MapCommand
         {
             public Reposition(VBot bot, MapModule mapMod) : base(bot, "!reposition", mapMod) { }
-            protected override string exec(MessageProcessEventData sender, string param)
+            protected override string exec(MessageProcessEventData Msg, string param)
             {
                 string[] parameters = param.Split(' ');
 
@@ -373,9 +373,10 @@ namespace SteamBotLite
 
                     
                     // Map editedMap = MapModule.mapList.Find(map => map.filename.Equals(parameters[0])); //OLD Map CODE
-                    if (editedMap.Submitter.Equals(sender.ToString()) | (userhandler.usersModule.admincheck(sender.Sender)))
+                    if (editedMap.Submitter.Equals(Msg.ToString()) | (userhandler.usersModule.admincheck(Msg.Sender)))
                     {
                         MapModule.mapList.Remove(editedMap);
+                        editedMap.Notes += string.Format("Map repositioned to {0} by {1} // ", index , Msg.Sender.identifier.ToString());
                         MapModule.mapList.Insert(index, editedMap);
                         MapModule.savePersistentData();
                         return string.Format("Map '{0}' has been repositioned to {1}.", editedMap.Filename , index);
@@ -437,7 +438,7 @@ namespace SteamBotLite
         private class Delete : MapCommand
         {
             public Delete(VBot bot, MapModule mapMod) : base(bot, "!delete", mapMod) { }
-            protected override string exec(MessageProcessEventData sender, string param)
+            protected override string exec(MessageProcessEventData Msg, string param)
             {
                 string[] parameters = param.Split(' ');
 
@@ -451,7 +452,7 @@ namespace SteamBotLite
                     }
                     else
                     {
-                        if ((deletedMap.Submitter.Equals(sender.Sender.identifier.ToString())) || (userhandler.usersModule.admincheck(sender.Sender)))
+                        if ((deletedMap.Submitter.Equals(Msg.Sender.identifier.ToString())) || (userhandler.usersModule.admincheck(Msg.Sender)))
                         {
                             MapModule.mapList.Remove(deletedMap);
                             MapModule.savePersistentData();
@@ -472,7 +473,7 @@ namespace SteamBotLite
         private class Wipe : MapCommand
         {
             public Wipe(VBot bot, MapModule mapMod) : base(bot, "!wipe", mapMod) { }
-            protected override string exec(MessageProcessEventData sender, string param)
+            protected override string exec(MessageProcessEventData Msg, string param)
             {
                 MapModule.mapList.Clear();
                 MapModule.savePersistentData();

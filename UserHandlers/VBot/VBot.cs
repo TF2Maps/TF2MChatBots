@@ -10,12 +10,8 @@ namespace SteamBotLite
 
     class VBot : UserHandler
     {
-        double interval = 60000;
-        readonly int InitialGhostCheck = 10;
-        int GhostCheck = 480;
-        int CrashCheck = 0;
         public string Username = "V2Bot";
-        Timer Tick;
+        
         bool Autojoin = true; 
 
         // Class members
@@ -57,7 +53,6 @@ namespace SteamBotLite
             searchModule = new SearchModule(this, jsconfig);
             
             ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule,adminmodule,searchModule};
-            InitTimer();
             Console.WriteLine("All Loaded");
         }
 
@@ -68,11 +63,10 @@ namespace SteamBotLite
             base.SetUsernameEventProcess("V3Bot");
             if (Autojoin)
                 base.FireMainChatRoomEvent(ChatroomEventEnum.EnterChat);
-            InitTimer();
             Console.WriteLine("UserHandler: {0} Has Loaded", this.GetType());
         }
 
-        public override void ProcessPrivateMessage(object sender, MessageProcessEventData e) //This is an example of using older methods for cross-compatibility, by converting the new format to the older one
+        public override void ProcessPrivateMessage(object sender, MessageProcessEventData e) 
         {
             ApplicationInterface AppInterface = (ApplicationInterface)sender;
             e.InterfaceHandlerDestination = AppInterface;
@@ -85,8 +79,6 @@ namespace SteamBotLite
 
         public override void ProcessChatRoomMessage(object sender, MessageProcessEventData e)
         {
-            GhostCheck = InitialGhostCheck;
-            CrashCheck = 0;
             e.ReplyMessage = ChatMessageHandler(e, e.ReceivedMessage);
             if (e.ReplyMessage != null)
             {
@@ -140,7 +132,7 @@ namespace SteamBotLite
         }
 
 
-        public string ChatMessageHandler(MessageProcessEventData sender , string Message)
+        public string ChatMessageHandler(MessageProcessEventData Msg , string Message)
         {
             string response = null;
             foreach (BaseModule module in ModuleList)
@@ -149,13 +141,13 @@ namespace SteamBotLite
                 { 
                     if (Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
                     {
-                        response = c.run(sender, Message);
+                        response = c.run(Msg, Message);
                         return response;
                     }
                 }
             }
 
-            if (usersModule.admincheck(sender.Sender)) //Verifies that it is a moderator, Can you please check if the "ISAdmin" is being used correctly? 
+            if (usersModule.admincheck(Msg.Sender)) //Verifies that it is a moderator, Can you please check if the "ISAdmin" is being used correctly? 
             {
                 Console.WriteLine("ADMIN SPOKE");
                 foreach (BaseModule module in ModuleList)
@@ -163,7 +155,7 @@ namespace SteamBotLite
                     foreach (BaseCommand c in module.adminCommands)
                         if (Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
                         {
-                            response = c.run(sender, Message);
+                            response = c.run(Msg, Message);
                             return response;
                         }
                 }
@@ -188,39 +180,5 @@ namespace SteamBotLite
         {
             usersModule.updateUserInfo(useridentifier, AdminStatus);
         }
-        /// <summary>
-        /// The Main Timer's method, executed per tick
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void TickTasks(object sender, EventArgs e)
-        {
-            GhostCheck--;
-            Console.WriteLine(string.Format("Ghostcheck = {0}"),GhostCheck);
-            if (GhostCheck <= 1)
-            {
-                GhostCheck = InitialGhostCheck;
-                CrashCheck += 1;
-                FireMainChatRoomEvent(ChatroomEventEnum.LeaveChat);
-                FireMainChatRoomEvent(ChatroomEventEnum.EnterChat);
-            }
-            if (CrashCheck >= 4)
-            {
-                CrashCheck = 0; 
-                Reboot();
-            }
-        }
-
-        /// <summary>
-        /// Initialises the main timer
-        /// </summary>
-        void InitTimer()
-        {
-            Tick = new Timer();
-            Tick.Elapsed += new ElapsedEventHandler(TickTasks);
-            Tick.Interval = interval; // in miliseconds
-            Tick.Start();
-        }
-
     }
 }

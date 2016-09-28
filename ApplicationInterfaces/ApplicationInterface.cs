@@ -193,6 +193,18 @@ namespace SteamBotLite
 
         public abstract void tick();
 
+        public enum TickThreadState { Running , Stopped};
+
+        public TickThreadState TickThread = TickThreadState.Running;
+
+        public void StartTickThreadLoop()
+        {
+            while (TickThread == TickThreadState.Running)
+            {
+                tick();
+            }
+        }
+
         public string Username
         {
             get
