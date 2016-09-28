@@ -45,7 +45,7 @@ namespace SteamBotLite
             {
                 this.module = module;
             }
-            protected override string exec(MessageProcessEventData sender, string param)
+            protected override string exec(MessageProcessEventData Msg, string param)
             {
                 module.SteamBot.Reboot();
                 return "Rebooted";
@@ -62,7 +62,7 @@ namespace SteamBotLite
             {
                 this.module = module;
             }
-            protected override string exec(MessageProcessEventData sender, string param)
+            protected override string exec(MessageProcessEventData Msg, string param)
             {
                 module.SteamBot.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.LeaveChat);
                 module.SteamBot.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.EnterChat);
@@ -80,7 +80,7 @@ namespace SteamBotLite
             {
                 this.module = module;
             }
-            protected override string exec(MessageProcessEventData sender, string param)
+            protected override string exec(MessageProcessEventData Msg, string param)
             {
                 string[] command = param.Split(new char[] { ' ' }, 2);
                 if (command.Length > 0)
@@ -104,7 +104,7 @@ namespace SteamBotLite
                 this.module = module;
                 botty = bot;
             }
-            protected override string exec(MessageProcessEventData sender, string param)
+            protected override string exec(MessageProcessEventData Msg, string param)
             {
                 botty.Disablemodule(param);
                 return "Removing Module...";
@@ -123,7 +123,7 @@ namespace SteamBotLite
                 this.module = module;
                 botty = bot;
             }
-            protected override string exec(MessageProcessEventData sender, string param)
+            protected override string exec(MessageProcessEventData Msg, string param)
             {
                 botty.Enablemodule(param);
                 return "Adding Module...";
@@ -142,7 +142,7 @@ namespace SteamBotLite
                 this.module = module;
                 botty = bot;
             }
-            protected override string exec(MessageProcessEventData sender, string param)
+            protected override string exec(MessageProcessEventData Msg, string param)
             {
                 string Response = "";
                 foreach (BaseModule ModuleEntry in botty.ModuleList)
