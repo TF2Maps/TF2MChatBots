@@ -32,10 +32,10 @@ namespace SteamBotLite
 
             userhandler = bot;
 
-            //WebServer = new MapWebServer("http://localhost:8080/index/",this);
+            WebServer = new MapWebServer("http://localhost:8080/index/",this);
 
             mapList.CollectionChanged += MapChange;
-            //mapList.CollectionChanged += WebServer.MapListUpdate;
+            mapList.CollectionChanged += WebServer.MapListUpdate;
 
             commands.Add(new Add(bot, this));
             commands.Add(new Maps(bot, this));
