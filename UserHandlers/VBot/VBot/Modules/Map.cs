@@ -20,6 +20,7 @@ namespace SteamBotLite
 
         int MaxMapNumber = 10;
         string ServerMapListUrl;
+        MapWebServer WebServer;
 
         public MapModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
@@ -31,7 +32,10 @@ namespace SteamBotLite
 
             userhandler = bot;
 
+            //WebServer = new MapWebServer("http://localhost:8080/index/",this);
+
             mapList.CollectionChanged += MapChange;
+            //mapList.CollectionChanged += WebServer.MapListUpdate;
 
             commands.Add(new Add(bot, this));
             commands.Add(new Maps(bot, this));
@@ -46,7 +50,7 @@ namespace SteamBotLite
 
         void MapChange (object sender, NotifyCollectionChangedEventArgs args)
             {
-            userhandler.OnMaplistchange(mapList.Count, sender, args);
+                userhandler.OnMaplistchange(mapList.Count, sender, args);
             }
         
         public class Map

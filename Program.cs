@@ -15,13 +15,17 @@ namespace SteamBotLite
 
         static void Main(string[] args)
         {
+
+            
             //Create userHandlers//
             List<UserHandler> UserHandlers = new List<UserHandler>();
 
             ConsoleUserHandler consolehandler = new ConsoleUserHandler();
             VBot VbotHandler = new VBot();
             GhostChecker ghostchecker = new GhostChecker();
-
+            MapWebServer webserver = new MapWebServer();
+            
+            
             // Create Interfaces//
             List<ApplicationInterface> Bots = new List<ApplicationInterface>();
 
