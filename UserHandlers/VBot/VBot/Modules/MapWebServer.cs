@@ -69,6 +69,7 @@ namespace SteamBotLite
 
         public void MapListUpdate(object sender, NotifyCollectionChangedEventArgs args)
         {
+            //PRONE TO INJECTION FIX
             string Header = "<html><body> <table> <tr> <th> MapName</th> <th> Url </th>";
             string MapDataCache = "";
             //string Form = "<form action=\"demo_form.asp\"method=\"get\">Map Name: <input type =\"text\" name=\"fname\"><br> Map Url: <input type =\"text\" name=\"lname\"><br><button type =\"submit\">Submit</button><button type =\"submit\" formmethod=\"POST\" formaction=\"demo_post.asp\">Submit using POST</button></ form > ";

@@ -500,6 +500,7 @@ namespace SteamBotLite
             }
             protected override string exec(MessageProcessEventData Msg, string param)
             {
+                return "This web server will not start until the injection error has been fixed";
                 MapModule.WebServer = new MapWebServer(param, MapModule);
                 MapModule.mapList.CollectionChanged += MapModule.WebServer.MapListUpdate;
                 return "Started the Web Server";
