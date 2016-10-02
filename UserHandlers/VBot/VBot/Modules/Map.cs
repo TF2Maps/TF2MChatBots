@@ -32,10 +32,10 @@ namespace SteamBotLite
 
             userhandler = bot;
 
-            WebServer = new MapWebServer("http://localhost:8080/index/",this);
+            //WebServer = new MapWebServer("http://localhost:8080/index/",this);
 
             mapList.CollectionChanged += MapChange;
-            mapList.CollectionChanged += WebServer.MapListUpdate;
+            
 
             commands.Add(new Add(bot, this));
             commands.Add(new Maps(bot, this));
@@ -46,6 +46,8 @@ namespace SteamBotLite
             adminCommands.Add(new Insert(bot, this));
             adminCommands.Add(new Reposition(bot, this));
             adminCommands.Add(new Wipe(bot, this));
+            adminCommands.Add(new WebServerStart(bot, "!StartWebServer", this));
+            adminCommands.Add(new WebServerStop(bot, "!StopWebServer", this));
         }
 
         void MapChange (object sender, NotifyCollectionChangedEventArgs args)
@@ -482,6 +484,43 @@ namespace SteamBotLite
                 MapModule.mapList.Clear();
                 MapModule.savePersistentData();
                 return "The map list has been DELETED.";
+            }
+        }
+
+        private class WebServerStart : BaseCommand
+        {
+            protected MapModule MapModule;
+            
+
+            public WebServerStart(VBot bot, string command , MapModule module)
+                : base(bot, command)
+            {
+                
+                MapModule = module;
+            }
+            protected override string exec(MessageProcessEventData Msg, string param)
+            {
+                MapModule.WebServer = new MapWebServer(param, MapModule);
+                MapModule.mapList.CollectionChanged += MapModule.WebServer.MapListUpdate;
+                return "Started the Web Server";
+            }
+        }
+        private class WebServerStop : BaseCommand
+        {
+            protected MapModule MapModule;
+            VBot bot;
+
+            public WebServerStop(VBot bot, string command, MapModule module)
+                : base(bot, command)
+            {
+                MapModule = module;
+            }
+            protected override string exec(MessageProcessEventData Msg, string param)
+            {
+                MapModule.mapList.CollectionChanged -= MapModule.WebServer.MapListUpdate;
+                MapModule.WebServer = null;
+                
+                return "Faded the Web Server away and made it OBSOLETE";
             }
         }
     }
