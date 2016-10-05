@@ -204,7 +204,7 @@ namespace SteamBotLite
                 {
                     return "Your map isn't uploaded! Please use include the url with the syntax: !add <mapname> <url> (notes)";
                 }
-                string Reply = string.Format("Map '{0}' added.", map.Filename);
+                string Reply = string.Format("'{0}' is now on the list.", map.Filename);
 
                 MapModule.mapList.Add(map);
                 MapModule.savePersistentData();
@@ -314,7 +314,7 @@ namespace SteamBotLite
                     // Build the chat response.
                     chatResponse = string.Join(" , ", mapList.Select(x => x.Filename));
                     if (maps.Count > maxMaps)
-                        chatResponse += string.Format(" (and {0} more...)", maps.Count - maxMaps);
+                        chatResponse += string.Format(" (and {0} more on the list...)", maps.Count - maxMaps);
 
                     // Build the private response.
                     pmResponse = "";
