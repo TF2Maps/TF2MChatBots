@@ -50,7 +50,7 @@ namespace SteamBotLite
 
             HttpListenerContext context = listener.EndGetContext(result);
             HttpListenerResponse response = context.Response;
-            /*if (context.Request.HttpMethod == "POST")
+            if (context.Request.HttpMethod.Equals("POST"))
             {
                 string Identifier = context.Request.UserHostAddress;
                 byte[] strArr = new byte[context.Request.InputStream.Length];
@@ -58,7 +58,7 @@ namespace SteamBotLite
                 context.Request.InputStream.Read(strArr, 0, Convert.ToInt32(context.Request.InputStream.Length));
                 Console.WriteLine(strArr);
             }
-            */
+            
             byte[] buff = System.Text.Encoding.UTF8.GetBytes(responseString);
             response.ContentLength64 = buff.Length;
             
