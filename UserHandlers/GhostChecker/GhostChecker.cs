@@ -28,8 +28,10 @@ namespace SteamBotLite
                 case (GhostStatus.Chatghosted):
                     FireMainChatRoomEvent(ChatroomEventEnum.LeaveChat);
                     FireMainChatRoomEvent(ChatroomEventEnum.EnterChat);
-                    CurrentGhostStatus = GhostStatus.ChatHasNotGhosted;
                     CrashCheck++;
+                    InitTimer();
+                    Console.WriteLine("Chat Ghosted, Crash check is at: {0}", CrashCheck);
+                    CurrentGhostStatus = GhostStatus.ChatHasNotGhosted;
                     break;
                 case (GhostStatus.ChatPotentiallyGhosted):
                     CurrentGhostStatus = GhostStatus.Chatghosted;
