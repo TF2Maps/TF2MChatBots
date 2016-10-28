@@ -1,14 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-
-using SteamKit2;
 using Newtonsoft.Json;
+
 
 namespace SteamBotLite
 {
@@ -16,6 +12,9 @@ namespace SteamBotLite
     {
         // public List<Map> mapList = new List<Map>();  //OLD MAP SYSTEM
         public ObservableCollection<Map> mapList = new ObservableCollection<Map>();
+       
+        
+        
 
 
         int MaxMapNumber = 10;
@@ -59,10 +58,39 @@ namespace SteamBotLite
         {
             public Object Submitter { get; set; }
             public string SubmitterName { get; set; }
-            public string Filename { get; set; }
+            
             public string DownloadURL { get; set; }
             public string Notes { get; set; }
+
+            int MaxCharacters = 27;
+            private string filename;
+
+            
+
+            public string Filename
+            {
+                get
+                {
+                    return filename;
+                }
+                set
+                {
+                    if (value.Length > MaxCharacters)
+                    {
+                        throw new ArgumentException("it includes too many characters: " + MaxCharacters);
+                    }
+                    
+                    if (value.Any(c => char.IsUpper(c)))
+                    {
+                        throw new ArgumentException("it includes an uppercase letter");
+                    }
+
+                    filename = value;
+                }
+            }
         }
+
+        
 
         public override string getPersistentData()
         {
@@ -164,6 +192,16 @@ namespace SteamBotLite
                 map.Submitter = Msg.Sender.identifier.ToString();
 
                 map.SubmitterName = Msg.Sender.DisplayName;
+
+                try 
+                {
+                    map.Filename = parameters[0];
+                }
+                catch (Exception exception)
+                {
+                    return string.Format("Your map is rejected because: {0}", exception);
+                }
+
                 map.Filename = parameters[0];
                 map.Notes = "";
                
@@ -171,15 +209,6 @@ namespace SteamBotLite
                 if (parameters[0].Length == 0)
                 {
                     return "Invalid parameters for !add. Syntax: !add <mapname> <url> <notes>";
-                }
-
-                if (parameters[0].Any(c => char.IsUpper(c)) )
-                {
-                    return "Your Map is rejected as it includes an uppercase letter";
-                }
-                if (parameters[0].Length > 27) //TODO make this the actually needed number
-                {
-                    return "Your Map is rejected for having a filename too long";
                 }
                 
                 if (uploadcheck(map.Filename, MapModule.ServerMapListUrl)) //Check if the map is uploaded
@@ -195,22 +224,31 @@ namespace SteamBotLite
                     parameters = param.Split(new char[] { ' ' }, 3);
 
                     map.DownloadURL = parameters[1];
+
                     if (parameters.Length > 2)
                     {
                         map.Notes = parameters.Last();
                     }
                 }
-                else //If a url isn't there lets return an error
+                else 
                 {
                     return "Your map isn't uploaded! Please use include the url with the syntax: !add <mapname> <url> (notes)";
                 }
-                string Reply = string.Format("'{0}' is now on the list.", map.Filename);
 
-                MapModule.mapList.Add(map);
-                MapModule.savePersistentData();
-                
-                return Reply;
+                if (MapModule.mapList.Any(m => m.Filename.Equals(map.Filename)))
+                {
+                    return "Your map has been rejected as it already exists in the map list!";
+                }
 
+                else
+
+                {
+                    MapModule.mapList.Add(map);
+                    MapModule.savePersistentData();
+                    
+                    string Reply = string.Format("'{0}' is now on the list.", map.Filename);
+                    return Reply;
+                }
             }
         }
 
@@ -241,21 +279,23 @@ namespace SteamBotLite
                 {
                     return "Invalid parameters for !insert. Syntax: !insert <index> <mapname> <url> <notes>";
                 }
+
                 Map map = new Map();
                 map.Submitter = msg.Sender.identifier.ToString();
 
                 map.SubmitterName = msg.Sender.DisplayName;
-                map.Filename = parameters[1];
-                map.Notes = string.Format("Inserted in position {0} by {1} //", index, msg.Sender.identifier.ToString());
 
-                if (parameters[1].Any(c => char.IsUpper(c)))
+                try
                 {
-                    return "Your Map is rejected as it includes an uppercase letter";
+                    map.Filename = parameters[1];
                 }
-                if (parameters[1].Length > 27) //TODO make this the actually needed number
+                catch (Exception exception)
                 {
-                    return "Your Map is rejected for having a filename too long";
+                    return string.Format("Your new map name was rejected because: {0}", exception);
                 }
+
+                
+                map.Notes = string.Format("Inserted in position {0} by {1} //", index, msg.Sender.identifier.ToString());
 
                 if (uploadcheck(map.Filename, MapModule.ServerMapListUrl)) //Check if the map is uploaded
                 {
@@ -500,7 +540,6 @@ namespace SteamBotLite
             }
             protected override string exec(MessageProcessEventData Msg, string param)
             {
-                return "This web server will not start until the injection error has been fixed";
                 MapModule.WebServer = new MapWebServer(param, MapModule);
                 MapModule.mapList.CollectionChanged += MapModule.WebServer.MapListUpdate;
                 return "Started the Web Server";
