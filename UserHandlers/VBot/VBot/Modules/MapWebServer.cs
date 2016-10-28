@@ -78,7 +78,7 @@ namespace SteamBotLite
 
             foreach (MapModule.Map map in mapmodule.mapList)
             {
-                MapDataCache += "<tr> <td>" + map.Filename + "</td>" + "<td>" + map.DownloadURL + "</td> </tr>";
+                MapDataCache += "<tr> <td>" + WebUtility.HtmlEncode(map.Filename) + "</td>" + "<td>" + WebUtility.HtmlEncode(map.DownloadURL) + "</td> </tr>";
             }
             responseString = Header + MapDataCache + Trailer;
 
