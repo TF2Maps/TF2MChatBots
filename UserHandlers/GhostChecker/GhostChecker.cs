@@ -30,7 +30,7 @@ namespace SteamBotLite
             FireMainChatRoomEvent(ChatroomEventEnum.LeaveChat);
             FireMainChatRoomEvent(ChatroomEventEnum.EnterChat);
             CrashCheck++;
-            InitTimer();
+            
             
             if (CrashCheck >= 4)
             {
