@@ -18,15 +18,15 @@ namespace SteamBotLite
             this.userhandler = bot;
             this.command = command;
         }
-        public string run(SteamID sender, string message = "")
+        public string run(MessageProcessEventData Msg, string message = "")
         {
             string param = "";
             string[] command = message.Split(new char[] { ' ' }, 2);
             if (command.Length > 1)
                 param = command[1].Trim();
-            return exec(sender, param);
+            return exec(Msg, param);
         }
-        protected virtual string exec(SteamID sender, string param)
+        protected virtual string exec(MessageProcessEventData Msg, string param)
         {
             return null;
         }

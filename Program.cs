@@ -6,48 +6,81 @@ using System.Threading.Tasks;
 using SteamKit2;
 using System.IO;
 using Newtonsoft.Json;
+using System.Threading;
 
 namespace SteamBotLite
 {
     class Program
     {
-        
+
         static void Main(string[] args)
         {
+
             
-            SteamBotData[] Bots = JsonConvert.DeserializeObject<SteamBotData[]>(File.ReadAllText("settings.json")); //Get the data about each bot alongside their info from the JSON file
+            //Create userHandlers//
+            List<UserHandler> UserHandlers = new List<UserHandler>();
 
-            List<SteamConnectionHandler> SteamConnections = new List<SteamConnectionHandler>(); //We make a list that'll contain our connections to steam
+            ConsoleUserHandler consolehandler = new ConsoleUserHandler();
+            VBot VbotHandler = new VBot();
+            GhostChecker ghostchecker = new GhostChecker();
+            
 
-            int ID = 0;
+            // Create Interfaces//
+            List<ApplicationInterface> Bots = new List<ApplicationInterface>();
 
-            foreach (SteamBotData Entry in Bots) //We create an instance of each Bot and add it to the list
+            SteamAccountVBot SteamPlatformInterface = new SteamAccountVBot();
+            DiscordAccountVFun DiscordPlatformInterfaceFun = new DiscordAccountVFun();
+            DiscordAccountVBot DiscordPlatformInterfaceRelay = new DiscordAccountVBot();
+
+            Bots.Add(SteamPlatformInterface);
+            Bots.Add(DiscordPlatformInterfaceRelay);
+            Bots.Add(DiscordPlatformInterfaceFun);
+
+            //Link userhandlers and classes that are two way//
+            AssignConnection(VbotHandler, DiscordPlatformInterfaceRelay);
+            AssignConnection(VbotHandler, DiscordPlatformInterfaceFun);
+            AssignConnection(VbotHandler, SteamPlatformInterface);
+            AssignConnection(consolehandler, DiscordPlatformInterfaceRelay);
+            AssignConnection(consolehandler, SteamPlatformInterface);
+            AssignConnection(ghostchecker, SteamPlatformInterface);
+
+            
+
+            Thread[] BotThreads = new Thread[Bots.Count];
+            //Start looping and iterating//
+            for (int x = 0; x < Bots.Count; x++)
             {
-                if (Entry.Userhandler != null) //We check if the UserHandler has been set before adding it
-                {
-                    SteamConnections.Add(new SteamConnectionHandler(Entry,ID)); //This loads the bot, then adds it to the list
-                }
-                else
-                {
-                    Console.WriteLine("Failed to load {0} because of an invalid BotControlClass", Entry.username); //Warn the user the bot isn't loaded
-                }
-                ID++;
+                BotThreads[x] = new Thread(new ThreadStart(Bots[x].StartTickThreadLoop));
+                BotThreads[x].Start();
             }
-
+            
             bool Running = true;
-
-            //This loop iterates through each bot in the list, checking it's callbacks for anything to run 
-            while (Running) 
+            
+            while (Running)
             {
-
-                foreach (SteamConnectionHandler Connection in SteamConnections)
+                string Message = Console.ReadLine();
+                foreach (ApplicationInterface bot in Bots)
                 {
-                    Connection.Tick();
+                    bot.BroadCastMessage(null, Message);
                 }
-                System.Threading.Thread.Sleep(100);
             }
         }
 
+        public static void AssignConnection (UserHandler userhandler , ApplicationInterface applicationinterface)
+        {
+            userhandler.AssignAppInterface(applicationinterface);
+            applicationinterface.AssignUserHandler(userhandler);
+        }
+
+        public void DoWork(ApplicationInterface Bot)
+        {
+            bool Running = true;
+            while (Running)
+            {
+                Bot.tick();
+            }
+
+        }
     }
 }
     

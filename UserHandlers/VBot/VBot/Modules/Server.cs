@@ -16,8 +16,7 @@ namespace SteamBotLite
 
         public List<ServerInfo> serverList;
         private BaseTask serverUpdate;
-        bool chatIsNotified = true;
-
+       
         public ServerModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
             serverList = new List<ServerInfo>();
@@ -88,7 +87,7 @@ namespace SteamBotLite
                     {
                         serverList[x].update(serverstate);
                         ServerUpdated(this, serverstate);
-                        userhandler.steamConnectionHandler.SteamFriends.SendChatRoomMessage(userhandler.GroupChatSID, EChatEntryType.ChatMsg, serverstate.ToString()); 
+                        userhandler.BroadcastMessageProcessEvent(serverstate.ToString());
                     }
                 }
                 x++;
@@ -162,7 +161,7 @@ namespace SteamBotLite
         private sealed class Status : BaseCommand
         {
             // Automaticaly generated status command for each server under the config
-            protected ServerInfo server;
+            ServerInfo server;
             ServerModule servermodule;
 
             public Status(VBot bot, ServerInfo server, ServerModule module) : base(bot, "!" + server.tag + "server")
@@ -171,7 +170,7 @@ namespace SteamBotLite
                 servermodule = module;
 
             }
-            protected override string exec(SteamID sender, string param)
+            protected override string exec(MessageProcessEventData Msg, string param)
             {
                 ServerInfo status = ServerQuery(server);
                 if (status != null)
@@ -195,7 +194,7 @@ namespace SteamBotLite
             {
                 this.module = module;
             }
-            protected override string exec(SteamID sender, string param)
+            protected override string exec(MessageProcessEventData Msg, string param)
             {
                 string activeServers = "";
                 foreach (ServerInfo server in module.serverList)
