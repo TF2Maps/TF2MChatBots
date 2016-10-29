@@ -6,10 +6,14 @@ namespace SteamBotLite
     public class GhostChecker :UserHandler
     {
         
-        double interval = 300000; //Five Minutes
+       // double interval = 300000; //Five Minutes
+        readonly double Minutes = 10;
+        double interval;
         enum GhostStatus { Chatghosted, ChatPotentiallyGhosted, ChatHasNotGhosted , ChatCrashed};
         GhostStatus CurrentGhostStatus = GhostStatus.ChatHasNotGhosted;
         int CrashCheck = 0;
+        readonly int MinutesThreshhole = 10;
+        int timeleft;
         Timer Tick;
 
         public GhostChecker()
@@ -23,25 +27,10 @@ namespace SteamBotLite
         /// <param name="e"></param>
         void TickTasks(object sender, EventArgs e)
         {
-            switch (CurrentGhostStatus)
-            {
-                case (GhostStatus.Chatghosted):
-                    FireMainChatRoomEvent(ChatroomEventEnum.LeaveChat);
-                    FireMainChatRoomEvent(ChatroomEventEnum.EnterChat);
-                    CrashCheck++;
-                    InitTimer();
-                    Console.WriteLine("Chat Ghosted, Crash check is at: {0}", CrashCheck);
-                    CurrentGhostStatus = GhostStatus.ChatHasNotGhosted;
-                    break;
-                case (GhostStatus.ChatPotentiallyGhosted):
-                    CurrentGhostStatus = GhostStatus.Chatghosted;
-                    break;
-                case (GhostStatus.ChatHasNotGhosted):
-                    CurrentGhostStatus = GhostStatus.ChatPotentiallyGhosted; //Therefore if this method runs twice (10 minutes) we have a ghost
-                    break;
-                case (GhostStatus.ChatCrashed):
-                    break;
-            }
+            FireMainChatRoomEvent(ChatroomEventEnum.LeaveChat);
+            FireMainChatRoomEvent(ChatroomEventEnum.EnterChat);
+            CrashCheck++;
+            InitTimer();
             
             if (CrashCheck >= 4)
             {
@@ -55,6 +44,7 @@ namespace SteamBotLite
         /// </summary>
         void InitTimer()
         {
+            interval = Minutes * 1000 * 60;
             Tick = new Timer();
             Tick.Elapsed += new ElapsedEventHandler(TickTasks);
             Tick.Interval = interval; // in miliseconds
@@ -63,8 +53,9 @@ namespace SteamBotLite
 
         public override void ProcessChatRoomMessage(object sender, MessageProcessEventData e)
         {
-            CurrentGhostStatus = GhostStatus.ChatHasNotGhosted;
             CrashCheck = 0;
+            Tick.Stop();
+            Tick.Start();
         }
 
         public override void ProcessPrivateMessage(object sender, MessageProcessEventData e) { }
