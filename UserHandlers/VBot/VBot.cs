@@ -60,7 +60,7 @@ namespace SteamBotLite
         {
             // OnMaplistchange();
             Console.WriteLine(Autojoin);
-            base.SetUsernameEventProcess("V3Bot");
+            base.SetUsernameEventProcess(Username);
             if (Autojoin)
                 base.FireMainChatRoomEvent(ChatroomEventEnum.EnterChat);
             Console.WriteLine("UserHandler: {0} Has Loaded", this.GetType());
