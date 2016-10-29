@@ -56,6 +56,7 @@ namespace SteamBotLite
             CrashCheck = 0;
             Tick.Stop();
             Tick.Start();
+            Console.WriteLine("Restarted the timer");
         }
 
         public override void ProcessPrivateMessage(object sender, MessageProcessEventData e) { }
