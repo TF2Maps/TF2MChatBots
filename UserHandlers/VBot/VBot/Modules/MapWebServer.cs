@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System;
+using System.IO;
 
 namespace SteamBotLite
 {
@@ -30,8 +31,9 @@ namespace SteamBotLite
             listener = new HttpListener();
             listener.Prefixes.Add(prefix);
             listener.Start();
+            
             listener.BeginGetContext(new AsyncCallback(ResponseMethod), listener);
-
+            
             
             Console.WriteLine("Website Loaded");
 
@@ -46,19 +48,25 @@ namespace SteamBotLite
         void ResponseMethod(IAsyncResult result )
         {
             HttpListener listener = (HttpListener)result.AsyncState;
+            
            
-
             HttpListenerContext context = listener.EndGetContext(result);
-            HttpListenerResponse response = context.Response;
+            
+            /*
+            Console.WriteLine(context.Request.HttpMethod);
             if (context.Request.HttpMethod.Equals("POST"))
             {
-                string Identifier = context.Request.UserHostAddress;
-                byte[] strArr = new byte[context.Request.InputStream.Length];
+                string text;
+                using (var reader = new StreamReader(context.Request.InputStream,
+                                                     context.Request.ContentEncoding))
+                {
+                    text = reader.ReadToEnd();
+                }
 
-                context.Request.InputStream.Read(strArr, 0, Convert.ToInt32(context.Request.InputStream.Length));
-                Console.WriteLine(strArr);
             }
-            
+            */
+
+            HttpListenerResponse response = context.Response;
             byte[] buff = System.Text.Encoding.UTF8.GetBytes(responseString);
             response.ContentLength64 = buff.Length;
             
@@ -72,9 +80,9 @@ namespace SteamBotLite
             //PRONE TO INJECTION FIX
             string Header = "<html><body> <table> <tr> <th> MapName</th> <th> Url </th>";
             string MapDataCache = "";
-            //string Form = "<form action=\"demo_form.asp\"method=\"get\">Map Name: <input type =\"text\" name=\"fname\"><br> Map Url: <input type =\"text\" name=\"lname\"><br><button type =\"submit\">Submit</button><button type =\"submit\" formmethod=\"POST\" formaction=\"demo_post.asp\">Submit using POST</button></ form > ";
+            string Form = "<form action=\"demo_form.asp\"method=\"get\">Map Name: <input type =\"text\" name=\"fname\"><br> Map Url: <input type =\"text\" name=\"lname\"><br><button type =\"submit\">Submit</button><button type =\"submit\" formmethod=\"POST\" formaction=\"index\">Submit using POST</button></ form > ";
 
-            string Trailer = "</table>" /*+ Form */ + "</body> </html>";
+            string Trailer = "</table>" /*+ Form*/  + "</body> </html>";
 
             foreach (MapModule.Map map in mapmodule.mapList)
             {
