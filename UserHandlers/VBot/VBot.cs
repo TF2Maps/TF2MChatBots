@@ -3,7 +3,7 @@ using System.Timers;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Collections.Specialized;
-
+using System.Collections.ObjectModel;
 
 namespace SteamBotLite
 {
@@ -22,6 +22,8 @@ namespace SteamBotLite
         AdminModule adminmodule;
         SearchModule searchModule;
         ImpNaoModule impnaomodule;
+       
+        MapWebServer WebServer;
 
         public UsersModule usersModule;
 
@@ -51,18 +53,22 @@ namespace SteamBotLite
             replyModule = new RepliesModule(this, jsconfig);
             adminmodule = new AdminModule(this, jsconfig);
             searchModule = new SearchModule(this, jsconfig);
-            
-            ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule,adminmodule,searchModule};
+
+            WebServer = new MapWebServer(this, jsconfig);
+
+            ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule,adminmodule,searchModule, WebServer };
             Console.WriteLine("All Loaded");
+
+            OnMaplistchange(mapModule.mapList);
+
         }
 
         public override void OnLoginCompleted(object sender, EventArgs e)
         {
-            // OnMaplistchange();
-            Console.WriteLine(Autojoin);
-            base.SetUsernameEventProcess(Username);
             if (Autojoin)
-                base.FireMainChatRoomEvent(ChatroomEventEnum.EnterChat);
+                {
+                    base.FireMainChatRoomEvent(ChatroomEventEnum.EnterChat);
+                }
             Console.WriteLine("UserHandler: {0} Has Loaded", this.GetType());
         }
 
@@ -162,9 +168,13 @@ namespace SteamBotLite
             }
             return response;
         }
-        public void OnMaplistchange(int MapCount, object sender = null, NotifyCollectionChangedEventArgs args = null)
+        public void OnMaplistchange(ObservableCollection<MapModule.Map> maplist, object sender = null, NotifyCollectionChangedEventArgs args = null)
         {
-            base.SetUsernameEventProcess("[" + MapCount + "]" + Username);         
+            base.SetUsernameEventProcess("[" + maplist.Count + "]" + Username);
+            if (WebServer != null)
+            {
+                WebServer.MapListUpdate(maplist);
+            }
         }
         public void ServerUpdated(object sender, ServerModule.ServerInfo args)
         {
@@ -174,7 +184,6 @@ namespace SteamBotLite
                 mapModule.HandleEvent(sender, args);
             }
         }
-
 
         public override void ChatMemberInfo(UserIdentifier useridentifier, bool AdminStatus)
         {

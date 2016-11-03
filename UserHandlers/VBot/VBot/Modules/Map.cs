@@ -19,10 +19,10 @@ namespace SteamBotLite
 
         int MaxMapNumber = 10;
         string ServerMapListUrl;
-        MapWebServer WebServer;
 
         public MapModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
+            
             loadPersistentData();
 
             ServerMapListUrl = config["ServerMapListUrl"].ToString();
@@ -51,7 +51,7 @@ namespace SteamBotLite
 
         void MapChange (object sender, NotifyCollectionChangedEventArgs args)
             {
-                userhandler.OnMaplistchange(mapList.Count, sender, args);
+                userhandler.OnMaplistchange(mapList.Count, sender, args , mapList);
             }
         
         public class Map
@@ -167,7 +167,7 @@ namespace SteamBotLite
             protected override string exec(MessageProcessEventData Msg, string param)
             {
                 NotifyCollectionChangedEventArgs args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
-                userhandler.OnMaplistchange(mapmodule.mapList.Count, Msg, args);
+                userhandler.OnMaplistchange(mapmodule.mapList, Msg, args);
                 return "Name has been updated";
             }
         }
@@ -526,7 +526,7 @@ namespace SteamBotLite
                 return "The map list has been DELETED.";
             }
         }
-
+        /*
         private class WebServerStart : BaseCommand
         {
             protected MapModule MapModule;
@@ -540,9 +540,16 @@ namespace SteamBotLite
             }
             protected override string exec(MessageProcessEventData Msg, string param)
             {
-                MapModule.WebServer = new MapWebServer(param, MapModule);
+                MapModule.WebServer = new MapWebServer(param, MapModule.mapList);
                 MapModule.mapList.CollectionChanged += MapModule.WebServer.MapListUpdate;
-                return "Started the Web Server";
+                if (MapModule.WebServer != null)
+                {
+                    return "Started the Web Server";
+                }
+                else
+                {
+                    return "An error prevented the webserver from loading";
+                }
             }
         }
         private class WebServerStop : BaseCommand
@@ -563,5 +570,6 @@ namespace SteamBotLite
                 return "Faded the Web Server away and made it OBSOLETE";
             }
         }
+        */
     }
 }

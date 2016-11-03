@@ -3,20 +3,39 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System;
 using System.IO;
+using System.Collections.Generic;
 
 namespace SteamBotLite
 {
-    class MapWebServer
+    class MapWebServer : BaseModule
     {
         HttpListener listener;
         MapModule mapmodule;
-        string responseString = "<HTML><BODY> Hello world!</BODY></HTML>";
+        readonly ObservableCollection<MapModule.Map> maplist;
 
-        public MapWebServer (string prefix , MapModule VBotMapmodule)
+        string responseString = "<HTML><BODY>Website is still initialising</BODY></HTML>";
+
+        readonly protected string header;
+        readonly protected string trailer;
+        string MapDataCache;
+
+        //string prefix, ObservableCollection<MapModule.Map> Maplist)
+
+        public MapWebServer (VBot bot, Dictionary<string, object> Jsconfig) : base (bot, Jsconfig)
         {
-            mapmodule = VBotMapmodule;
-            mapmodule.mapList.CollectionChanged += MapListUpdate;
-            StartWebServer(prefix);
+
+            //maplist = new ObservableCollection<MapModule.Map>(Maplist);        
+            
+            try
+            {
+                header = System.IO.File.ReadAllText(Path.Combine("websitemodule", "header.html"));
+                trailer = System.IO.File.ReadAllText(Path.Combine("websitemodule", "trailer.html"));
+                StartWebServer(config["address"].ToString());
+            }
+            catch
+            {
+                Console.WriteLine("Files not found, webserver load failed");
+            }
         }
 
         //When this class is turned off, we close the server properly
@@ -34,15 +53,15 @@ namespace SteamBotLite
             
             listener.BeginGetContext(new AsyncCallback(ResponseMethod), listener);
             
-            
             Console.WriteLine("Website Loaded");
 
-            MapListUpdate(this, null);
+            //MapListUpdate(this, null);
         }
         public void CloseWebServer ()
         {
-           // listener.Stop();
-          //  listener.Close();
+            Console.WriteLine("Closing Web Server");
+            listener.Stop();
+            listener.Close();
         }
 
         void ResponseMethod(IAsyncResult result )
@@ -67,7 +86,7 @@ namespace SteamBotLite
             */
 
             HttpListenerResponse response = context.Response;
-            byte[] buff = System.Text.Encoding.UTF8.GetBytes(responseString);
+            byte[] buff = System.Text.Encoding.UTF8.GetBytes(header + MapDataCache + trailer);
             response.ContentLength64 = buff.Length;
             
             response.Close(buff, true);
@@ -75,21 +94,32 @@ namespace SteamBotLite
             
         }
 
-        public void MapListUpdate(object sender, NotifyCollectionChangedEventArgs args)
+        public void MapListUpdate(ObservableCollection<MapModule.Map> maplist)
         {
-            //PRONE TO INJECTION FIX
-            string Header = "<html><body> <table> <tr> <th> MapName</th> <th> Url </th>";
-            string MapDataCache = "";
-            string Form = "<form action=\"demo_form.asp\"method=\"get\">Map Name: <input type =\"text\" name=\"fname\"><br> Map Url: <input type =\"text\" name=\"lname\"><br><button type =\"submit\">Submit</button><button type =\"submit\" formmethod=\"POST\" formaction=\"index\">Submit using POST</button></ form > ";
+            MapDataCache = "";
 
-            string Trailer = "</table>" /*+ Form*/  + "</body> </html>";
-
-            foreach (MapModule.Map map in mapmodule.mapList)
+            foreach (MapModule.Map map in maplist)
             {
-                MapDataCache += "<tr> <td>" + WebUtility.HtmlEncode(map.Filename) + "</td>" + "<td>" + WebUtility.HtmlEncode(map.DownloadURL) + "</td> </tr>";
+                MapDataCache += "<tr>";
+                MapDataCache += "<td>" + WebUtility.HtmlEncode(map.Filename) + "</td>";
+                MapDataCache += "<td>" + WebUtility.HtmlEncode(map.DownloadURL) + "</td>";
+                MapDataCache += "<td>" + WebUtility.HtmlEncode(map.Notes) + "</td>";
+                MapDataCache += "<td>" + WebUtility.HtmlEncode(map.SubmitterName) + "</td>";
+                MapDataCache += "</tr>";
             }
-            responseString = Header + MapDataCache + Trailer;
+            
+            //string Form = "<form action=\"demo_form.asp\"method=\"get\">Map Name: <input type =\"text\" name=\"fname\"><br> Map Url: <input type =\"text\" name=\"lname\"><br><button type =\"submit\">Submit</button><button type =\"submit\" formmethod=\"POST\" formaction=\"index\">Submit using POST</button></ form > ";
 
+        }
+
+        public override string getPersistentData()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void loadPersistentData()
+        {
+            throw new NotImplementedException();
         }
     }
 }
