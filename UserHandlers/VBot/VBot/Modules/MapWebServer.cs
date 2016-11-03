@@ -30,7 +30,7 @@ namespace SteamBotLite
             {
                 header = System.IO.File.ReadAllText(config["HeaderFilePath"].ToString());
                 trailer = System.IO.File.ReadAllText(config["TrailerFilePath"].ToString());
-                StartWebServer(config["address"].ToString());
+                StartWebServer(config["Address"].ToString());
                 //header = System.IO.File.ReadAllText(Path.Combine("websitemodule", "header.html"));
                 //trailer = System.IO.File.ReadAllText(Path.Combine("websitemodule", "trailer.html"));
             }
