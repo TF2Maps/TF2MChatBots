@@ -57,7 +57,7 @@ namespace SteamBotLite
             WebServer = new MapWebServer(this, jsconfig);
 
             ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule,adminmodule,searchModule, WebServer };
-            Console.WriteLine("All Loaded");
+            Console.WriteLine("Modules loaded and ModuleList intitialised");
 
             OnMaplistchange(mapModule.mapList);
 
