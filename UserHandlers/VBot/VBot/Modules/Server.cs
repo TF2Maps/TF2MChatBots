@@ -81,7 +81,7 @@ namespace SteamBotLite
 
                 if (serverstate != null)
                 {
-                    Console.WriteLine(string.Format("New Map is {0} Oldy one is {1} and the player count is {2} went from {3}", serverstate.currentMap, serverList[x].currentMap, serverstate.playerCount, serverList[x].playerCount));
+                   // Console.WriteLine(string.Format("New Map is {0} Oldy one is {1} and the player count is {2} went from {3}", serverstate.currentMap, serverList[x].currentMap, serverstate.playerCount, serverList[x].playerCount));
                     
                     if (!(serverList[x].currentMap.Equals(serverstate.currentMap)) && (serverstate.playerCount > 3))
                     {
@@ -137,11 +137,11 @@ namespace SteamBotLite
                     // getting server capacity
                     updatedServer.capacity = (int)Encoding.ASCII.GetBytes(serverinfos[4]).Skip(2).ToArray()[1];
 
-                    Console.WriteLine(string.Format("{0} Responded with {1} and {2}",updatedServer.tag, updatedServer.currentMap,updatedServer.playerCount));
+                    //Console.WriteLine(string.Format("{0} Responded with {1} and {2}",updatedServer.tag, updatedServer.currentMap,updatedServer.playerCount));
 
-                    Console.WriteLine(string.Format("{0} Responded with: {1} and: {2}", updatedServer.tag, updatedServer.currentMap, updatedServer.playerCount));
+                    //Console.WriteLine(string.Format("{0} Responded with: {1} and: {2}", updatedServer.tag, updatedServer.currentMap, updatedServer.playerCount));
 
-                    Console.WriteLine(string.Format("{0} Responded with {1}",server.tag, updatedServer.currentMap));
+                   // Console.WriteLine(string.Format("{0} Responded with {1}",server.tag, updatedServer.currentMap));
 
                     client.Close();
                 }

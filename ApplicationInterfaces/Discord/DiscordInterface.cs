@@ -124,7 +124,7 @@ namespace SteamBotLite
             try
             {
                 User user = (User)messagedata.Sender.extradata;
-                Console.WriteLine("Casted Fine");
+                Console.WriteLine("Casted Fine To Discord");
                 SendLargeMessage(user, messagedata.ReplyMessage);
             }
             catch

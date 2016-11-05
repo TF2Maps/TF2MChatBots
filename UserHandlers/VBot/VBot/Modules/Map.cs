@@ -13,10 +13,6 @@ namespace SteamBotLite
         // public List<Map> mapList = new List<Map>();  //OLD MAP SYSTEM
         public ObservableCollection<Map> mapList = new ObservableCollection<Map>();
        
-        
-        
-
-
         int MaxMapNumber = 10;
         string ServerMapListUrl;
 
@@ -45,13 +41,11 @@ namespace SteamBotLite
             adminCommands.Add(new Insert(bot, this));
             adminCommands.Add(new Reposition(bot, this));
             adminCommands.Add(new Wipe(bot, this));
-            adminCommands.Add(new WebServerStart(bot, "!StartWebServer", this));
-            adminCommands.Add(new WebServerStop(bot, "!StopWebServer", this));
         }
 
         void MapChange (object sender, NotifyCollectionChangedEventArgs args)
             {
-                userhandler.OnMaplistchange(mapList.Count, sender, args , mapList);
+                userhandler.OnMaplistchange(mapList, sender, args);
             }
         
         public class Map
@@ -502,7 +496,7 @@ namespace SteamBotLite
                         {
                             MapModule.mapList.Remove(deletedMap);
                             MapModule.savePersistentData();
-                            userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData(null) { Sender = new UserIdentifier(deletedMap.Submitter), ReplyMessage = string.Format("Your map {0} has been deleted from the map list",deletedMap.Filename) });
+                            userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData(null) { Sender = new UserIdentifier(deletedMap.Submitter), ReplyMessage = string.Format("Your map {0} has been deleted from the map list", deletedMap.Filename) });
                             return string.Format("Map '{0}' DELETED.", deletedMap.Filename);
                         }
                         else

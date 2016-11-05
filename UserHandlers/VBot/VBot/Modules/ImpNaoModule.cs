@@ -31,7 +31,7 @@ namespace SteamBotLite
 
         void MapChange(object sender, NotifyCollectionChangedEventArgs args)
         {
-            userhandler.OnMaplistchange(MapListCache.Count, sender, args);
+           // userhandler.OnMaplistchange(MapListCache, sender, args); //TODO Fix I guess?
         }
 
 
@@ -76,7 +76,7 @@ namespace SteamBotLite
             protected override string exec(MessageProcessEventData Msg, string param)
             {
                 NotifyCollectionChangedEventArgs args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
-                userhandler.OnMaplistchange(mapmodule.MapListCache.Count, Msg, args);
+           //     userhandler.OnMaplistchange(mapmodule.MapListCache.Count, Msg, args); //TODO fix I guess?
                 return "Name has been updated";
             }
         }

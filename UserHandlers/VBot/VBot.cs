@@ -54,7 +54,7 @@ namespace SteamBotLite
             adminmodule = new AdminModule(this, jsconfig);
             searchModule = new SearchModule(this, jsconfig);
 
-            WebServer = new MapWebServer(this, jsconfig);
+            WebServer = null; // new MapWebServer(this, jsconfig);
 
             ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule,adminmodule,searchModule, WebServer };
             Console.WriteLine("Modules loaded and ModuleList intitialised");
@@ -143,27 +143,32 @@ namespace SteamBotLite
             string response = null;
             foreach (BaseModule module in ModuleList)
             {
-                foreach (BaseCommand c in module.commands)
-                { 
-                    if (Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
+                if (module != null)
+                {
+                    foreach (BaseCommand c in module.commands)
                     {
-                        response = c.run(Msg, Message);
-                        return response;
+                        if (Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
+                        {
+                            response = c.run(Msg, Message);
+                            return response;
+                        }
                     }
                 }
             }
 
             if (usersModule.admincheck(Msg.Sender)) //Verifies that it is a moderator, Can you please check if the "ISAdmin" is being used correctly? 
             {
-                Console.WriteLine("ADMIN SPOKE");
                 foreach (BaseModule module in ModuleList)
                 {
-                    foreach (BaseCommand c in module.adminCommands)
-                        if (Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
-                        {
-                            response = c.run(Msg, Message);
-                            return response;
-                        }
+                    if (module != null)
+                    {
+                        foreach (BaseCommand c in module.adminCommands)
+                            if (Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
+                            {
+                                response = c.run(Msg, Message);
+                                return response;
+                            }
+                    }
                 }
             }
             return response;

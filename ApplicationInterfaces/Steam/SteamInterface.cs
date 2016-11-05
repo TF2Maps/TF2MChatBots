@@ -440,7 +440,8 @@ namespace SteamBotLite
         {
             try
             {
-                SteamFriends.SendChatMessage((SteamID)messagedata.Sender.identifier, EChatEntryType.ChatMsg, messagedata.ReplyMessage);
+                SteamID user = new SteamID(messagedata.Sender.identifier.ToString());
+                SteamFriends.SendChatMessage(user, EChatEntryType.ChatMsg, messagedata.ReplyMessage);
             }
             catch
             {
