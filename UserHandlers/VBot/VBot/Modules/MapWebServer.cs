@@ -38,9 +38,9 @@ namespace SteamBotLite
                 
                 trailer = System.IO.File.ReadAllText(Path.Combine (WebsiteFilesDirectory , config["TrailerFileName"].ToString()));
 
-                string address = "http://localhost:8080/";
-                StartWebServer(address);
-                Console.WriteLine(address);
+                
+                StartWebServer(config["Address"].ToString());
+                
                 //StartWebServer(config["Address"].ToString());
             }
             catch (Exception exception)
