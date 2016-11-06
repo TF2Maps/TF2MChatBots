@@ -15,7 +15,7 @@ namespace SteamBotLite
         public List<BaseTask> tasks { get; private set;}
         public string ModuleSavedDataFilePath()
         {
-            
+          //  Console.WriteLine("Path: {0}", Path.Combine(userhandler.GetType().Name, this.GetType().Name + ".json"));
             return Path.Combine(userhandler.GetType().Name, this.GetType().Name + ".json");
         }
         

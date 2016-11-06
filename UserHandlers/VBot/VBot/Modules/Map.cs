@@ -71,12 +71,12 @@ namespace SteamBotLite
                 {
                     if (value.Length > MaxCharacters)
                     {
-                        throw new ArgumentException("it includes too many characters: " + MaxCharacters);
+                        throw new ArgumentException("It includes too many characters: " + MaxCharacters);
                     }
                     
                     if (value.Any(c => char.IsUpper(c)))
                     {
-                        throw new ArgumentException("it includes an uppercase letter");
+                        throw new ArgumentException("It includes an uppercase letter");
                     }
 
                     filename = value;
@@ -193,7 +193,7 @@ namespace SteamBotLite
                 }
                 catch (Exception exception)
                 {
-                    return string.Format("Your map is rejected because: {0}", exception);
+                    return string.Format("Your map is rejected because: {0}", exception.Message);
                 }
 
                 map.Filename = parameters[0];
@@ -285,7 +285,7 @@ namespace SteamBotLite
                 }
                 catch (Exception exception)
                 {
-                    return string.Format("Your new map name was rejected because: {0}", exception);
+                    return string.Format("Your new map name was rejected because: {0}", exception.Message);
                 }
 
                 
@@ -348,7 +348,13 @@ namespace SteamBotLite
                     // Build the chat response.
                     chatResponse = string.Join(" , ", mapList.Select(x => x.Filename));
                     if (maps.Count > maxMaps)
-                        chatResponse += string.Format(" (and {0} more on the list...)", maps.Count - maxMaps);
+                    {
+                        chatResponse += string.Format(" (and {0} more at: http://vbot.site)", maps.Count - maxMaps);
+                    }
+                    else
+                    {
+                        chatResponse += " at: http://vbot.site";
+                    }
 
                     // Build the private response.
                     pmResponse = "";

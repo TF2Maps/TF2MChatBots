@@ -54,7 +54,7 @@ namespace SteamBotLite
             adminmodule = new AdminModule(this, jsconfig);
             searchModule = new SearchModule(this, jsconfig);
 
-            WebServer = null; // new MapWebServer(this, jsconfig);
+            WebServer = new MapWebServer(this, jsconfig);
 
             ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule,adminmodule,searchModule, WebServer };
             Console.WriteLine("Modules loaded and ModuleList intitialised");

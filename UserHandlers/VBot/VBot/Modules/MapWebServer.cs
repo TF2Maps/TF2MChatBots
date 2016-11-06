@@ -17,6 +17,7 @@ namespace SteamBotLite
 
         readonly protected string header;
         readonly protected string trailer;
+        readonly protected string WebsiteFilesDirectory;
         string MapDataCache;
 
         //string prefix, ObservableCollection<MapModule.Map> Maplist)
@@ -25,17 +26,26 @@ namespace SteamBotLite
         {
 
             //maplist = new ObservableCollection<MapModule.Map>(Maplist);        
-            
             try
             {
-                header = System.IO.File.ReadAllText(config["HeaderFilePath"].ToString());
-                trailer = System.IO.File.ReadAllText(config["TrailerFilePath"].ToString());
-                StartWebServer(config["Address"].ToString());
-                //header = System.IO.File.ReadAllText(Path.Combine("websitemodule", "header.html"));
-                //trailer = System.IO.File.ReadAllText(Path.Combine("websitemodule", "trailer.html"));
+                //string data = config["HeaderFilePath"].ToString();
+              //  Console.WriteLine(data);
+
+                WebsiteFilesDirectory = config["FilesDirectory"].ToString();
+
+                Console.WriteLine("Directory set to: {0}", WebsiteFilesDirectory);
+                header = System.IO.File.ReadAllText(Path.Combine(WebsiteFilesDirectory , config["HeaderFileName"].ToString()));
+                
+                trailer = System.IO.File.ReadAllText(Path.Combine (WebsiteFilesDirectory , config["TrailerFileName"].ToString()));
+
+                string address = "http://localhost:8080/";
+                StartWebServer(address);
+                Console.WriteLine(address);
+                //StartWebServer(config["Address"].ToString());
             }
-            catch
+            catch (Exception exception)
             {
+                Console.WriteLine(exception);
                 Console.WriteLine("Files not found, webserver load failed");
             }
         }
@@ -66,13 +76,27 @@ namespace SteamBotLite
             listener.Close();
         }
 
-        void ResponseMethod(IAsyncResult result )
+        void ResponseMethod(IAsyncResult result)
         {
             HttpListener listener = (HttpListener)result.AsyncState;
-            
-           
+
+
             HttpListenerContext context = listener.EndGetContext(result);
+            HttpListenerResponse response = context.Response;
+            string path = (WebsiteFilesDirectory + context.Request.RawUrl);
             
+            byte[] buff;
+
+            if (File.Exists(path))
+            {
+                buff = System.Text.Encoding.UTF8.GetBytes(System.IO.File.ReadAllText(path).ToString());
+            }
+            else
+            {
+                buff = System.Text.Encoding.UTF8.GetBytes(header + MapDataCache + trailer);
+            }          
+            
+
             /*
             Console.WriteLine(context.Request.HttpMethod);
             if (context.Request.HttpMethod.Equals("POST"))
@@ -87,8 +111,8 @@ namespace SteamBotLite
             }
             */
 
-            HttpListenerResponse response = context.Response;
-            byte[] buff = System.Text.Encoding.UTF8.GetBytes(header + MapDataCache + trailer);
+           
+            
             response.ContentLength64 = buff.Length;
             
             response.Close(buff, true);
@@ -104,9 +128,9 @@ namespace SteamBotLite
             {
                 MapDataCache += "<tr>";
                 MapDataCache += "<td>" + WebUtility.HtmlEncode(map.Filename) + "</td>";
-                MapDataCache += "<td>" + WebUtility.HtmlEncode(map.DownloadURL) + "</td>";
+                MapDataCache += "<td> <a href=\"" + WebUtility.HtmlEncode(map.DownloadURL) + "\">" + WebUtility.HtmlEncode(map.DownloadURL) + "</a></td>";
                 MapDataCache += "<td>" + WebUtility.HtmlEncode(map.Notes) + "</td>";
-                MapDataCache += "<td>" + WebUtility.HtmlEncode(map.SubmitterName) + "</td>";
+                MapDataCache += "<td> <span title = \"" + WebUtility.HtmlEncode(map.Submitter.ToString()) + "\">" +  WebUtility.HtmlEncode(map.SubmitterName) + "</span> </td>";
                 MapDataCache += "</tr>";
             }
             
