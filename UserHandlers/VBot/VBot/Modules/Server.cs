@@ -16,6 +16,8 @@ namespace SteamBotLite
 
         public List<ServerInfo> serverList;
         private BaseTask serverUpdate;
+
+        
        
         public ServerModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
@@ -35,9 +37,13 @@ namespace SteamBotLite
 
             // loading commands
             foreach (ServerInfo server in serverList)
-                commands.Add(new Status(bot, server,this));
+                {
+                    commands.Add(new Status(bot, server, this));
+                }
 
             commands.Add(new Active(bot, this));
+            adminCommands.Add(new ServerAdd(bot, this));
+            
 
             serverUpdate = new BaseTask(updateInterval, new System.Timers.ElapsedEventHandler(SyncServerInfo));
             ServerUpdated += bot.ServerUpdated;
@@ -96,12 +102,26 @@ namespace SteamBotLite
 
         public override string getPersistentData()
         {
-            return "";
+            return JsonConvert.SerializeObject(serverList);
         }
 
         public override void loadPersistentData()
         {
-            throw new NotImplementedException();
+            try
+            {
+                Tuple<string, string, int>[] servers = JsonConvert.DeserializeObject<Tuple<string, string, int>[]>(System.IO.File.ReadAllText(ModuleSavedDataFilePath()));
+                // parsing ServerInfos
+                foreach (Tuple<string, string, int> servconf in servers)
+                {
+                    IPEndPoint ep = new IPEndPoint(System.Net.IPAddress.Parse(servconf.Item2), servconf.Item3);
+                    ServerInfo serverInfo = new ServerInfo(ep, servconf.Item1);
+                    serverList.Add(serverInfo);
+                }
+            }
+            catch
+            {
+                Console.WriteLine("There was an error loading the serverlist");
+            }
         }
 
         // queries a server and returns a <string, int> Tuple (mapname, playercount)
@@ -184,6 +204,36 @@ namespace SteamBotLite
             }
         }
 
+        private class ServerAdd : BaseCommand
+        {
+            ServerModule module;
+            public ServerAdd(VBot bot, ServerModule module) : base(bot, "!serveradd")
+            {
+
+            }
+
+            protected override string exec(MessageProcessEventData Msg, string param)
+            {
+                string[] parameters = param.Split(new char[] { ' ' });
+                if (parameters.Length > 2)
+                {
+                    IPEndPoint ep = new IPEndPoint(System.Net.IPAddress.Parse(parameters[1]), int.Parse(parameters[2]));
+                    ServerInfo Server = new ServerInfo(ep, parameters[0]);
+                    module.serverList.Add(Server);
+
+                    return string.Format("Server {0} has been successfully added at: {1}", Server.tag, Server.serverIP);
+                }
+                else
+                {
+                    return "Your Server was not added, remember the command is: !serveradd servername serverIP serverPort";
+                }
+
+            }
+        }
+        private class ServerRemove : BaseCommand
+        {
+
+        }
         // Other commands
 
         private class Active : BaseCommand
@@ -208,5 +258,8 @@ namespace SteamBotLite
                 return activeServers.Equals(string.Empty) ? "no server is currently active" : activeServers;
             }
         }
+
+        
+
     }
 }
