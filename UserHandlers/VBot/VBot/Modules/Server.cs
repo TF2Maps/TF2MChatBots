@@ -7,6 +7,7 @@ using SteamKit2;
 using System.Net;
 using System.Net.Sockets;
 using Newtonsoft.Json;
+using System.IO;
 
 namespace SteamBotLite
 {
@@ -14,35 +15,87 @@ namespace SteamBotLite
     {
         public event EventHandler<ServerInfo> ServerUpdated;
 
-        public List<ServerInfo> serverList;
+
         private BaseTask serverUpdate;
 
-        
+        public ServerList serverList;
+
+        public VBot Bot;
+
+        public class ServerList
+        {
+            ServerModule Servermodule;
+
+            public ServerList(ServerModule module , List<ServerInfo> serverlist)
+            {
+                Servermodule = module;
+                ServerListObject = serverlist;
+            }
+
+            List<ServerInfo> ServerListObject { get; }
+
+            public IReadOnlyList<ServerInfo> Servers
+            {
+                get
+                {
+                    return ServerListObject.AsReadOnly();
+                }
+            }
+
+            public void Add (ServerInfo server)
+            {
+                ServerListObject.Add(server);
+                Servermodule.commands.Add((new Status(Servermodule.Bot, server, Servermodule)));
+                Servermodule.savePersistentData();
+            }
+            public void Remove (ServerInfo server)
+            {
+                
+                foreach (BaseCommand command in Servermodule.commands)
+                {
+                    if(command.command.Equals("!" + server.tag + "server"))
+                    {
+                        Servermodule.commands.Remove(command);
+                    }
+                }
+                ServerListObject.Remove(server);
+
+                Servermodule.savePersistentData();
+            }
+        }
        
         public ServerModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
-            serverList = new List<ServerInfo>();
+            
+            Bot = bot;
+            List<ServerInfo> ServerList = new List<ServerInfo>();
 
             // loading config
-            int updateInterval = int.Parse(config["updateInterval"].ToString());
-            Tuple<string, string, int>[] servers = JsonConvert.DeserializeObject<Tuple<string, string, int>[]>(config["Servers"].ToString());
 
-            // parsing ServerInfos
-            foreach (Tuple<string, string, int> servconf in servers)
+            int updateInterval = int.Parse(config["updateInterval"].ToString());
+            Tuple<string, string, int>[] servers;
+
+            if (File.Exists(ModuleSavedDataFilePath()))
             {
-                IPEndPoint ep = new IPEndPoint(System.Net.IPAddress.Parse(servconf.Item2), servconf.Item3);
-                ServerInfo serverInfo = new ServerInfo(ep, servconf.Item1);
-                serverList.Add(serverInfo);
+                ServerList = JsonConvert.DeserializeObject<List<ServerInfo>>(System.IO.File.ReadAllText(ModuleSavedDataFilePath()));
+                if (ServerList.Count > 0)
+                {
+                    foreach (ServerInfo server in ServerList)
+                    {
+                        commands.Add(new Status(bot, server, this));
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("No servers found in config file");
+                servers = null;
             }
 
-            // loading commands
-            foreach (ServerInfo server in serverList)
-                {
-                    commands.Add(new Status(bot, server, this));
-                }
-
+            serverList = new ServerList(this, ServerList);
             commands.Add(new Active(bot, this));
             adminCommands.Add(new ServerAdd(bot, this));
+            adminCommands.Add(new ServerRemove(bot, this));
             
 
             serverUpdate = new BaseTask(updateInterval, new System.Timers.ElapsedEventHandler(SyncServerInfo));
@@ -51,15 +104,18 @@ namespace SteamBotLite
 
         public class ServerInfo : EventArgs
         {
-            public IPEndPoint serverIP;
+            public string serverIP; 
+            public int port;
+
             public string tag;
             public int playerCount;
             public int capacity;
             public string currentMap = "";
 
-            public ServerInfo(IPEndPoint serverIP, string tag)
+            public ServerInfo(string serverIP, int port, string tag)
             {
                 this.serverIP = serverIP;
+                this.port = port;
                 this.tag = tag;
             }
 
@@ -74,14 +130,14 @@ namespace SteamBotLite
             {
                 return this.tag + " server is now on " + this.currentMap +
                     " - " + this.playerCount + "/" + this.capacity +
-                    " - join: steam://connect/" + this.serverIP;
+                    " - join: steam://connect/" + this.serverIP + ":" + this.port;
             }
         }
 
         public void SyncServerInfo(object sender, EventArgs e)
         {
             int x = 0;
-            foreach (ServerInfo server in serverList)
+            foreach (ServerInfo server in serverList.Servers)
             {
                 ServerInfo serverstate = ServerQuery(server);
 
@@ -89,9 +145,9 @@ namespace SteamBotLite
                 {
                    // Console.WriteLine(string.Format("New Map is {0} Oldy one is {1} and the player count is {2} went from {3}", serverstate.currentMap, serverList[x].currentMap, serverstate.playerCount, serverList[x].playerCount));
                     
-                    if (!(serverList[x].currentMap.Equals(serverstate.currentMap)) && (serverstate.playerCount > 3))
+                    if (!(serverList.Servers[x].currentMap.Equals(serverstate.currentMap)) && (serverstate.playerCount > 3))
                     {
-                        serverList[x].update(serverstate);
+                        serverList.Servers[x].update(serverstate);
                         ServerUpdated(this, serverstate);
                         userhandler.BroadcastMessageProcessEvent(serverstate.ToString());
                     }
@@ -102,7 +158,7 @@ namespace SteamBotLite
 
         public override string getPersistentData()
         {
-            return JsonConvert.SerializeObject(serverList);
+            return JsonConvert.SerializeObject(serverList.Servers);
         }
 
         public override void loadPersistentData()
@@ -114,7 +170,7 @@ namespace SteamBotLite
                 foreach (Tuple<string, string, int> servconf in servers)
                 {
                     IPEndPoint ep = new IPEndPoint(System.Net.IPAddress.Parse(servconf.Item2), servconf.Item3);
-                    ServerInfo serverInfo = new ServerInfo(ep, servconf.Item1);
+                    ServerInfo serverInfo = new ServerInfo(servconf.Item2,servconf.Item3 , servconf.Item1);
                     serverList.Add(serverInfo);
                 }
             }
@@ -136,7 +192,7 @@ namespace SteamBotLite
                 client.Client.ReceiveTimeout = 5000;
                 client.Client.SendTimeout = 5000;
 
-                client.Connect(server.serverIP);
+                client.Connect(new IPEndPoint(System.Net.IPAddress.Parse(server.serverIP), server.port));
 
                 var request = new List<byte>();
                 request.AddRange(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0x54 });
@@ -148,7 +204,7 @@ namespace SteamBotLite
                 {
                     var data = client.Receive(ref localEndpoint).Skip(6).ToArray();
 
-                    updatedServer = new ServerInfo(server.serverIP, server.tag);
+                    updatedServer = new ServerInfo(server.serverIP, server.port, server.tag);
                     string[] serverinfos = Encoding.ASCII.GetString(data).Split(new char[] { '\0' }, 5);
                     // getting and sanitizing map name
                     updatedServer.currentMap = serverinfos[1].Split('.')[0].Replace("workshop/", "");
@@ -184,7 +240,7 @@ namespace SteamBotLite
             ServerInfo server;
             ServerModule servermodule;
 
-            public Status(VBot bot, ServerInfo server, ServerModule module) : base(bot, "!" + server.tag + "server")
+            public Status(VBot bot, ServerInfo server, ServerModule module) : base(bot, "!" + server.tag.ToLower() + "server")
             {
                 this.server = server;
                 servermodule = module;
@@ -209,6 +265,7 @@ namespace SteamBotLite
             ServerModule module;
             public ServerAdd(VBot bot, ServerModule module) : base(bot, "!serveradd")
             {
+                this.module = module;
 
             }
 
@@ -217,11 +274,18 @@ namespace SteamBotLite
                 string[] parameters = param.Split(new char[] { ' ' });
                 if (parameters.Length > 2)
                 {
-                    IPEndPoint ep = new IPEndPoint(System.Net.IPAddress.Parse(parameters[1]), int.Parse(parameters[2]));
-                    ServerInfo Server = new ServerInfo(ep, parameters[0]);
-                    module.serverList.Add(Server);
+                    try
+                    {
+                        IPEndPoint ep = new IPEndPoint(System.Net.IPAddress.Parse(parameters[1]), int.Parse(parameters[2]));
+                        ServerInfo Server = new ServerInfo(parameters[1], int.Parse(parameters[2]), parameters[0]);
+                        module.serverList.Add(Server);
 
-                    return string.Format("Server {0} has been successfully added at: {1}", Server.tag, Server.serverIP);
+                        return string.Format("Server {0} has been successfully added at: {1}", Server.tag, Server.serverIP);
+                    }
+                    catch
+                    {
+                        return "Your data types were invalid!";
+                    }
                 }
                 else
                 {
@@ -232,8 +296,26 @@ namespace SteamBotLite
         }
         private class ServerRemove : BaseCommand
         {
+            ServerModule module;
 
+            public ServerRemove(VBot bot, ServerModule module) : base(bot, "!serverremove")
+            {
+                this.module = module;
+            }
+            protected override string exec(MessageProcessEventData Msg, string param)
+            {
+                foreach (ServerInfo server in module.serverList.Servers)
+                    {
+                        if (param.Equals(server.tag))
+                        {
+                            module.serverList.Remove(server);
+                            return "The server has been removed from the list";
+                        }
+                    }
+                    return "Server was not found, remember the servername does not include ! preceeding or 'server' afterwards (EUserver would be EU)";
+                }
         }
+
         // Other commands
 
         private class Active : BaseCommand
@@ -247,7 +329,7 @@ namespace SteamBotLite
             protected override string exec(MessageProcessEventData Msg, string param)
             {
                 string activeServers = "";
-                foreach (ServerInfo server in module.serverList)
+                foreach (ServerInfo server in module.serverList.Servers)
                     if (server.playerCount > 1)
                     {
                         if (!activeServers.Equals(string.Empty))    
@@ -255,11 +337,34 @@ namespace SteamBotLite
 
                         activeServers += server.ToString();
                     }
-                return activeServers.Equals(string.Empty) ? "no server is currently active" : activeServers;
+                return activeServers.Equals(string.Empty) ? "No server is currently active" : activeServers;
             }
         }
 
-        
+        private class FullServerQuery : BaseCommand
+        {
+            // Command to query if a server is active
+            ServerModule module;
+            public FullServerQuery(VBot bot, ServerModule module) : base(bot, "!Serverquery")
+            {
+                this.module = module;
+            }
+            protected override string exec(MessageProcessEventData Msg, string param)
+            {
+                string activeServers = "";
+                foreach (ServerInfo server in module.serverList.Servers)
+                {
+                    if (!activeServers.Equals(string.Empty))
+                    {
+                        activeServers += "\n";
+                    }
+                    activeServers += server.ToString();
+                }
+                return activeServers.Equals(string.Empty) ? "No server is currently active" : activeServers;
+            }
+        }
+
+
 
     }
 }
