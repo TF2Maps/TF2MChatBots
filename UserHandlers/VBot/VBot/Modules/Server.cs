@@ -96,6 +96,7 @@ namespace SteamBotLite
             commands.Add(new Active(bot, this));
             adminCommands.Add(new ServerAdd(bot, this));
             adminCommands.Add(new ServerRemove(bot, this));
+            adminCommands.Add(new FullServerQuery(bot, this));
             
 
             serverUpdate = new BaseTask(updateInterval, new System.Timers.ElapsedEventHandler(SyncServerInfo));
@@ -306,7 +307,7 @@ namespace SteamBotLite
             {
                 foreach (ServerInfo server in module.serverList.Servers)
                     {
-                        if (param.Equals(server.tag))
+                        if (param.Equals(server.tag, StringComparison.OrdinalIgnoreCase))
                         {
                             module.serverList.Remove(server);
                             return "The server has been removed from the list";
