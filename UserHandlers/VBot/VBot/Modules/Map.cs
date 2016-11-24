@@ -349,7 +349,7 @@ namespace SteamBotLite
                     chatResponse = string.Join(" , ", mapList.Select(x => x.Filename));
                     if (maps.Count > maxMaps)
                     {
-                        chatResponse += string.Format(" (and {0} more at: http://vbot.site)", maps.Count - maxMaps);
+                        chatResponse += string.Format(" (and {0} more at: http://vbot.site )", maps.Count - maxMaps);
                     }
                     else
                     {
@@ -409,7 +409,6 @@ namespace SteamBotLite
                     {
                         if (entry.Filename == parameters[1])
                             editedMap = entry;
-
                     }
 
                     if (editedMap == null)
@@ -419,7 +418,7 @@ namespace SteamBotLite
 
                     
                     // Map editedMap = MapModule.mapList.Find(map => map.filename.Equals(parameters[0])); //OLD Map CODE
-                    if (editedMap.Submitter.Equals(Msg.ToString()) | (userhandler.usersModule.admincheck(Msg.Sender)))
+                    if (editedMap.Submitter.Equals(Msg.Sender.identifier.ToString()) | (userhandler.usersModule.admincheck(Msg.Sender)))
                     {
                         MapModule.mapList.Remove(editedMap);
                         editedMap.Notes += string.Format("Map repositioned to {0} by {1} // ", index , Msg.Sender.identifier.ToString());
