@@ -65,6 +65,6 @@ namespace SteamBotLite
         public override void OnLoginCompleted(object sender, EventArgs e) { }
         
 
-        public override void ChatMemberInfo(UserIdentifier useridentifier, bool MemberInfo) { }
+        public override void ChatMemberInfo(ChatroomEntity ChatroomEntity, bool MemberInfo) { }
     }
 }

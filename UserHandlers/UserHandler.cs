@@ -32,7 +32,7 @@ namespace SteamBotLite
         public abstract void OnLoginCompleted(object sender, EventArgs e);
 
         
-        public abstract void ChatMemberInfo(UserIdentifier useridentifier, bool MemberInfo); //TODO make this an object, not a bool
+        public abstract void ChatMemberInfo(ChatroomEntity ChatroomEntity, bool MemberInfo); //TODO make this an object, not a bool
 
         public event EventHandler<EventArgs> RebootEvent;
         /// <summary>
@@ -66,14 +66,14 @@ namespace SteamBotLite
         public enum ChatroomEventEnum { LeaveChat, EnterChat , Other };
 
 
-        public event EventHandler<ChatRoomIdentifier> ChatRoomJoin;
-        public event EventHandler<ChatRoomIdentifier> ChatRoomLeave;
-        public event EventHandler<ChatRoomIdentifier> ChatRoomOther;
+        public event EventHandler<ChatroomEntity> ChatRoomJoin;
+        public event EventHandler<ChatroomEntity> ChatRoomLeave;
+        public event EventHandler<ChatroomEntity> ChatRoomOther;
 
         //The event-invoking method that derived classes can override.
-        protected virtual void FireChatRoomEvent(ChatroomEventEnum e , ChatRoomIdentifier chatroom)
+        protected virtual void FireChatRoomEvent(ChatroomEventEnum e , ChatroomEntity chatroom)
         {
-            EventHandler<ChatRoomIdentifier> handler;
+            EventHandler<ChatroomEntity> handler;
             switch (e)
             {
                 case ChatroomEventEnum.EnterChat:

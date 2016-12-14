@@ -190,9 +190,9 @@ namespace SteamBotLite
             }
         }
 
-        public override void ChatMemberInfo(UserIdentifier useridentifier, bool AdminStatus)
+        public override void ChatMemberInfo(ChatroomEntity ChatroomEntity, bool AdminStatus)
         {
-            usersModule.updateUserInfo(useridentifier, AdminStatus);
+            usersModule.updateUserInfo(ChatroomEntity, AdminStatus);
         }
     }
 }

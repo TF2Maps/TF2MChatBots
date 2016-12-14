@@ -40,7 +40,7 @@ namespace SteamBotLite
             catch { }
         }
 
-        public void updateUserInfo(UserIdentifier info, bool IsAdmin)
+        public void updateUserInfo(ChatroomEntity info, bool IsAdmin)
         {
             if (IsAdmin)
             {
@@ -58,9 +58,9 @@ namespace SteamBotLite
             }
         }
 
-        public bool admincheck(UserIdentifier UserToVerify)
+        public bool admincheck(ChatroomEntity UserToVerify)
         {
-            if (UserToVerify.UserRank == UserIdentifier.UserAdminStatus.True | (admins.Any(s => UserToVerify.identifier.ToString().Equals(s))))
+            if (UserToVerify.Rank == ChatroomEntity.AdminStatus.True | (admins.Any(s => UserToVerify.identifier.ToString().Equals(s))))
             {
                 return true;
             }

@@ -8,7 +8,7 @@ namespace SteamBotLite
 {
     class ConsoleUserHandler : UserHandler
     {
-        public override void ChatMemberInfo(UserIdentifier useridentifier, bool MemberInfo)
+        public override void ChatMemberInfo(ChatroomEntity ChatroomEntity, bool MemberInfo)
         {
         }
 

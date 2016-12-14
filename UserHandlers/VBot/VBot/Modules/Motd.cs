@@ -13,7 +13,7 @@ namespace SteamBotLite
         public int postCount {get; private set;}
         public int postCountLimit { get; private set; }
         public string message {get; private set;}
-        public UserIdentifier setter {get; private set;}
+        public ChatroomEntity setter {get; private set;}
 
         private BaseTask motdPost;
 

@@ -181,7 +181,7 @@ namespace SteamBotLite
             }
         }
 
-        // queries a server and returns a <string, int> Tuple (mapname, playercount)
+        // queries a server and returns a <string, int> Tuple (filename, playercount)
         public static ServerInfo ServerQuery(ServerInfo server)
         {
             ServerInfo updatedServer = null;
@@ -207,7 +207,7 @@ namespace SteamBotLite
 
                     updatedServer = new ServerInfo(server.serverIP, server.port, server.tag);
                     string[] serverinfos = Encoding.ASCII.GetString(data).Split(new char[] { '\0' }, 5);
-                    // getting and sanitizing map name
+                    // getting and sanitizing filename
                     updatedServer.currentMap = serverinfos[1].Split('.')[0].Replace("workshop/", "");
                     // getting playerount
                     updatedServer.playerCount = (int)Encoding.ASCII.GetBytes(serverinfos[4]).Skip(2).ToArray()[0];

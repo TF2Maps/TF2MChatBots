@@ -100,9 +100,9 @@ namespace SteamBotLite
         private class Add : MapCommand
         {
             ImpNaoModule impnaomodule;
-            public bool uploadcheck(string MapName, string Website)
+            public bool uploadcheck(string filename, string Website)
             {
-                return SearchClass.CheckDataExistsOnWebPage(Website, MapName); //TODO develop method to check website
+                return SearchClass.CheckDataExistsOnWebPage(Website, filename); //TODO develop method to check website
             }
 
             public Add(VBot bot, ImpNaoModule Impnaomodule) : base(bot, "!add", Impnaomodule) {
@@ -146,7 +146,7 @@ namespace SteamBotLite
             }
         }
 
-        public async Task DeleteMapOnline(string Map , UserIdentifier user)
+        public async Task DeleteMapOnline(string Map , ChatroomEntity user)
         {
             
 

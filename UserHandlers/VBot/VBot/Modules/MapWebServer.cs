@@ -134,7 +134,7 @@ namespace SteamBotLite
                 MapDataCache += "</tr>";
             }
             
-            //string Form = "<form action=\"demo_form.asp\"method=\"get\">Map Name: <input type =\"text\" name=\"fname\"><br> Map Url: <input type =\"text\" name=\"lname\"><br><button type =\"submit\">Submit</button><button type =\"submit\" formmethod=\"POST\" formaction=\"index\">Submit using POST</button></ form > ";
+            //string Form = "<form action=\"demo_form.asp\"method=\"get\">filename: <input type =\"text\" name=\"fname\"><br> Map Url: <input type =\"text\" name=\"lname\"><br><button type =\"submit\">Submit</button><button type =\"submit\" formmethod=\"POST\" formaction=\"index\">Submit using POST</button></ form > ";
 
         }
 

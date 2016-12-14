@@ -12,13 +12,15 @@ namespace SteamBotLite
     {
         // public List<Map> mapList = new List<Map>();  //OLD MAP SYSTEM
         public ObservableCollection<Map> mapList = new ObservableCollection<Map>();
-       
+
         int MaxMapNumber = 10;
         string ServerMapListUrl;
 
+
+
         public MapModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
-            
+
             loadPersistentData();
 
             ServerMapListUrl = config["ServerMapListUrl"].ToString();
@@ -30,7 +32,7 @@ namespace SteamBotLite
             //WebServer = new MapWebServer("http://localhost:8080/index/",this);
 
             mapList.CollectionChanged += MapChange;
-            
+
 
             commands.Add(new Add(bot, this));
             commands.Add(new Maps(bot, this));
@@ -43,23 +45,23 @@ namespace SteamBotLite
             adminCommands.Add(new Wipe(bot, this));
         }
 
-        void MapChange (object sender, NotifyCollectionChangedEventArgs args)
-            {
-                userhandler.OnMaplistchange(mapList, sender, args);
-            }
-        
+        void MapChange(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            userhandler.OnMaplistchange(mapList, sender, args);
+        }
+
         public class Map
         {
             public Object Submitter { get; set; }
             public string SubmitterName { get; set; }
-            
+
             public string DownloadURL { get; set; }
             public string Notes { get; set; }
 
             int MaxCharacters = 27;
             private string filename;
 
-            
+
 
             public string Filename
             {
@@ -73,7 +75,7 @@ namespace SteamBotLite
                     {
                         throw new ArgumentException("It includes too many characters: " + MaxCharacters);
                     }
-                    
+
                     if (value.Any(c => char.IsUpper(c)))
                     {
                         throw new ArgumentException("It includes an uppercase letter");
@@ -84,7 +86,7 @@ namespace SteamBotLite
             }
         }
 
-        
+
 
         public override string getPersistentData()
         {
@@ -114,9 +116,9 @@ namespace SteamBotLite
 
             if (map != null)
             {
-                UserIdentifier Submitter = new UserIdentifier(map.Submitter);
+                ChatroomEntity Submitter = new ChatroomEntity(map.Submitter,ChatroomEntity.Individual.User,null);
                 Console.WriteLine("Found map, sending message to {0}", Submitter);
-                userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData(null) { Sender = Submitter, ReplyMessage = string.Format("Map {0} is being tested on the {1} server and has been DELETED.", map.Filename, args.tag)});               
+                userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData(null) { Sender = Submitter, ReplyMessage = string.Format("Map {0} is being tested on the {1} server and has been DELETED.", map.Filename, args.tag) });
                 mapList.Remove(map);
                 Console.WriteLine("Map {0} is being tested on the {1} server and has been DELETED.", map.Filename, args.tag);
                 savePersistentData();
@@ -147,7 +149,7 @@ namespace SteamBotLite
             }
             protected override string exec(MessageProcessEventData Msg, string param)
             {
-                return SearchClass.CheckDataExistsOnWebPage(ServerMapListURL, param).ToString(); 
+                return SearchClass.CheckDataExistsOnWebPage(ServerMapListURL, param).ToString();
             }
         }
 
@@ -170,10 +172,10 @@ namespace SteamBotLite
 
         private class Add : MapCommand
         {
-            
-            public bool uploadcheck(string MapName, string Website)
+
+            public bool uploadcheck(string filename, string Website)
             {
-                return SearchClass.CheckDataExistsOnWebPage(Website, MapName); //TODO develop method to check website
+                return SearchClass.CheckDataExistsOnWebPage(Website, filename); //TODO develop method to check website
             }
 
             public Add(VBot bot, MapModule mapModule) : base(bot, "!add", mapModule) { }
@@ -187,7 +189,7 @@ namespace SteamBotLite
 
                 map.SubmitterName = Msg.Sender.DisplayName;
 
-                try 
+                try
                 {
                     map.Filename = parameters[0];
                 }
@@ -198,13 +200,13 @@ namespace SteamBotLite
 
                 map.Filename = parameters[0];
                 map.Notes = "";
-               
+
 
                 if (parameters[0].Length == 0)
                 {
-                    return "Invalid parameters for !add. Syntax: !add <mapname> <url> <notes>";
+                    return "Invalid parameters for !add. Syntax: !add <filename> <url> <notes>";
                 }
-                
+
                 if (uploadcheck(map.Filename, MapModule.ServerMapListUrl)) //Check if the map is uploaded
                 {
                     map.DownloadURL = "Uploaded";
@@ -224,9 +226,9 @@ namespace SteamBotLite
                         map.Notes = parameters.Last();
                     }
                 }
-                else 
+                else
                 {
-                    return "Your map isn't uploaded! Please use include the url with the syntax: !add <mapname> <url> (notes)";
+                    return "Your map isn't uploaded! Please use include the url with the syntax: !add <filename> <url> (notes)";
                 }
 
                 if (MapModule.mapList.Any(m => m.Filename.Equals(map.Filename)))
@@ -239,7 +241,7 @@ namespace SteamBotLite
                 {
                     MapModule.mapList.Add(map);
                     MapModule.savePersistentData();
-                    
+
                     string Reply = string.Format("'{0}' is now on the list.", map.Filename);
                     return Reply;
                 }
@@ -249,9 +251,9 @@ namespace SteamBotLite
         private class Insert : MapCommand
         {
 
-            public bool uploadcheck(string MapName, string Website)
+            public bool uploadcheck(string filename, string Website)
             {
-                return SearchClass.CheckDataExistsOnWebPage(Website, MapName); //TODO develop method to check website
+                return SearchClass.CheckDataExistsOnWebPage(Website, filename); //TODO develop method to check website
             }
 
             public Insert(VBot bot, MapModule mapModule) : base(bot, "!insert", mapModule) { }
@@ -263,7 +265,7 @@ namespace SteamBotLite
 
                 if (parameters[0].Length == 0)
                 {
-                    return "Invalid parameters for !insert. Syntax: !insert <index> <mapname> <url> <notes>";
+                    return "Invalid parameters for !insert. Syntax: !insert <index> <filename> <url> <notes>";
                 }
                 try
                 {
@@ -271,7 +273,7 @@ namespace SteamBotLite
                 }
                 catch
                 {
-                    return "Invalid parameters for !insert. Syntax: !insert <index> <mapname> <url> <notes>";
+                    return "Invalid parameters for !insert. Syntax: !insert <index> <filename> <url> <notes>";
                 }
 
                 Map map = new Map();
@@ -285,10 +287,10 @@ namespace SteamBotLite
                 }
                 catch (Exception exception)
                 {
-                    return string.Format("Your new map name was rejected because: {0}", exception.Message);
+                    return string.Format("Your new file name was rejected because: {0}", exception.Message);
                 }
 
-                
+
                 map.Notes = string.Format("Inserted in position {0} by {1} //", index, msg.Sender.identifier.ToString());
 
                 if (uploadcheck(map.Filename, MapModule.ServerMapListUrl)) //Check if the map is uploaded
@@ -311,7 +313,7 @@ namespace SteamBotLite
                 }
                 else //If a url isn't there lets return an error
                 {
-                    return "Your map isn't uploaded! Please use include the url with the syntax: !add <mapname> <url> (notes)";
+                    return "Your map isn't uploaded! Please use include the url with the syntax: !add <filename> <url> (notes)";
                 }
                 string Reply = string.Format("Map '{0}' added.", map.Filename);
 
@@ -360,7 +362,7 @@ namespace SteamBotLite
                     pmResponse = "";
                     for (int i = 0; i < maps.Count; i++)
                     {
-                        string mapLine = string.Format("{0} // {1} // {2} ({3})", maps[i].Filename, maps[i].DownloadURL , maps[i].SubmitterName, maps[i].Submitter.ToString());
+                        string mapLine = string.Format("{0} // {1} // {2} ({3})", maps[i].Filename, maps[i].DownloadURL, maps[i].SubmitterName, maps[i].Submitter.ToString());
 
                         if (!string.IsNullOrEmpty(maps[i].Notes))
                             mapLine += "\nNotes: " + maps[i].Notes;
@@ -391,7 +393,7 @@ namespace SteamBotLite
 
                 if (parameters.Length < 2)
                 {
-                    return string.Format("Invalid parameters for !reposition. Syntax: !reposition <new position> <mapname>");
+                    return string.Format("Invalid parameters for !reposition. Syntax: !reposition <new position> <filename>");
                 }
                 else
                 {
@@ -402,7 +404,7 @@ namespace SteamBotLite
                     }
                     catch
                     {
-                        return string.Format("Invalid parameters for !reposition. Syntax: !reposition <new position> <mapname>");
+                        return string.Format("Invalid parameters for !reposition. Syntax: !reposition <new position> <filename>");
                     }
                     Map editedMap = null;
                     foreach (Map entry in MapModule.mapList)
@@ -416,15 +418,15 @@ namespace SteamBotLite
                         return "Map not found";
                     }
 
-                    
+
                     // Map editedMap = MapModule.mapList.Find(map => map.filename.Equals(parameters[0])); //OLD Map CODE
                     if (editedMap.Submitter.Equals(Msg.Sender.identifier.ToString()) | (userhandler.usersModule.admincheck(Msg.Sender)))
                     {
                         MapModule.mapList.Remove(editedMap);
-                        editedMap.Notes += string.Format("Map repositioned to {0} by {1} // ", index , Msg.Sender.identifier.ToString());
+                        editedMap.Notes += string.Format("Map repositioned to {0} by {1} // ", index, Msg.Sender.identifier.ToString());
                         MapModule.mapList.Insert(index, editedMap);
                         MapModule.savePersistentData();
-                        return string.Format("Map '{0}' has been repositioned to {1}.", editedMap.Filename , index);
+                        return string.Format("Map '{0}' has been repositioned to {1}.", editedMap.Filename, index);
                     }
                     else
                     {
@@ -444,7 +446,7 @@ namespace SteamBotLite
 
                 if (parameters.Length < 2)
                 {
-                    return string.Format("Invalid parameters for !update. Syntax: !update <mapname> (url)");
+                    return string.Format("Invalid parameters for !update. Syntax: !update <Current filename> <New filename> <New Url> <New Notes>");
                 }
                 else
                 {
@@ -470,7 +472,7 @@ namespace SteamBotLite
                             MapModule.mapList[Index].DownloadURL = parameters[2];
                         }
                         MapModule.savePersistentData();
-                        return string.Format("Map renamed to'{0}'" , MapModule.mapList[Index].Filename );
+                        return string.Format("Map renamed to'{0}'", MapModule.mapList[Index].Filename);
                     }
                     else
                     {
@@ -501,7 +503,7 @@ namespace SteamBotLite
                         {
                             MapModule.mapList.Remove(deletedMap);
                             MapModule.savePersistentData();
-                            userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData(null) { Sender = new UserIdentifier(deletedMap.Submitter), ReplyMessage = string.Format("Your map {0} has been deleted from the map list", deletedMap.Filename) });
+                            userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData(null) { Sender = new ChatroomEntity(deletedMap.Submitter,ChatroomEntity.Individual.User,null), ReplyMessage = string.Format("Your map {0} has been deleted from the map list", deletedMap.Filename) });
                             return string.Format("Map '{0}' DELETED.", deletedMap.Filename);
                         }
                         else
@@ -510,21 +512,49 @@ namespace SteamBotLite
                         }
                     }
                 }
-                return "Invalid parameters for !delete. Syntax: !delete <mapname>";
+                return "Invalid parameters for !delete. Syntax: !delete <filename>";
             }
 
         }
 
         private class Wipe : MapCommand
         {
-            public Wipe(VBot bot, MapModule mapMod) : base(bot, "!wipe", mapMod) { }
+            MapModule module;
+            public Wipe(VBot bot, MapModule mapMod) : base(bot, "!wipe", mapMod)
+            {
+                module = mapMod;
+            }
             protected override string exec(MessageProcessEventData Msg, string param)
             {
-                MapModule.mapList.Clear();
-                MapModule.savePersistentData();
-                return "The map list has been DELETED.";
+                if (!string.IsNullOrEmpty(param))
+                {
+                    module.ClearMapListWithMessage(param);
+                    MapModule.savePersistentData();
+                    return "The map list has been DELETED.";
+                }
+                else
+                {
+                    return "The map list has not been DELETED, you must include a reason! !wipe <reason>";
+                }
             }
         }
+
+
+        void ClearMapListWithMessage(string message)
+        {
+            ObservableCollection<Map> TempMapList = new ObservableCollection<Map>();
+
+            while (mapList.Count > 0)
+            {
+                MessageProcessEventData Msg = new MessageProcessEventData(null);
+                Msg.ReplyMessage = string.Format("Hi, the Maplist has been cleared and your map was removed for the following reason: {0}", message);
+                ChatroomEntity sender = new ChatroomEntity(mapList[0].Submitter, ChatroomEntity.Individual.User, null);
+                userhandler.SendPrivateMessageProcessEvent(Msg);
+                mapList.RemoveAt(0);
+            };
+        }
+    }
+}
         /*
         private class WebServerStart : BaseCommand
         {
@@ -570,5 +600,5 @@ namespace SteamBotLite
             }
         }
         */
-    }
-}
+   
+

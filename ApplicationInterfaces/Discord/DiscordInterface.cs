@@ -32,25 +32,26 @@ namespace SteamBotLite
             Console.WriteLine(e.Message.RawText);
             if (!e.Message.IsAuthor)
             {
-
-                UserIdentifier User = new UserIdentifier(e.User.Id);
-                User.DisplayName = e.User.Name;
-                User.extradata = e.User;
+                ChatroomEntity user = new ChatroomEntity(e.User.Id, ChatroomEntity.Individual.User, this);
+                user.DisplayName = e.User.Name;
+                user.ExtraData = e.User;
+                
+               
                 if (e.User.ServerPermissions.Administrator)
                 {
-                    User.UserRank = UserIdentifier.UserAdminStatus.True;
+                    user.Rank = ChatroomEntity.AdminStatus.True;
                 }
                 else
                 {
-                    User.UserRank = UserIdentifier.UserAdminStatus.False;
+                    user.Rank = ChatroomEntity.AdminStatus.False;
                 }
 
                 MessageProcessEventData Msg = new MessageProcessEventData(this);
                 Msg.ReceivedMessage = e.Message.RawText;
-                Msg.Sender = User;
-               
-                Msg.Chatroom = new ChatRoomIdentifier(e.Message.Channel);
-               
+                Msg.Sender = user;
+
+                Msg.Chatroom = new ChatroomEntity(e.Message.Channel, ChatroomEntity.Individual.Chatroom, this, "", ChatroomEntity.AdminStatus.Unknown, e.Message.Server);
+                
                 if (e.Message.Channel != null)
                 {
                     ChatRoomMessageProcessEvent(Msg);
@@ -75,12 +76,12 @@ namespace SteamBotLite
         }
 
 
-        public override void EnterChatRoom(object sender, ChatRoomIdentifier chatroomidentifier)
+        public override void EnterChatRoom(object sender, ChatroomEntity ChatroomEntity)
         {
             Console.WriteLine("Enter Chatroom");
         }
 
-        public override string GetOthersUsername(object sender, UserIdentifier user)
+        public override string GetOthersUsername(object sender, ChatroomEntity user)
         {
             return user.DisplayName;
         }
@@ -90,7 +91,7 @@ namespace SteamBotLite
             return _client.CurrentUser.Name;
         }
 
-        public override void LeaveChatroom(object sender, ChatRoomIdentifier chatroomidentifier)
+        public override void LeaveChatroom(object sender, ChatroomEntity ChatroomEntity)
         {
             Console.WriteLine("Leave Chatroom");
         }
@@ -101,7 +102,7 @@ namespace SteamBotLite
             ConnectionProcess(Token, _client);
         }
 
-        public override void ReceiveChatMemberInfo(UserIdentifier useridentifier, bool AdminStatus)
+        public override void ReceiveChatMemberInfo(ChatroomEntity ChatroomEntity, bool AdminStatus)
         {
             throw new NotImplementedException();
         }
@@ -123,7 +124,8 @@ namespace SteamBotLite
         {
             try
             {
-                User user = (User)messagedata.Sender.extradata;
+                User user = (User)messagedata.Sender.ExtraData;
+                
                 Console.WriteLine("Casted Fine To Discord");
                 SendLargeMessage(user, messagedata.ReplyMessage);
             }
