@@ -7,9 +7,9 @@ using System.Collections.ObjectModel;
 
 namespace SteamBotLite
 {
-
     class VBot : UserHandler
     {
+        
         public string Username = "V2Bot";
         
         bool Autojoin = true; 
@@ -31,7 +31,7 @@ namespace SteamBotLite
 
         public List<BaseCommand> chatCommands = new List<BaseCommand>();
         public List<BaseCommand> chatAdminCommands = new List<BaseCommand>();
-
+        public List<ServerMapChangeListiner> MapChangeEventListiners = new List<ServerMapChangeListiner>();
         // Loading Config
         Dictionary<string, object> jsconfig = JsonConvert.DeserializeObject<Dictionary<string, object>>(System.IO.File.ReadAllText(@"config.json"));
 
@@ -184,9 +184,12 @@ namespace SteamBotLite
         public void ServerUpdated(object sender, ServerModule.ServerInfo args)
         {
             Console.WriteLine("Entered VBot");
-            if (mapModule != null)
+            if (MapChangeEventListiners.Count > 0 )
             {
-                mapModule.HandleEvent(sender, args);
+                foreach(ServerMapChangeListiner Listiner in MapChangeEventListiners)
+                {
+                    Listiner.OnMapChange(args);
+                }
             }
         }
 

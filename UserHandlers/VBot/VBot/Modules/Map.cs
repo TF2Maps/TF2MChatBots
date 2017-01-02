@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace SteamBotLite
 {
-    class MapModule : BaseModule
+    class MapModule : BaseModule : ServerMapChangeListiner
     {
         // public List<Map> mapList = new List<Map>();  //OLD MAP SYSTEM
         public ObservableCollection<Map> mapList = new ObservableCollection<Map>();
@@ -108,7 +108,7 @@ namespace SteamBotLite
             }
         }
 
-        public void HandleEvent(object sender, ServerModule.ServerInfo args)
+        public void OnMapChange(ServerModule.ServerInfo args)
         {
             Console.WriteLine("Going to possibly remove {0} Map...", args.currentMap);
             Map map = mapList.FirstOrDefault(x => x.Filename == args.currentMap);
