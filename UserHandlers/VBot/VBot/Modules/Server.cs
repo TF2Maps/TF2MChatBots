@@ -253,7 +253,7 @@ namespace SteamBotLite
                 if (status != null)
                 {
                     server.update(status);
-                    servermodule.ServerUpdated(this, server);
+                  //  servermodule.ServerUpdated(this, server);
                     return server.ToString();
                 }
                 else
