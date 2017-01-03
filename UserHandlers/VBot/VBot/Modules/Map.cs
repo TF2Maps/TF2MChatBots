@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace SteamBotLite
 {
-    class MapModule : BaseModule : ServerMapChangeListiner
+    class MapModule : BaseModule , ServerMapChangeListiner
     {
         // public List<Map> mapList = new List<Map>();  //OLD MAP SYSTEM
         public ObservableCollection<Map> mapList = new ObservableCollection<Map>();
@@ -32,7 +32,7 @@ namespace SteamBotLite
             //WebServer = new MapWebServer("http://localhost:8080/index/",this);
 
             mapList.CollectionChanged += MapChange;
-
+            ConvertMaplistToTable();
 
             commands.Add(new Add(bot, this));
             commands.Add(new Maps(bot, this));
@@ -48,6 +48,20 @@ namespace SteamBotLite
         void MapChange(object sender, NotifyCollectionChangedEventArgs args)
         {
             userhandler.OnMaplistchange(mapList, sender, args);
+            ConvertMaplistToTable();
+        }
+
+        void ConvertMaplistToTable ()
+        {
+            string[] HeaderNames = new string[] { "Filename", "Url", "Notes", "Submitter" };
+            List<string[]> DataEntries = new List<string[]>();
+            foreach(Map entry in mapList)
+            {
+                string[] Data = new string[] { entry.Filename, entry.DownloadURL, entry.Notes, entry.SubmitterName };
+                DataEntries.Add(Data);
+            }
+            userhandler.HTMLFileFromArray(HeaderNames, DataEntries, "CurrentMaps");
+
         }
 
         public class Map
@@ -472,6 +486,7 @@ namespace SteamBotLite
                             MapModule.mapList[Index].DownloadURL = parameters[2];
                         }
                         MapModule.savePersistentData();
+                        
                         return string.Format("Map renamed to'{0}'", MapModule.mapList[Index].Filename);
                     }
                     else

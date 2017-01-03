@@ -6,14 +6,32 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SteamBotLite.UserHandlers.VBot.VBot.Modules
+namespace SteamBotLite
 {
     class ServerListHolder : BaseModule, ServerMapChangeListiner
     {
-        ServerListHolder()
+        HTMLFileFromArrayListiners listiner;
+        public ServerListHolder(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
+            loadPersistentData();
+            MapNameList = JsonConvert.DeserializeObject<List<string>>(config["Whitelist"].ToString());
+            if (bool.Parse(config["WhiteListIsBlacklist"].ToString()))
+            {
+                MethodToSummariseWith = SummariseMethod.Blacklist;
+            }
+            else
+            {
+                MethodToSummariseWith = SummariseMethod.Whitelist;
+            }
+            listiner = bot;
+            
+            loadPersistentData();
+            UpdateList();
 
         }
+
+        List<string> MapNameList;
+        SummariseMethod MethodToSummariseWith;
         private Dictionary<string, List<PlayEntry>> MapTests;
 
         class PlayEntry
@@ -32,8 +50,15 @@ namespace SteamBotLite.UserHandlers.VBot.VBot.Modules
         public void OnMapChange(ServerModule.ServerInfo args)
         {
             PlayEntry entry = new PlayEntry(args.playerCount.ToString(), args.serverIP, System.DateTime.Now.ToShortDateString() + " : " + System.DateTime.Now.ToShortTimeString());
+            AddEntry(args.currentMap, entry);
+            UpdateList();
+            
         }
 
+        void UpdateList ()
+        {
+            listiner.HTMLFileFromArray(new string[] { "MapName, TimesPlayed" }, ParseSummarisedListToHTMLTable(SummariseEntries(MapTests, MapNameList, MethodToSummariseWith)), "ServerPlayedList");
+        }
         void AddEntry(string MapName, PlayEntry Entry)
         {
             if (MapTests.ContainsKey(MapName))
@@ -76,6 +101,15 @@ namespace SteamBotLite.UserHandlers.VBot.VBot.Modules
                 }
             }
             return SumamrisedDictionary;
+        }
+        List<string[]> ParseSummarisedListToHTMLTable (Dictionary<string,int> Dictionary)
+        {
+            List<string[]> Array = new List<string[]>();
+            foreach(KeyValuePair<string,int> entry in Dictionary)
+            {
+                Array.Add(new string[] { entry.Key, entry.Value.ToString() });
+            }
+            return Array;
         }
 
         public override string getPersistentData()

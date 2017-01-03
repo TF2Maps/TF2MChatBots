@@ -93,6 +93,8 @@
     <Compile Include="UserHandlers\UserHandler.cs" />
     <Compile Include="ApplicationInterfaces\Discord\Accounts\DiscordAccountVBot.cs" />
     <Compile Include="ApplicationInterfaces\Discord\Accounts\DiscordAccountVFun.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Interfaces\HTMLFileFromArray.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Interfaces\Interface1.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\MapWebServer.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\SearchClass.cs" />
     <Compile Include="UserHandlers\VBot\VBot.cs" />
@@ -106,6 +108,7 @@
     <Compile Include="UserHandlers\VBot\VBot\Modules\Replies.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\SearchModule.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\Server.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\ServerListHolder.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\Users.cs" />
   </ItemGroup>
   <ItemGroup>
