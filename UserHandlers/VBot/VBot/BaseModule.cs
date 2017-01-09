@@ -50,6 +50,8 @@ namespace SteamBotLite
             
         }
 
+        public abstract void OnAllModulesLoaded();
+
         abstract public string getPersistentData();
         abstract public void loadPersistentData();
     }

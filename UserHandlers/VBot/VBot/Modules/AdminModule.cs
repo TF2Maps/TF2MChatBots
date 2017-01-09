@@ -35,6 +35,29 @@ namespace SteamBotLite
             throw new NotImplementedException();
         }
 
+        public override void OnAllModulesLoaded()
+        {
+            foreach(BaseModule module in SteamBot.ModuleList)
+            {
+                
+                string[] HeaderNames = { "Command Type", "Command Name" };
+
+                List<string[]> CommandList = new List<string[]>();
+
+                foreach (BaseCommand command in module.commands)
+                {
+                    CommandList.Add(new string[] { "Regular Command", command.command });
+                }
+
+                foreach (BaseCommand command in module.adminCommands)
+                {
+                    CommandList.Add(new string[] { "Admin Command", command.command });
+                }
+
+                SteamBot.HTMLFileFromArray(HeaderNames, CommandList, module.GetType().ToString());
+            }
+           
+        }
 
         private class Reboot : BaseCommand
         {

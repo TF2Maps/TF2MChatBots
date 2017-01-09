@@ -7,9 +7,9 @@ using System.Collections.ObjectModel;
 
 namespace SteamBotLite
 {
-
-    class VBot : UserHandler
+    class VBot : UserHandler , HTMLFileFromArrayListiners
     {
+        
         public string Username = "V2Bot";
         
         bool Autojoin = true; 
@@ -22,6 +22,7 @@ namespace SteamBotLite
         AdminModule adminmodule;
         SearchModule searchModule;
         ImpNaoModule impnaomodule;
+        ServerListHolder serverlistmodule;
        
         MapWebServer WebServer;
 
@@ -29,9 +30,11 @@ namespace SteamBotLite
 
         public List<BaseModule> ModuleList;
 
+        public List<HTMLFileFromArrayListiners> HTMLParsers;
+
         public List<BaseCommand> chatCommands = new List<BaseCommand>();
         public List<BaseCommand> chatAdminCommands = new List<BaseCommand>();
-
+        public List<ServerMapChangeListiner> MapChangeEventListiners = new List<ServerMapChangeListiner>();
         // Loading Config
         Dictionary<string, object> jsconfig = JsonConvert.DeserializeObject<Dictionary<string, object>>(System.IO.File.ReadAllText(@"config.json"));
 
@@ -43,21 +46,39 @@ namespace SteamBotLite
         {
             Console.WriteLine("Vbot Initialised");
             Console.WriteLine("Loading modules and stuff");
-            
+            MapChangeEventListiners = new List<ServerMapChangeListiner>();
+            HTMLParsers = new List<HTMLFileFromArrayListiners>();
             // loading modules
+            WebServer = new MapWebServer(this, jsconfig);
+            HTMLParsers.Add(WebServer);
+
+            mapModule = new MapModule(this, jsconfig);
+
+            serverlistmodule = new ServerListHolder(this, jsconfig);
+            MapChangeEventListiners.Add(serverlistmodule);
 
             motdModule = new MotdModule(this, jsconfig);
-            mapModule = new MapModule(this, jsconfig);
+            
             serverModule = new ServerModule(this, jsconfig);
             usersModule = new UsersModule(this, jsconfig);
             replyModule = new RepliesModule(this, jsconfig);
-            adminmodule = new AdminModule(this, jsconfig);
+            
             searchModule = new SearchModule(this, jsconfig);
+            adminmodule = new AdminModule(this, jsconfig);
 
-            WebServer = new MapWebServer(this, jsconfig);
 
-            ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule,adminmodule,searchModule, WebServer };
+
+            ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule,adminmodule,searchModule, WebServer, serverlistmodule };
             Console.WriteLine("Modules loaded and ModuleList intitialised");
+
+            //We run this to allow the modules to partake in actions requiring all to be loaded
+            foreach (BaseModule module in ModuleList)
+            {
+                module.OnAllModulesLoaded();
+            }
+            
+            
+            
 
             OnMaplistchange(mapModule.mapList);
 
@@ -178,21 +199,32 @@ namespace SteamBotLite
             base.SetUsernameEventProcess("[" + maplist.Count + "]" + Username);
             if (WebServer != null)
             {
-                WebServer.MapListUpdate(maplist);
+               // WebServer.MapListUpdate(maplist);
             }
         }
         public void ServerUpdated(object sender, ServerModule.ServerInfo args)
         {
             Console.WriteLine("Entered VBot");
-            if (mapModule != null)
+            if (MapChangeEventListiners.Count > 0 )
             {
-                mapModule.HandleEvent(sender, args);
+                foreach(ServerMapChangeListiner Listiner in MapChangeEventListiners)
+                {
+                    Listiner.OnMapChange(args);
+                }
             }
         }
 
         public override void ChatMemberInfo(ChatroomEntity ChatroomEntity, bool AdminStatus)
         {
             usersModule.updateUserInfo(ChatroomEntity, AdminStatus);
+        }
+
+        public void HTMLFileFromArray(string[] Headernames, List<string[]> Data, string TableKey)
+        {
+            foreach(HTMLFileFromArrayListiners Listiner in HTMLParsers)
+            {
+                Listiner.HTMLFileFromArray(Headernames, Data, TableKey);
+            }
         }
     }
 }

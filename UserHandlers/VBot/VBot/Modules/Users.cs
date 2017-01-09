@@ -20,6 +20,11 @@ namespace SteamBotLite
             loadPersistentData();
         }
 
+        public override void OnAllModulesLoaded()
+        {
+
+        }
+
         public override string getPersistentData()
         {
             Dictionary<string, List<object>> data = new Dictionary<string, List<object>>();

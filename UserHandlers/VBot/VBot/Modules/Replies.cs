@@ -28,6 +28,12 @@ namespace SteamBotLite
             adminCommands.Add(new ReplyRemove(bot, this));            
         }
 
+        public override void OnAllModulesLoaded()
+        {
+
+
+        }
+
         public override string getPersistentData()
         {
                return "";

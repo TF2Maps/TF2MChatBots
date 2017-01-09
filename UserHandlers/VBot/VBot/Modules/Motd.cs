@@ -37,6 +37,11 @@ namespace SteamBotLite
             motdPost = new BaseTask(updateInterval, new System.Timers.ElapsedEventHandler(MotdPost));
         }
 
+        public override void OnAllModulesLoaded()
+        {
+
+        }
+
         public override string getPersistentData()
         {
 

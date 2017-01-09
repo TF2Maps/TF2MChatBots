@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace SteamBotLite
 {
-    class MapModule : BaseModule
+    class MapModule : BaseModule , ServerMapChangeListiner
     {
         // public List<Map> mapList = new List<Map>();  //OLD MAP SYSTEM
         public ObservableCollection<Map> mapList = new ObservableCollection<Map>();
@@ -32,7 +32,7 @@ namespace SteamBotLite
             //WebServer = new MapWebServer("http://localhost:8080/index/",this);
 
             mapList.CollectionChanged += MapChange;
-
+            ConvertMaplistToTable();
 
             commands.Add(new Add(bot, this));
             commands.Add(new Maps(bot, this));
@@ -45,9 +45,28 @@ namespace SteamBotLite
             adminCommands.Add(new Wipe(bot, this));
         }
 
+        public override void OnAllModulesLoaded()
+        {
+
+        }
+
         void MapChange(object sender, NotifyCollectionChangedEventArgs args)
         {
             userhandler.OnMaplistchange(mapList, sender, args);
+            ConvertMaplistToTable();
+        }
+
+        void ConvertMaplistToTable ()
+        {
+            string[] HeaderNames = new string[] { "Filename", "Url", "Notes", "Submitter" };
+            List<string[]> DataEntries = new List<string[]>();
+            foreach(Map entry in mapList)
+            {
+                string[] Data = new string[] { entry.Filename, entry.DownloadURL, entry.Notes, entry.SubmitterName };
+                DataEntries.Add(Data);
+            }
+            userhandler.HTMLFileFromArray(HeaderNames, DataEntries, "CurrentMaps");
+
         }
 
         public class Map
@@ -108,7 +127,7 @@ namespace SteamBotLite
             }
         }
 
-        public void HandleEvent(object sender, ServerModule.ServerInfo args)
+        public void OnMapChange(ServerModule.ServerInfo args)
         {
             Console.WriteLine("Going to possibly remove {0} Map...", args.currentMap);
             Map map = mapList.FirstOrDefault(x => x.Filename == args.currentMap);
@@ -220,6 +239,11 @@ namespace SteamBotLite
                     parameters = param.Split(new char[] { ' ' }, 3);
 
                     map.DownloadURL = parameters[1];
+
+                    if (!map.DownloadURL.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return "Your map is not uploaded and your download URL is invalid!";
+                    }
 
                     if (parameters.Length > 2)
                     {
@@ -472,6 +496,7 @@ namespace SteamBotLite
                             MapModule.mapList[Index].DownloadURL = parameters[2];
                         }
                         MapModule.savePersistentData();
+                        
                         return string.Format("Map renamed to'{0}'", MapModule.mapList[Index].Filename);
                     }
                     else

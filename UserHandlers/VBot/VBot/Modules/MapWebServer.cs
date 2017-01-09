@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace SteamBotLite
 {
-    class MapWebServer : BaseModule
+    class MapWebServer : BaseModule , HTMLFileFromArrayListiners
     {
         HttpListener listener;
         MapModule mapmodule;
@@ -18,29 +18,28 @@ namespace SteamBotLite
         readonly protected string header;
         readonly protected string trailer;
         readonly protected string WebsiteFilesDirectory;
-        string MapDataCache;
+        
+        Dictionary<string, string> WebsiteTables;
 
         //string prefix, ObservableCollection<MapModule.Map> Maplist)
 
-        public MapWebServer (VBot bot, Dictionary<string, object> Jsconfig) : base (bot, Jsconfig)
+        public MapWebServer(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
+            WebsiteTables = new Dictionary<string, string>();
 
-            //maplist = new ObservableCollection<MapModule.Map>(Maplist);        
             try
             {
-                //string data = config["HeaderFilePath"].ToString();
-              //  Console.WriteLine(data);
 
                 WebsiteFilesDirectory = config["FilesDirectory"].ToString();
 
                 Console.WriteLine("Directory set to: {0}", WebsiteFilesDirectory);
-                header = System.IO.File.ReadAllText(Path.Combine(WebsiteFilesDirectory , config["HeaderFileName"].ToString()));
-                
-                trailer = System.IO.File.ReadAllText(Path.Combine (WebsiteFilesDirectory , config["TrailerFileName"].ToString()));
+                header = System.IO.File.ReadAllText(Path.Combine(WebsiteFilesDirectory, config["HeaderFileName"].ToString()));
 
-                
+                trailer = System.IO.File.ReadAllText(Path.Combine(WebsiteFilesDirectory, config["TrailerFileName"].ToString()));
+
+
                 StartWebServer(config["Address"].ToString());
-                
+
                 //StartWebServer(config["Address"].ToString());
             }
             catch (Exception exception)
@@ -50,26 +49,41 @@ namespace SteamBotLite
             }
         }
 
+        public override void OnAllModulesLoaded()
+        {
+
+        }
+
+        string GetAlltables ()
+        {
+            string value = "";
+            foreach (KeyValuePair<string,string> table in WebsiteTables)
+            {
+                value += table.Value;
+            }
+            return value;
+        }
+
         //When this class is turned off, we close the server properly
-        ~MapWebServer ()
+        ~MapWebServer()
         {
             CloseWebServer();
         }
-        
-        public void StartWebServer (string prefix)
+
+        public void StartWebServer(string prefix)
         {
             Console.WriteLine("Website Loding");
             listener = new HttpListener();
             listener.Prefixes.Add(prefix);
             listener.Start();
-            
+
             listener.BeginGetContext(new AsyncCallback(ResponseMethod), listener);
-            
+
             Console.WriteLine("Website Loaded");
 
             //MapListUpdate(this, null);
         }
-        public void CloseWebServer ()
+        public void CloseWebServer()
         {
             Console.WriteLine("Closing Web Server");
             listener.Stop();
@@ -84,7 +98,7 @@ namespace SteamBotLite
             HttpListenerContext context = listener.EndGetContext(result);
             HttpListenerResponse response = context.Response;
             string path = (WebsiteFilesDirectory + context.Request.RawUrl);
-            
+
             byte[] buff;
 
             if (File.Exists(path))
@@ -93,33 +107,18 @@ namespace SteamBotLite
             }
             else
             {
-                buff = System.Text.Encoding.UTF8.GetBytes(header + MapDataCache + trailer);
-            }          
-            
-
-            /*
-            Console.WriteLine(context.Request.HttpMethod);
-            if (context.Request.HttpMethod.Equals("POST"))
-            {
-                string text;
-                using (var reader = new StreamReader(context.Request.InputStream,
-                                                     context.Request.ContentEncoding))
-                {
-                    text = reader.ReadToEnd();
-                }
-
+                buff = System.Text.Encoding.UTF8.GetBytes(header + GetAlltables() + trailer);
             }
-            */
 
-           
-            
             response.ContentLength64 = buff.Length;
-            
+
             response.Close(buff, true);
             listener.BeginGetContext(new AsyncCallback(ResponseMethod), listener);
-            
-        }
 
+        }
+        //TODO Maybe we could keep this? 
+
+        /*
         public void MapListUpdate(ObservableCollection<MapModule.Map> maplist)
         {
             MapDataCache = "";
@@ -130,13 +129,29 @@ namespace SteamBotLite
                 MapDataCache += "<td>" + WebUtility.HtmlEncode(map.Filename) + "</td>";
                 MapDataCache += "<td> <a href=\"" + WebUtility.HtmlEncode(map.DownloadURL) + "\">" + WebUtility.HtmlEncode(map.DownloadURL) + "</a></td>";
                 MapDataCache += "<td>" + WebUtility.HtmlEncode(map.Notes) + "</td>";
-                MapDataCache += "<td> <span title = \"" + WebUtility.HtmlEncode(map.Submitter.ToString()) + "\">" +  WebUtility.HtmlEncode(map.SubmitterName) + "</span> </td>";
+                MapDataCache += "<td> <span title = \"" + WebUtility.HtmlEncode(map.Submitter.ToString()) + "\">" + WebUtility.HtmlEncode(map.SubmitterName) + "</span> </td>";
                 MapDataCache += "</tr>";
             }
-            
+
             //string Form = "<form action=\"demo_form.asp\"method=\"get\">filename: <input type =\"text\" name=\"fname\"><br> Map Url: <input type =\"text\" name=\"lname\"><br><button type =\"submit\">Submit</button><button type =\"submit\" formmethod=\"POST\" formaction=\"index\">Submit using POST</button></ form > ";
 
         }
+        */
+
+        
+
+        void AddTable (string TableKey, string Data)
+        {
+            if (WebsiteTables.ContainsKey(TableKey))
+            {
+                WebsiteTables[TableKey] = Data;
+            }
+            else
+            {
+                WebsiteTables.Add(TableKey, Data);
+            }
+        }
+
 
         public override string getPersistentData()
         {
@@ -146,6 +161,30 @@ namespace SteamBotLite
         public override void loadPersistentData()
         {
             throw new NotImplementedException();
+        }
+
+        void HTMLFileFromArrayListiners.HTMLFileFromArray(string[] Headernames, List<string[]> Data, string TableKey)
+        {
+            string Table = string.Format("<table> <caption> <h1> {0} </h1> </caption> <tbody> <tr>",TableKey);
+            foreach (string value in Headernames)
+            {
+                Table += "<th>" + WebUtility.HtmlEncode(value) + "</th>";
+            }
+
+            Table += "</tr>";
+
+            foreach (string[] Entry in Data)
+            {
+                Table += "<tr>";
+                foreach (string Entryvalue in Entry)
+                {
+                    Table += "<td>" + WebUtility.HtmlEncode(Entryvalue) + "</td>";
+                }
+                Table += "</tr>";
+            }
+            Table += "</tbody> </table>";
+
+            AddTable(TableKey, Table);
         }
     }
 }
