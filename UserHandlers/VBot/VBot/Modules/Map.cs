@@ -28,12 +28,9 @@ namespace SteamBotLite
             Console.WriteLine("URL list is now {0} and maximum map number {1}", ServerMapListUrl, MaxMapNumber);
 
             userhandler = bot;
-
-            //WebServer = new MapWebServer("http://localhost:8080/index/",this);
-
+            
             mapList.CollectionChanged += MapChange;
             ConvertMaplistToTable();
-
             commands.Add(new Add(bot, this));
             commands.Add(new Maps(bot, this));
             commands.Add(new Update(bot, this));
@@ -43,6 +40,8 @@ namespace SteamBotLite
             adminCommands.Add(new Insert(bot, this));
             adminCommands.Add(new Reposition(bot, this));
             adminCommands.Add(new Wipe(bot, this));
+
+            bot.MapChangeEventListiners.Add(this);
         }
 
         public override void OnAllModulesLoaded()
