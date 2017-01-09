@@ -14,6 +14,10 @@ namespace SteamBotLite
         {
             return JsonConvert.SerializeObject(Searches);            
         }
+        public override void OnAllModulesLoaded()
+        {
+
+        }
 
         public override void loadPersistentData()
         {
@@ -31,7 +35,7 @@ namespace SteamBotLite
             loadPersistentData();
             foreach (SearchClassEntry Entry in Searches)
                 {
-                commands.Add(new Search(bot, Entry));
+                    commands.Add(new Search(bot, Entry));
                 }
         }
         private class Search : BaseCommand

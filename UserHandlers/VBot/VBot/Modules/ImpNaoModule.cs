@@ -28,7 +28,10 @@ namespace SteamBotLite
             adminCommands.Add(new Wipe(bot, this));
             */
         }
+        public override void OnAllModulesLoaded()
+        {
 
+        }
         void MapChange(object sender, NotifyCollectionChangedEventArgs args)
         {
            // userhandler.OnMaplistchange(MapListCache, sender, args); //TODO Fix I guess?

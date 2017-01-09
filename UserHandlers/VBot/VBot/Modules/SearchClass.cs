@@ -39,6 +39,9 @@ namespace SteamBotLite
             }
 
         }
+
+       
+
         public static string GetWebPageAsString(string URL, Int32 Timeout = 15000)
         {
             WebRequest wrGETURL = (WebRequest.Create(URL));

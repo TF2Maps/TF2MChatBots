@@ -63,7 +63,13 @@ namespace SteamBotLite
                 Servermodule.savePersistentData();
             }
         }
-       
+
+        public override void OnAllModulesLoaded()
+        {
+
+        }
+
+
         public ServerModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
             

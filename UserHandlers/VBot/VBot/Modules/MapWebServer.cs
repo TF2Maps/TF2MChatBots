@@ -49,6 +49,11 @@ namespace SteamBotLite
             }
         }
 
+        public override void OnAllModulesLoaded()
+        {
+
+        }
+
         string GetAlltables ()
         {
             string value = "";

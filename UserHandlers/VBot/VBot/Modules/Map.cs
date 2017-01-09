@@ -45,6 +45,11 @@ namespace SteamBotLite
             adminCommands.Add(new Wipe(bot, this));
         }
 
+        public override void OnAllModulesLoaded()
+        {
+
+        }
+
         void MapChange(object sender, NotifyCollectionChangedEventArgs args)
         {
             userhandler.OnMaplistchange(mapList, sender, args);
@@ -234,6 +239,11 @@ namespace SteamBotLite
                     parameters = param.Split(new char[] { ' ' }, 3);
 
                     map.DownloadURL = parameters[1];
+
+                    if (!map.DownloadURL.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return "Your map is not uploaded and your download URL is invalid!";
+                    }
 
                     if (parameters.Length > 2)
                     {

@@ -37,6 +37,11 @@ namespace SteamBotLite
 
         }
 
+        public override void OnAllModulesLoaded()
+        {
+
+        }
+
         List<string> MapNameList;
         SummariseMethod MethodToSummariseWith;
         private Dictionary<string, List<PlayEntry>> MapTests;

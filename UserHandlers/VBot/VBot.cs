@@ -62,15 +62,20 @@ namespace SteamBotLite
             serverModule = new ServerModule(this, jsconfig);
             usersModule = new UsersModule(this, jsconfig);
             replyModule = new RepliesModule(this, jsconfig);
-            adminmodule = new AdminModule(this, jsconfig);
-            searchModule = new SearchModule(this, jsconfig);
             
-        
-          
+            searchModule = new SearchModule(this, jsconfig);
+            adminmodule = new AdminModule(this, jsconfig);
+
+
 
             ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule,adminmodule,searchModule, WebServer, serverlistmodule };
             Console.WriteLine("Modules loaded and ModuleList intitialised");
-            
+
+            //We run this to allow the modules to partake in actions requiring all to be loaded
+            foreach (BaseModule module in ModuleList)
+            {
+                module.OnAllModulesLoaded();
+            }
             
             
             
