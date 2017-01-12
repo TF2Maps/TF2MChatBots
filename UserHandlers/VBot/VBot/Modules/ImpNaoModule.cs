@@ -203,7 +203,7 @@ namespace SteamBotLite
                 }
                 // PM map list to the caller.
                 if (mapList.Count != 0)
-                    userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Sender = Msg.Sender, ReplyMessage = pmResponse });
+                    userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = Msg.Sender, ReplyMessage = pmResponse });
 
                 return chatResponse;
 
@@ -246,7 +246,7 @@ namespace SteamBotLite
                 }
                 // PM map list to the caller.
                 if (mapList.Count != 0)
-                    userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Sender = Msg.Sender, ReplyMessage = pmResponse });
+                    userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = Msg.Sender, ReplyMessage = pmResponse });
 
                 return chatResponse;
             }
