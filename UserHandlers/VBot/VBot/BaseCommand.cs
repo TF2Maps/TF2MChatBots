@@ -18,7 +18,7 @@ namespace SteamBotLite
             this.userhandler = bot;
             this.command = command;
         }
-        public string run(MessageProcessEventData Msg, string message = "")
+        public string run(MessageEventArgs Msg, string message = "")
         {
             string param = "";
             string[] command = message.Split(new char[] { ' ' }, 2);
@@ -26,7 +26,26 @@ namespace SteamBotLite
                 param = command[1].Trim();
             return exec(Msg, param);
         }
-        protected virtual string exec(MessageProcessEventData Msg, string param)
+
+        public virtual bool CheckCommand(MessageEventArgs Msg, string Message)
+        {
+            if (Message.StartsWith(command, StringComparison.OrdinalIgnoreCase))
+            {
+                return run(Msg, Message);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        protected virtual string[] GetCommmand ()
+        {
+            return new string[] { command };
+        }
+    
+
+        protected virtual string exec(MessageEventArgs Msg, string param)
         {
             return null;
         }

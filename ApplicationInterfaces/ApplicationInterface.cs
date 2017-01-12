@@ -8,59 +8,7 @@ using Newtonsoft.Json;
 
 namespace SteamBotLite
 {
-    /*
-    /// <summary>
-    /// The identification of the chatroom or channel to send messages to and receive them from
-    /// </summary>
-    public struct ChatroomEntity
-    {
-        public ChatroomEntity(object Identification, object additionaldata = null)
-        {
-            identifier = Identification;
-            
-            if (additionaldata != null)
-            {
-                extradata = additionaldata;
-            }
-            else
-            {
-                extradata = null;
-            }
-        }
-        public object identifier;
-        public object extradata;
-    }
-
     
-
-    /// <summary>
-    /// The identification of the individual users
-    /// </summary>
-    public struct ChatroomEntity
-    {
-        public enum UserAdminStatus { Unknown, Other, False, True };
-
-        public ChatroomEntity(object Identification,  UserAdminStatus Rank = UserAdminStatus.Unknown , object additionaldata = null, string displayname = "Unknown")
-        {
-            identifier = Identification;
-            UserRank = Rank; //TODO check if this throws an error
-            DisplayName = displayname;
-            if (additionaldata != null)
-            {
-                extradata = additionaldata;
-            }
-            else
-            {
-                extradata = null;
-            }
-        }
-        public UserAdminStatus UserRank;
-        public object identifier;
-        public object extradata;
-        public string DisplayName;
-    }
-    */
-
     public struct ChatroomEntity
     {
         public enum Individual {User, Chatroom };
@@ -98,14 +46,15 @@ namespace SteamBotLite
         bool IsChild;
     }
 
-    public class MessageProcessEventData : EventArgs
+    public class MessageEventArgs : EventArgs
     {
         public ChatroomEntity Sender;
+        public ChatroomEntity Destination;
         public ChatroomEntity Chatroom;
         public string ReceivedMessage;
         public string ReplyMessage;
         public ApplicationInterface InterfaceHandlerDestination;    
-        public MessageProcessEventData (ApplicationInterface interfacehandlerdestination)
+        public MessageEventArgs (ApplicationInterface interfacehandlerdestination)
         {
             InterfaceHandlerDestination = interfacehandlerdestination;
         }
@@ -124,8 +73,8 @@ namespace SteamBotLite
         }
 
 
-        public abstract void SendChatRoomMessage(object sender, MessageProcessEventData messagedata);
-        public abstract void SendPrivateMessage(object sender, MessageProcessEventData messagedata);
+        public abstract void SendChatRoomMessage(object sender, MessageEventArgs messagedata);
+        public abstract void SendPrivateMessage(object sender, MessageEventArgs messagedata);
         public abstract void BroadCastMessage(object sender, string message);
 
 
@@ -148,30 +97,30 @@ namespace SteamBotLite
         public abstract void ReceivePrivateMessage(ChatroomEntity ChatroomEntity, string Message);
         */
 
-        public event EventHandler<MessageProcessEventData> ChatRoomMessageEvent;
+        public event EventHandler<MessageEventArgs> ChatRoomMessageEvent;
         
         //The event-invoking method that derived classes can override.
-        protected virtual void ChatRoomMessageProcessEvent(MessageProcessEventData e)
+        protected virtual void ChatRoomMessageProcessEvent(MessageEventArgs e)
         {
             // Make a temporary copy of the event to avoid possibility of
             // a race condition if the last subscriber unsubscribes
             // immediately after the null check and before the event is raised.
-            EventHandler<MessageProcessEventData> handler = ChatRoomMessageEvent;
+            EventHandler<MessageEventArgs> handler = ChatRoomMessageEvent;
             if (handler != null)
             {
                 handler(this, e);
             }
         }
 
-        public event EventHandler<MessageProcessEventData> PrivateMessageEvent;
+        public event EventHandler<MessageEventArgs> PrivateMessageEvent;
 
         //The event-invoking method that derived classes can override.
-        protected virtual void PrivateMessageProcessEvent(MessageProcessEventData e)
+        protected virtual void PrivateMessageProcessEvent(MessageEventArgs e)
         {
             // Make a temporary copy of the event to avoid possibility of
             // a race condition if the last subscriber unsubscribes
             // immediately after the null check and before the event is raised.
-            EventHandler<MessageProcessEventData> handler = PrivateMessageEvent;
+            EventHandler<MessageEventArgs> handler = PrivateMessageEvent;
             if (handler != null)
             {
                 handler(this, e);

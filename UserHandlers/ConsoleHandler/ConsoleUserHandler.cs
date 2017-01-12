@@ -16,12 +16,12 @@ namespace SteamBotLite
         {
         }
 
-        public override void ProcessChatRoomMessage(object sender, MessageProcessEventData e)
+        public override void ProcessChatRoomMessage(object sender, MessageEventArgs e)
         {
             Console.WriteLine("{0} | {1}: {2}", e.Chatroom, e.Sender.DisplayName, e.ReceivedMessage);
         }
 
-        public override void ProcessPrivateMessage(object sender, MessageProcessEventData e)
+        public override void ProcessPrivateMessage(object sender, MessageEventArgs e)
         {
             Console.WriteLine("{0}: {1}", e.Sender.DisplayName, e.ReceivedMessage);
         }

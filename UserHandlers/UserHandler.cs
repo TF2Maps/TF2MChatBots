@@ -25,9 +25,9 @@ namespace SteamBotLite
             appinterface.ChatRoomMessageEvent += ProcessChatRoomMessage;
         }
 
-        public abstract void ProcessChatRoomMessage(object sender, MessageProcessEventData e);
+        public abstract void ProcessChatRoomMessage(object sender, MessageEventArgs e);
 
-        public abstract void ProcessPrivateMessage(object sender, MessageProcessEventData e);
+        public abstract void ProcessPrivateMessage(object sender, MessageEventArgs e);
 
         public abstract void OnLoginCompleted(object sender, EventArgs e);
 
@@ -138,30 +138,30 @@ namespace SteamBotLite
             }
         }
 
-        public event EventHandler<MessageProcessEventData> SendPrivateMessageEvent;
+        public event EventHandler<MessageEventArgs> SendPrivateMessageEvent;
 
         //The event-invoking method that derived classes can override.
-        public virtual void SendPrivateMessageProcessEvent(MessageProcessEventData e)
+        public virtual void SendPrivateMessageProcessEvent(MessageEventArgs e)
         {
             // Make a temporary copy of the event to avoid possibility of
             // a race condition if the last subscriber unsubscribes
             // immediately after the null check and before the event is raised.
-            EventHandler<MessageProcessEventData> handler = SendPrivateMessageEvent;
+            EventHandler<MessageEventArgs> handler = SendPrivateMessageEvent;
             if (handler != null)
             {
                 handler(this, e);
             }
         }
 
-        public event EventHandler<MessageProcessEventData> SendChatRoomMessageEvent;
+        public event EventHandler<MessageEventArgs> SendChatRoomMessageEvent;
 
         //The event-invoking method that derived classes can override.
-        public virtual void SendChatRoomMessageProcessEvent(MessageProcessEventData e)
+        public virtual void SendChatRoomMessageProcessEvent(MessageEventArgs e)
         {
             // Make a temporary copy of the event to avoid possibility of
             // a race condition if the last subscriber unsubscribes
             // immediately after the null check and before the event is raised.
-            EventHandler<MessageProcessEventData> handler = SendChatRoomMessageEvent;
+            EventHandler<MessageEventArgs> handler = SendChatRoomMessageEvent;
             if (handler != null)
             {
                 handler(this, e);

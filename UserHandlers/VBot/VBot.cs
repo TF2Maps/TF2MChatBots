@@ -93,7 +93,7 @@ namespace SteamBotLite
             Console.WriteLine("UserHandler: {0} Has Loaded", this.GetType());
         }
 
-        public override void ProcessPrivateMessage(object sender, MessageProcessEventData e) 
+        public override void ProcessPrivateMessage(object sender, MessageEventArgs e) 
         {
             ApplicationInterface AppInterface = (ApplicationInterface)sender;
             e.InterfaceHandlerDestination = AppInterface;
@@ -104,7 +104,7 @@ namespace SteamBotLite
             }
         }
 
-        public override void ProcessChatRoomMessage(object sender, MessageProcessEventData e)
+        public override void ProcessChatRoomMessage(object sender, MessageEventArgs e)
         {
             e.ReplyMessage = ChatMessageHandler(e, e.ReceivedMessage);
             if (e.ReplyMessage != null)
@@ -159,7 +159,7 @@ namespace SteamBotLite
         }
 
 
-        public string ChatMessageHandler(MessageProcessEventData Msg , string Message)
+        public string ChatMessageHandler(MessageEventArgs Msg , string Message)
         {
             string response = null;
             foreach (BaseModule module in ModuleList)
@@ -168,7 +168,7 @@ namespace SteamBotLite
                 {
                     foreach (BaseCommand c in module.commands)
                     {
-                        if (Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
+                        if (c.CheckCommand(Msg,Message))
                         {
                             response = c.run(Msg, Message);
                             return response;

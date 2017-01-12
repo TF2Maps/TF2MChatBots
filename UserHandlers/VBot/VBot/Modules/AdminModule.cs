@@ -68,7 +68,7 @@ namespace SteamBotLite
             {
                 this.module = module;
             }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 module.SteamBot.Reboot();
                 return "Rebooted";
@@ -85,11 +85,27 @@ namespace SteamBotLite
             {
                 this.module = module;
             }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 module.SteamBot.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.LeaveChat);
                 module.SteamBot.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.EnterChat);
                 return "Rejoined!";
+            }
+
+        }
+
+        private class CheckStatus : BaseCommand
+        {
+            // Command to query if a server is active
+            AdminModule module;
+
+            public CheckStatus(VBot bot, AdminModule module) : base(bot, "!CheckData")
+            {
+                this.module = module;
+            }
+            protected override string exec(MessageEventArgs Msg, string param)
+            {
+                return Msg.Sender.Rank.ToString();
             }
 
         }
@@ -103,7 +119,7 @@ namespace SteamBotLite
             {
                 this.module = module;
             }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 string[] command = param.Split(new char[] { ' ' }, 2);
                 if (command.Length > 0)
@@ -127,7 +143,7 @@ namespace SteamBotLite
                 this.module = module;
                 botty = bot;
             }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 botty.Disablemodule(param);
                 return "Removing Module...";
@@ -146,7 +162,7 @@ namespace SteamBotLite
                 this.module = module;
                 botty = bot;
             }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 botty.Enablemodule(param);
                 return "Adding Module...";
@@ -165,7 +181,7 @@ namespace SteamBotLite
                 this.module = module;
                 botty = bot;
             }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 string Response = "";
                 foreach (BaseModule ModuleEntry in botty.ModuleList)

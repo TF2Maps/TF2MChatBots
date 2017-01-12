@@ -51,7 +51,7 @@ namespace SteamBotLite
             Tick.Start();
         }
 
-        public override void ProcessChatRoomMessage(object sender, MessageProcessEventData e)
+        public override void ProcessChatRoomMessage(object sender, MessageEventArgs e)
         {
             CrashCheck = 0;
             Tick.Stop();
@@ -59,7 +59,7 @@ namespace SteamBotLite
             Console.WriteLine("Restarted the timer");
         }
 
-        public override void ProcessPrivateMessage(object sender, MessageProcessEventData e) { }
+        public override void ProcessPrivateMessage(object sender, MessageEventArgs e) { }
         
 
         public override void OnLoginCompleted(object sender, EventArgs e) { }

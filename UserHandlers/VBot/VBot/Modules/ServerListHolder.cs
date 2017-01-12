@@ -10,6 +10,7 @@ namespace SteamBotLite
 {
     class ServerListHolder : BaseModule, ServerMapChangeListiner
     {
+        string[] Header = new string[] { "Map", "Time Played" };
         HTMLFileFromArrayListiners listiner;
         public ServerListHolder(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
@@ -71,8 +72,11 @@ namespace SteamBotLite
 
         void UpdateList ()
         {
-            listiner.HTMLFileFromArray(new string[] { "MapName", "TimesPlayed" }, ParseSummarisedListToHTMLTable(SummariseEntries(MapTests, MapNameList, MethodToSummariseWith)), "ServerPlayedList");
+            listiner.HTMLFileFromArray(Header, ParseSummarisedListToHTMLTable(SummariseEntries(MapTests, new List<string>(), MethodToSummariseWith)), "All Maps Played");
+
+            listiner.HTMLFileFromArray(Header, ParseSummarisedListToHTMLTable(SummariseEntries(MapTests, MapNameList, MethodToSummariseWith)), "ASYMM Entries");
         }
+
         void AddEntry(string MapName, PlayEntry Entry)
         {
             if (MapTests.ContainsKey(MapName))
@@ -91,12 +95,13 @@ namespace SteamBotLite
         /// Used to summarise the Dictionary but only return entries in the whitelist or not in the blacklist
         /// </summary>
         /// <param name="Dictionary"></param>
-        /// <param name="MapNameWhiteList"></param>
+        /// <param name="Filter"></param>
         /// <returns></returns>
-        Dictionary<string, int> SummariseEntries(Dictionary<string, List<PlayEntry>> Dictionary, List<string> MapNameList , SummariseMethod MethodToSummariseWith)
+        Dictionary<string, int> SummariseEntries(Dictionary<string, List<PlayEntry>> Dictionary, List<string> Filter , SummariseMethod MethodToSummariseWith)
         {
             //Assign Values for the Boolean 
             bool SummariseMethod;
+
             if (MethodToSummariseWith.Equals(ServerListHolder.SummariseMethod.Whitelist))
             {
                 SummariseMethod = true; 
@@ -110,7 +115,7 @@ namespace SteamBotLite
 
             foreach (KeyValuePair<string, List<PlayEntry>> Item in Dictionary)
             {
-                if ((MapNameList.Contains(Item.Key) == (SummariseMethod))) //If we are using a whitelist, the bool will be "True" and if the list contains it, it'll be true, so it will add. Inversely for the blacklist.
+                if ((Filter.Contains(Item.Key) == (SummariseMethod))) //If we are using a whitelist, the bool will be "True" and if the list contains it, it'll be true, so it will add. Inversely for the blacklist.
                 {
                     SumamrisedDictionary.Add(Item.Key, Item.Value.Count);
                 }

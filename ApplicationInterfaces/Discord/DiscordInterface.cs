@@ -27,7 +27,7 @@ namespace SteamBotLite
             _client.MessageReceived += _client_MessageReceived;
         }
 
-        private void _client_MessageReceived(object sender, MessageEventArgs e)
+        private void _client_MessageReceived(object sender, Discord.MessageEventArgs e)
         {
             Console.WriteLine(e.Message.RawText);
             if (!e.Message.IsAuthor)
@@ -46,7 +46,7 @@ namespace SteamBotLite
                     user.Rank = ChatroomEntity.AdminStatus.False;
                 }
 
-                MessageProcessEventData Msg = new MessageProcessEventData(this);
+                MessageEventArgs Msg = new MessageEventArgs(this);
                 Msg.ReceivedMessage = e.Message.RawText;
                 Msg.Sender = user;
 
@@ -107,7 +107,7 @@ namespace SteamBotLite
             throw new NotImplementedException();
         }
 
-        public override void SendChatRoomMessage(object sender, MessageProcessEventData messagedata)
+        public override void SendChatRoomMessage(object sender, MessageEventArgs messagedata)
         {
             try
             {
@@ -120,7 +120,7 @@ namespace SteamBotLite
             }
         }
 
-        public override void SendPrivateMessage(object sender, MessageProcessEventData messagedata)
+        public override void SendPrivateMessage(object sender, MessageEventArgs messagedata)
         {
             try
             {

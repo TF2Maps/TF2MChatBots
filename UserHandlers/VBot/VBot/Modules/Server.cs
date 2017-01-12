@@ -253,7 +253,7 @@ namespace SteamBotLite
                 servermodule = module;
 
             }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 ServerInfo status = ServerQuery(server);
                 if (status != null)
@@ -276,7 +276,7 @@ namespace SteamBotLite
 
             }
 
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 string[] parameters = param.Split(new char[] { ' ' });
                 if (parameters.Length > 2)
@@ -309,7 +309,7 @@ namespace SteamBotLite
             {
                 this.module = module;
             }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 foreach (ServerInfo server in module.serverList.Servers)
                     {
@@ -333,7 +333,7 @@ namespace SteamBotLite
             {
                 this.module = module;
             }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 string activeServers = "";
                 foreach (ServerInfo server in module.serverList.Servers)
@@ -356,7 +356,7 @@ namespace SteamBotLite
             {
                 this.module = module;
             }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 string activeServers = "";
                 foreach (ServerInfo server in module.serverList.Servers)

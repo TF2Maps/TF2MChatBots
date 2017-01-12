@@ -11,19 +11,18 @@ namespace SteamBotLite
     class RepliesModule : BaseModule
     {
        
-        public string SaveDataFile; 
+        public string SaveDataFile;
+
+        Dictionary<string, string> Responses;
 
         public RepliesModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
             
             SaveDataFile = this.GetType().Name + ".json";
 
-            Dictionary<string, string> values = GetDataDictionary();
-                      
-            foreach (KeyValuePair<string, string> Responses in values)
-            {
-                commands.Add(new Reply(bot, this, Responses));
-            }
+            Responses = GetDataDictionary();
+
+            commands.Add(new ReplyFunction(bot, this));
             adminCommands.Add(new ReplyAdd(bot, this));
             adminCommands.Add(new ReplyRemove(bot, this));            
         }
@@ -44,6 +43,46 @@ namespace SteamBotLite
             throw new NotImplementedException();
         }
 
+        private class ReplyFunction : BaseCommand
+        {
+            // Command to query if a server is active
+            RepliesModule module;
+
+            public ReplyFunction(VBot bot, RepliesModule module) : base(bot, null)
+            {
+                this.module = module;
+            }
+            protected override string exec(MessageEventArgs Msg, string param)
+            {
+                return (module.Responses[param]);
+
+            }
+            public override bool CheckCommand(MessageEventArgs Msg, string Message)
+            {
+                if (module.Responses.ContainsKey(Message))
+                {
+                    return true;
+                }
+
+                else
+                {
+                    return false;
+                }
+            }
+
+            protected override string[] GetCommmand()
+            {
+                string[] Array = new string[module.Responses.Count];
+
+                for (int i = 0; i < module.Responses.Count; i++)
+                {
+                    Array[i] = module.Responses.ElementAt(i).Key;
+                }
+
+                return Array;
+            }
+        }
+
 
         private class Reply : BaseCommand
         {
@@ -55,7 +94,7 @@ namespace SteamBotLite
                 this.module = module;
                 this.reply = entry.Value;
             }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 return (reply);
 
@@ -82,7 +121,7 @@ namespace SteamBotLite
             {
                 replymodule = repliesModule;
             }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 string[] command = param.Split(new char[] { ' ' }, 2);
 
@@ -92,7 +131,6 @@ namespace SteamBotLite
                 {
                     values.Add(command[0],command[1]);
                     System.IO.File.WriteAllText(replymodule.SaveDataFile, JsonConvert.SerializeObject(values));
-                    replymodule.commands.Add(new Reply(userhandler, replymodule, new KeyValuePair<string, string>(command[0], command[1])));          
                     return "Reply Added";
                 }
 
@@ -107,7 +145,7 @@ namespace SteamBotLite
             {
                 replymodule = repliesModule;
             }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 string[] command = param.Split(new char[] { ' ' }, 2);
 
@@ -118,7 +156,6 @@ namespace SteamBotLite
                     values.Remove(command[0]);
                     System.IO.File.WriteAllText(replymodule.SaveDataFile, JsonConvert.SerializeObject(values));
                     BaseCommand ReplyToRemove = replymodule.commands.FirstOrDefault(x => x.command == command[0]);
-                    replymodule.commands.Remove(ReplyToRemove);
                     return "Reply Removed";
                 }
 

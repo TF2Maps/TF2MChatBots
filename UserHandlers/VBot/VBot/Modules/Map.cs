@@ -136,7 +136,7 @@ namespace SteamBotLite
             {
                 ChatroomEntity Submitter = new ChatroomEntity(map.Submitter,ChatroomEntity.Individual.User,null);
                 Console.WriteLine("Found map, sending message to {0}", Submitter);
-                userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData(null) { Sender = Submitter, ReplyMessage = string.Format("Map {0} is being tested on the {1} server and has been DELETED.", map.Filename, args.tag) });
+                userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Sender = Submitter, ReplyMessage = string.Format("Map {0} is being tested on the {1} server and has been DELETED.", map.Filename, args.tag) });
                 mapList.Remove(map);
                 Console.WriteLine("Map {0} is being tested on the {1} server and has been DELETED.", map.Filename, args.tag);
                 savePersistentData();
@@ -165,7 +165,7 @@ namespace SteamBotLite
             {
                 ServerMapListURL = Website;
             }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 return SearchClass.CheckDataExistsOnWebPage(ServerMapListURL, param).ToString();
             }
@@ -178,7 +178,7 @@ namespace SteamBotLite
             {
                 mapmodule = module;
             }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 NotifyCollectionChangedEventArgs args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
                 userhandler.OnMaplistchange(mapmodule.mapList, Msg, args);
@@ -198,7 +198,7 @@ namespace SteamBotLite
 
             public Add(VBot bot, MapModule mapModule) : base(bot, "!add", mapModule) { }
 
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 string[] parameters = param.Split(new char[] { ' ' }, 2);
 
@@ -238,7 +238,7 @@ namespace SteamBotLite
                     parameters = param.Split(new char[] { ' ' }, 3);
 
                     map.DownloadURL = parameters[1];
-
+                    
                     if (!map.DownloadURL.StartsWith("http", StringComparison.OrdinalIgnoreCase))
                     {
                         return "Your map is not uploaded and your download URL is invalid!";
@@ -281,7 +281,7 @@ namespace SteamBotLite
 
             public Insert(VBot bot, MapModule mapModule) : base(bot, "!insert", mapModule) { }
 
-            protected override string exec(MessageProcessEventData msg, string param)
+            protected override string exec(MessageEventArgs msg, string param)
             {
                 string[] parameters = param.Split(new char[] { ' ' }, 3);
                 int index;
@@ -352,7 +352,7 @@ namespace SteamBotLite
         private class Maps : MapCommand
         {
             public Maps(VBot bot, MapModule mapMod) : base(bot, "!maps", mapMod) { }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 var maps = MapModule.mapList;
                 int maxMaps = MapModule.MaxMapNumber;
@@ -400,7 +400,7 @@ namespace SteamBotLite
                 // PM map list to the caller.
                 if (maps.Count != 0)
                 {
-                    userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData(null) { Sender = Msg.Sender, ReplyMessage = pmResponse });
+                    userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Sender = Msg.Sender, ReplyMessage = pmResponse });
                 }
 
                 return chatResponse;
@@ -410,7 +410,7 @@ namespace SteamBotLite
         private class Reposition : MapCommand
         {
             public Reposition(VBot bot, MapModule mapMod) : base(bot, "!reposition", mapMod) { }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 string[] parameters = param.Split(' ');
 
@@ -463,7 +463,7 @@ namespace SteamBotLite
         private class Update : MapCommand
         {
             public Update(VBot bot, MapModule mapMod) : base(bot, "!update", mapMod) { }
-            protected override string exec(MessageProcessEventData msg, string param)
+            protected override string exec(MessageEventArgs msg, string param)
             {
                 string[] parameters = param.Split(' ');
 
@@ -509,7 +509,7 @@ namespace SteamBotLite
         private class Delete : MapCommand
         {
             public Delete(VBot bot, MapModule mapMod) : base(bot, "!delete", mapMod) { }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 string[] parameters = param.Split(' ');
 
@@ -527,7 +527,7 @@ namespace SteamBotLite
                         {
                             MapModule.mapList.Remove(deletedMap);
                             MapModule.savePersistentData();
-                            userhandler.SendPrivateMessageProcessEvent(new MessageProcessEventData(null) { Sender = new ChatroomEntity(deletedMap.Submitter,ChatroomEntity.Individual.User,null), ReplyMessage = string.Format("Your map {0} has been deleted from the map list", deletedMap.Filename) });
+                            userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Sender = new ChatroomEntity(deletedMap.Submitter,ChatroomEntity.Individual.User,null), ReplyMessage = string.Format("Your map {0} has been deleted from the map list", deletedMap.Filename) });
                             return string.Format("Map '{0}' DELETED.", deletedMap.Filename);
                         }
                         else
@@ -548,7 +548,7 @@ namespace SteamBotLite
             {
                 module = mapMod;
             }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 if (!string.IsNullOrEmpty(param))
                 {
@@ -570,7 +570,7 @@ namespace SteamBotLite
 
             while (mapList.Count > 0)
             {
-                MessageProcessEventData Msg = new MessageProcessEventData(null);
+                MessageEventArgs Msg = new MessageEventArgs(null);
                 Msg.ReplyMessage = string.Format("Hi, the Maplist has been cleared and your map was removed for the following reason: {0}", message);
                 ChatroomEntity sender = new ChatroomEntity(mapList[0].Submitter, ChatroomEntity.Individual.User, null);
                 userhandler.SendPrivateMessageProcessEvent(Msg);
@@ -579,50 +579,3 @@ namespace SteamBotLite
         }
     }
 }
-        /*
-        private class WebServerStart : BaseCommand
-        {
-            protected MapModule MapModule;
-            
-
-            public WebServerStart(VBot bot, string command , MapModule module)
-                : base(bot, command)
-            {
-                
-                MapModule = module;
-            }
-            protected override string exec(MessageProcessEventData Msg, string param)
-            {
-                MapModule.WebServer = new MapWebServer(param, MapModule.mapList);
-                MapModule.mapList.CollectionChanged += MapModule.WebServer.MapListUpdate;
-                if (MapModule.WebServer != null)
-                {
-                    return "Started the Web Server";
-                }
-                else
-                {
-                    return "An error prevented the webserver from loading";
-                }
-            }
-        }
-        private class WebServerStop : BaseCommand
-        {
-            protected MapModule MapModule;
-            VBot bot;
-
-            public WebServerStop(VBot bot, string command, MapModule module)
-                : base(bot, command)
-            {
-                MapModule = module;
-            }
-            protected override string exec(MessageProcessEventData Msg, string param)
-            {
-                MapModule.mapList.CollectionChanged -= MapModule.WebServer.MapListUpdate;
-                MapModule.WebServer = null;
-                
-                return "Faded the Web Server away and made it OBSOLETE";
-            }
-        }
-        */
-   
-

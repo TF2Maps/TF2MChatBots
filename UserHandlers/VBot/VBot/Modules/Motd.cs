@@ -105,7 +105,7 @@ namespace SteamBotLite
         private class Get : MotdCommand
         {
             public Get(VBot bot, MotdModule motd) : base(bot, "!Motd", motd) { }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 if (motd.postCount >= motd.postCountLimit){
                     motd.message = null;
@@ -119,7 +119,7 @@ namespace SteamBotLite
         private class Emulate : MotdCommand
         {
             public Emulate(VBot bot, MotdModule motd) : base(bot, "!EmulateMotd", motd) { }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 
                 userhandler.BroadcastMessageProcessEvent(motd.message);
@@ -130,7 +130,7 @@ namespace SteamBotLite
         private class Set : MotdCommand
         {
             public Set(VBot bot, MotdModule motd) : base(bot, "!SetMotd", motd) { }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 if (param == String.Empty)
                     return "Make sure to include a MOTD to display!";
@@ -150,7 +150,7 @@ namespace SteamBotLite
         private class SetExtended : MotdCommand
         {
             public SetExtended(VBot bot, MotdModule motd) : base(bot, "!setextendedmotd", motd) { }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 string[] parameters = param.Split(new char[] { ' ' }, 2);
 
@@ -184,7 +184,7 @@ namespace SteamBotLite
         private class Remove : MotdCommand
         {
             public Remove(VBot bot, MotdModule motd) : base(bot, "!RemoveMotd", motd) { }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 motd.message = null;
                 //motd.setter = null; //TODO FIX
@@ -197,7 +197,7 @@ namespace SteamBotLite
         private class Tick : MotdCommand
         {
             public Tick(VBot bot, MotdModule motd) : base(bot, "!TickMotd", motd) { }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 return "MOTD displayed " + motd.postCount + " times and will display a total of " + motd.postCountLimit + " times in total";
             }
@@ -206,7 +206,7 @@ namespace SteamBotLite
         private class Setter : MotdCommand
         {
             public Setter(VBot bot, MotdModule motd) : base(bot, "!SetterMotd", motd) { }
-            protected override string exec(MessageProcessEventData Msg, string param)
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 return "MOTD set by " + motd.setter;
             }
