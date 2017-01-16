@@ -128,6 +128,7 @@ namespace SteamBotLite
 
                 if (!values.ContainsKey(command[0]) && (command.Length > 1))
                 {
+                    replymodule.Responses.Add(command[0], command[1]);
                     values.Add(command[0],command[1]);
                     System.IO.File.WriteAllText(replymodule.SaveDataFile, JsonConvert.SerializeObject(values));
                     return "Reply Added";
@@ -154,7 +155,7 @@ namespace SteamBotLite
                 {
                     values.Remove(command[0]);
                     System.IO.File.WriteAllText(replymodule.SaveDataFile, JsonConvert.SerializeObject(values));
-                    BaseCommand ReplyToRemove = replymodule.commands.FirstOrDefault(x => x.command == command[0]);
+                    replymodule.Responses.Remove(command[0]);
                     return "Reply Removed";
                 }
 

@@ -49,7 +49,7 @@ namespace SteamBotLite
                 {
                     foreach (string entry in command.GetCommmand())
                     {
-                        CommandList.Add(new string[] { "Admin Command", entry });
+                        CommandList.Add(new string[] { "User Command", entry });
                     }
 
                 }
