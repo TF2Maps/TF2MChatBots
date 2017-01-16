@@ -89,6 +89,9 @@ namespace SteamBotLite
             userhandler.BroadcastMessageEvent += BroadCastMessage;
             userhandler.MainChatRoomJoin += EnterMainChatRoom;
             userhandler.MainChatRoomLeave += LeaveMainChatroom;
+            userhandler.ChatMemberInfoEvent += ChatMemberInfoEvent;
+
+
         }
 
 
@@ -97,6 +100,26 @@ namespace SteamBotLite
         public abstract void ReceivePrivateMessage(ChatroomEntity ChatroomEntity, string Message);
         */
 
+        public class ChatMemberInfoEventArgs
+        {
+            ChatroomEntity User;
+            bool IsAdmin;
+        }
+
+        /*
+        public event EventHandler<ChatMemberInfoEventArgs> ChatMemberInfoEvent;
+        protected virtual void ChatMemberInfoProcessEvent(ChatMemberInfoEventArgs e)
+        {
+            // Make a temporary copy of the event to avoid possibility of
+            // a race condition if the last subscriber unsubscribes
+            // immediately after the null check and before the event is raised.
+            EventHandler<ChatMemberInfoEventArgs> handler = ChatMemberInfoEvent;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+        */
         public event EventHandler<MessageEventArgs> ChatRoomMessageEvent;
         
         //The event-invoking method that derived classes can override.
@@ -129,7 +152,7 @@ namespace SteamBotLite
 
         
 
-        event EventHandler<Tuple<ChatroomEntity, bool>> ChatMemberInfoEvent;
+        public event EventHandler<Tuple<ChatroomEntity, bool>> ChatMemberInfoEvent;
         //The event-invoking method that derived classes can override.
         protected virtual void ChatMemberInfoProcessEvent(ChatroomEntity e , bool isadmin)
         {

@@ -10,27 +10,37 @@ namespace SteamBotLite
 {
     class ServerListHolder : BaseModule, ServerMapChangeListiner
     {
+
+        class Maplist
+        {
+            public List<string> Maps;
+            public SummariseMethod ListKind;
+            public string ListName;
+        }
+
+
+
         string[] Header = new string[] { "Map", "Time Played" };
         HTMLFileFromArrayListiners listiner;
+
         public ServerListHolder(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
             loadPersistentData();
-            MapNameList = new List<string>();
-            List<string>Templist = JsonConvert.DeserializeObject<List<string>>(config["Whitelist"].ToString());
+
+            List<Maplist> Maplist = new List<Maplist>();
+
+            List<Maplist> Templist = new List<Maplist>();
+           
+           
+          
+
+            Templist = JsonConvert.DeserializeObject<List<Maplist>>(config["ListConfigs"].ToString());
 
             if (Templist != null)
             {
-                MapNameList = Templist;
+                this.Maplists = Templist;
             }
-
-            if (bool.Parse(config["WhiteListIsBlacklist"].ToString()))
-            {
-                MethodToSummariseWith = SummariseMethod.Blacklist;
-            }
-            else
-            {
-                MethodToSummariseWith = SummariseMethod.Whitelist;
-            }
+            
             listiner = bot;
             
             loadPersistentData();
@@ -43,8 +53,7 @@ namespace SteamBotLite
 
         }
 
-        List<string> MapNameList;
-        SummariseMethod MethodToSummariseWith;
+        List<Maplist> Maplists;
         private Dictionary<string, List<PlayEntry>> MapTests;
 
         public class PlayEntry
@@ -72,9 +81,11 @@ namespace SteamBotLite
 
         void UpdateList ()
         {
-            listiner.HTMLFileFromArray(Header, ParseSummarisedListToHTMLTable(SummariseEntries(MapTests, new List<string>(), MethodToSummariseWith)), "All Maps Played");
-
-            listiner.HTMLFileFromArray(Header, ParseSummarisedListToHTMLTable(SummariseEntries(MapTests, MapNameList, MethodToSummariseWith)), "ASYMM Entries");
+            foreach(Maplist entry in Maplists)
+            {
+                listiner.HTMLFileFromArray(Header, ParseSummarisedListToHTMLTable(SummariseEntries(MapTests, entry.Maps, entry.ListKind)), entry.ListName);
+            }
+            
         }
 
         void AddEntry(string MapName, PlayEntry Entry)
@@ -91,6 +102,7 @@ namespace SteamBotLite
 
 
         enum SummariseMethod { Blacklist,Whitelist}
+
         /// <summary>
         /// Used to summarise the Dictionary but only return entries in the whitelist or not in the blacklist
         /// </summary>

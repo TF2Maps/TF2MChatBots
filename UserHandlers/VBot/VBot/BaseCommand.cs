@@ -18,28 +18,35 @@ namespace SteamBotLite
             this.userhandler = bot;
             this.command = command;
         }
-        public string run(MessageEventArgs Msg, string message = "")
+        public string run(MessageEventArgs Msg, string message = "" )
         {
             string param = "";
             string[] command = message.Split(new char[] { ' ' }, 2);
             if (command.Length > 1)
-                param = command[1].Trim();
-            return exec(Msg, param);
-        }
-
-        public virtual bool CheckCommand(MessageEventArgs Msg, string Message)
-        {
-            if (Message.StartsWith(command, StringComparison.OrdinalIgnoreCase))
             {
-                return run(Msg, Message);
+                param = command[1].Trim();
             }
             else
             {
-                return null;
+                param = command[0].Trim();
+            }
+
+            return exec(Msg, param);
+        }
+
+        public virtual bool CheckCommandExists(MessageEventArgs Msg, string Message)
+        {
+            if (Message.StartsWith(command, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
-        protected virtual string[] GetCommmand ()
+        public virtual string[] GetCommmand ()
         {
             return new string[] { command };
         }

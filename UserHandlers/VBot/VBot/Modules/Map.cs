@@ -495,7 +495,7 @@ namespace SteamBotLite
                             MapModule.mapList[Index].DownloadURL = parameters[2];
                         }
                         MapModule.savePersistentData();
-                        
+                        MapModule.ConvertMaplistToTable(); //TODO Make this more orthogonal. 
                         return string.Format("Map renamed to'{0}'", MapModule.mapList[Index].Filename);
                     }
                     else

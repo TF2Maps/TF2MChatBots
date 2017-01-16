@@ -55,9 +55,8 @@ namespace SteamBotLite
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 return (module.Responses[param]);
-
             }
-            public override bool CheckCommand(MessageEventArgs Msg, string Message)
+            public override bool CheckCommandExists(MessageEventArgs Msg, string Message)
             {
                 if (module.Responses.ContainsKey(Message))
                 {
@@ -70,7 +69,7 @@ namespace SteamBotLite
                 }
             }
 
-            protected override string[] GetCommmand()
+            public override string[] GetCommmand()
             {
                 string[] Array = new string[module.Responses.Count];
 

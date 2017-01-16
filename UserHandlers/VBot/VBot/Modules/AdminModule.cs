@@ -23,6 +23,7 @@ namespace SteamBotLite
             adminCommands.Add(new AddModule(bot, this));
             adminCommands.Add(new GetAllModules(bot, this));
             adminCommands.Add(new Rejoin(bot, this));
+            
         }
 
         public override string getPersistentData()
@@ -46,12 +47,20 @@ namespace SteamBotLite
 
                 foreach (BaseCommand command in module.commands)
                 {
-                    CommandList.Add(new string[] { "Regular Command", command.command });
+                    foreach (string entry in command.GetCommmand())
+                    {
+                        CommandList.Add(new string[] { "Admin Command", entry });
+                    }
+
                 }
 
                 foreach (BaseCommand command in module.adminCommands)
                 {
-                    CommandList.Add(new string[] { "Admin Command", command.command });
+                    foreach (string entry in command.GetCommmand())
+                    {
+                        CommandList.Add(new string[] { "Admin Command", entry });
+                    }
+                    
                 }
 
                 SteamBot.HTMLFileFromArray(HeaderNames, CommandList, module.GetType().ToString());

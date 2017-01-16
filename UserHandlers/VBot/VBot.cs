@@ -168,12 +168,13 @@ namespace SteamBotLite
                 {
                     foreach (BaseCommand c in module.commands)
                     {
-                        if (c.CheckCommand(Msg,Message))
+                        if (c.CheckCommandExists(Msg,Message))
                         {
                             response = c.run(Msg, Message);
                             return response;
                         }
                     }
+                    
                 }
             }
 
@@ -184,7 +185,7 @@ namespace SteamBotLite
                     if (module != null)
                     {
                         foreach (BaseCommand c in module.adminCommands)
-                            if (Message.StartsWith(c.command, StringComparison.OrdinalIgnoreCase))
+                            if (c.CheckCommandExists(Msg, Message))
                             {
                                 response = c.run(Msg, Message);
                                 return response;
@@ -214,9 +215,9 @@ namespace SteamBotLite
             }
         }
 
-        public override void ChatMemberInfo(ChatroomEntity ChatroomEntity, bool AdminStatus)
+        public override void ChatMemberInfo(object sender, Tuple<ChatroomEntity,bool>e)
         {
-            usersModule.updateUserInfo(ChatroomEntity, AdminStatus);
+            usersModule.updateUserInfo(e.Item1, e.Item2);
         }
 
         public void HTMLFileFromArray(string[] Headernames, List<string[]> Data, string TableKey)

@@ -23,6 +23,7 @@ namespace SteamBotLite
             appinterface.AnnounceLoginCompletedEvent += OnLoginCompleted;
             appinterface.PrivateMessageEvent += ProcessPrivateMessage;
             appinterface.ChatRoomMessageEvent += ProcessChatRoomMessage;
+            appinterface.ChatMemberInfoEvent += ChatMemberInfo;
         }
 
         public abstract void ProcessChatRoomMessage(object sender, MessageEventArgs e);
@@ -31,8 +32,10 @@ namespace SteamBotLite
 
         public abstract void OnLoginCompleted(object sender, EventArgs e);
 
-        
-        public abstract void ChatMemberInfo(ChatroomEntity ChatroomEntity, bool MemberInfo); //TODO make this an object, not a bool
+
+        public EventHandler<Tuple<ChatroomEntity, bool>> ChatMemberInfoEvent;
+
+        public abstract void ChatMemberInfo(object sender , Tuple<ChatroomEntity,bool> e); //TODO make this an object, not a bool
 
         public event EventHandler<EventArgs> RebootEvent;
         /// <summary>

@@ -22,6 +22,7 @@ namespace SteamBotLite
 
         public override void OnAllModulesLoaded()
         {
+           
 
         }
 
@@ -38,7 +39,7 @@ namespace SteamBotLite
             try
             {
                 Dictionary<string, List<object>> data;
-                data = JsonConvert.DeserializeObject<Dictionary<string, List<object>>>(System.IO.File.ReadAllText(this.GetType().Name + ".json"));
+                data = JsonConvert.DeserializeObject<Dictionary<string, List<object>>>(System.IO.File.ReadAllText(ModuleSavedDataFilePath()));
                 admins = data["admins"];
                 bans = data["bans"];
             }
@@ -65,7 +66,9 @@ namespace SteamBotLite
 
         public bool admincheck(ChatroomEntity UserToVerify)
         {
-            if (UserToVerify.Rank == ChatroomEntity.AdminStatus.True | (admins.Any(s => UserToVerify.identifier.ToString().Equals(s))))
+            string data = UserToVerify.identifier.ToString();
+
+            if (UserToVerify.Rank == ChatroomEntity.AdminStatus.True | (admins.Any(s => UserToVerify.identifier.Equals(s))))
             {
                 return true;
             }

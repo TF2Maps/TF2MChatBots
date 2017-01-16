@@ -65,6 +65,12 @@ namespace SteamBotLite
         public override void OnLoginCompleted(object sender, EventArgs e) { }
         
 
-        public override void ChatMemberInfo(ChatroomEntity ChatroomEntity, bool MemberInfo) { }
+        public override void ChatMemberInfo(object sender, Tuple<ChatroomEntity, bool> e)
+        {
+            CrashCheck = 0;
+            Tick.Stop();
+            Tick.Start();
+            Console.WriteLine("Restarted the timer");
+        }
     }
 }
