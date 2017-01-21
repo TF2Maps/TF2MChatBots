@@ -171,8 +171,20 @@ namespace SteamBotLite
             }
         }
 
+        public event EventHandler<string> SetStatusmessage;
 
-
+        //The event-invoking method that derived classes can override.
+        public virtual void SetStatusmessageEvent(string e)
+        {
+            // Make a temporary copy of the event to avoid possibility of
+            // a race condition if the last subscriber unsubscribes
+            // immediately after the null check and before the event is raised.
+            EventHandler<string> handler = SetStatusmessage;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
 
 
 

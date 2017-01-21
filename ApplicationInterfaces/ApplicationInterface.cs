@@ -90,8 +90,7 @@ namespace SteamBotLite
             userhandler.MainChatRoomJoin += EnterMainChatRoom;
             userhandler.MainChatRoomLeave += LeaveMainChatroom;
             userhandler.ChatMemberInfoEvent += ChatMemberInfoEvent;
-
-
+            userhandler.SetStatusmessage += SetStatusMessage;
         }
 
 
@@ -106,20 +105,6 @@ namespace SteamBotLite
             bool IsAdmin;
         }
 
-        /*
-        public event EventHandler<ChatMemberInfoEventArgs> ChatMemberInfoEvent;
-        protected virtual void ChatMemberInfoProcessEvent(ChatMemberInfoEventArgs e)
-        {
-            // Make a temporary copy of the event to avoid possibility of
-            // a race condition if the last subscriber unsubscribes
-            // immediately after the null check and before the event is raised.
-            EventHandler<ChatMemberInfoEventArgs> handler = ChatMemberInfoEvent;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
-        */
         public event EventHandler<MessageEventArgs> ChatRoomMessageEvent;
         
         //The event-invoking method that derived classes can override.
@@ -179,6 +164,10 @@ namespace SteamBotLite
                 AnnounceLoginCompletedEvent(this , null);
             }
         }
+
+        public event EventHandler<string> SetStatusMessageEvent;
+
+        public abstract void SetStatusMessage(object sender, string message);
 
         public abstract void ReceiveChatMemberInfo(ChatroomEntity ChatroomEntity, bool AdminStatus);
 

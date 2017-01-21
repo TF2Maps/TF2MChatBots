@@ -23,8 +23,8 @@ namespace SteamBotLite
         SearchModule searchModule;
         ImpNaoModule impnaomodule;
         ServerListHolder serverlistmodule;
-       
-        MapWebServer WebServer;
+        CountDownModule countdownmodule;
+         MapWebServer WebServer;
 
         public UsersModule usersModule;
 
@@ -66,9 +66,10 @@ namespace SteamBotLite
             searchModule = new SearchModule(this, jsconfig);
             adminmodule = new AdminModule(this, jsconfig);
 
+            countdownmodule = new CountDownModule(this, jsconfig);
 
 
-            ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule,adminmodule,searchModule, WebServer, serverlistmodule };
+            ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule,adminmodule,searchModule, WebServer, serverlistmodule , countdownmodule };
             Console.WriteLine("Modules loaded and ModuleList intitialised");
 
             //We run this to allow the modules to partake in actions requiring all to be loaded

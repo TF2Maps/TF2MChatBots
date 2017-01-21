@@ -7,6 +7,7 @@ using SteamKit2;
 using System.IO;
 using System.Security.Cryptography;
 using Newtonsoft.Json;
+using SteamKit2.Internal;
 
 namespace SteamBotLite
 {
@@ -498,6 +499,23 @@ namespace SteamBotLite
             return SteamFriends.GetPersonaName();
         }
 
-        
+        public override void SetStatusMessage(object sender, string message)
+        {
+            var request = new ClientMsgProtobuf<CMsgClientGamesPlayed>(EMsg.ClientGamesPlayed);
+
+            var gamePlayed = new CMsgClientGamesPlayed.GamePlayed();
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                gamePlayed.game_id = 12350489788975939584;
+                gamePlayed.game_extra_info = message;
+            }
+
+            request.Body.games_played.Add(gamePlayed);
+            
+            steamClient.Send(request);
+        }
+
+
     }
 }

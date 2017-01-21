@@ -23,7 +23,7 @@ namespace SteamBotLite
             adminCommands.Add(new AddModule(bot, this));
             adminCommands.Add(new GetAllModules(bot, this));
             adminCommands.Add(new Rejoin(bot, this));
-            
+            adminCommands.Add(new SetStatusMessage(bot, this));
         }
 
         public override string getPersistentData()
@@ -68,6 +68,27 @@ namespace SteamBotLite
            
         }
 
+        private class SetStatusMessage : BaseCommand
+        {
+            // Command to query if a server is active
+            VBot bot;
+
+            public SetStatusMessage(VBot bot, AdminModule module) : base(bot, "!Status")
+            {
+                this.bot = bot;
+            }
+            protected override string exec(MessageEventArgs Msg, string param)
+            {
+                bot.SetStatusmessageEvent(param);
+                return "Status has been updated";
+            }
+
+            private void Bot_SetStatusmessage(object sender, string e)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         private class Reboot : BaseCommand
         {
             // Command to query if a server is active
@@ -96,6 +117,7 @@ namespace SteamBotLite
             }
             protected override string exec(MessageEventArgs Msg, string param)
             {
+
                 module.SteamBot.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.LeaveChat);
                 module.SteamBot.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.EnterChat);
                 return "Rejoined!";

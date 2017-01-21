@@ -171,5 +171,10 @@ namespace SteamBotLite
 
             }
         }
+
+        public override void SetStatusMessage(object sender, string message)
+        {
+         //   _client.SetGame(message);
+        }
     }
 }
