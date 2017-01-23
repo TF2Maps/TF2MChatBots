@@ -31,9 +31,6 @@ namespace SteamBotLite
 
             List<Maplist> Templist = new List<Maplist>();
            
-           
-          
-
             Templist = JsonConvert.DeserializeObject<List<Maplist>>(config["ListConfigs"].ToString());
 
             if (Templist != null)
@@ -42,10 +39,10 @@ namespace SteamBotLite
             }
             
             listiner = bot;
-            
             loadPersistentData();
             UpdateList();
 
+            bot.MapChangeEventListiners.Add(this);
         }
 
         public override void OnAllModulesLoaded()

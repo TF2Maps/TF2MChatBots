@@ -13,7 +13,7 @@ namespace SteamBotLite
 {
     class ServerModule : BaseModule
     {
-        public event EventHandler<ServerInfo> ServerUpdated;
+        public event EventHandler<ServerInfo> ServerMapChanged;
 
 
         private BaseTask serverUpdate;
@@ -26,7 +26,7 @@ namespace SteamBotLite
         {
             ServerModule Servermodule;
 
-            public ServerList(ServerModule module , List<ServerInfo> serverlist)
+            public ServerList(ServerModule module, List<ServerInfo> serverlist)
             {
                 Servermodule = module;
                 ServerListObject = serverlist;
@@ -42,18 +42,18 @@ namespace SteamBotLite
                 }
             }
 
-            public void Add (ServerInfo server)
+            public void Add(ServerInfo server)
             {
                 ServerListObject.Add(server);
                 Servermodule.commands.Add((new Status(Servermodule.Bot, server, Servermodule)));
                 Servermodule.savePersistentData();
             }
-            public void Remove (ServerInfo server)
+            public void Remove(ServerInfo server)
             {
-                
+
                 foreach (BaseCommand command in Servermodule.commands)
                 {
-                    if(command.command.Equals("!" + server.tag + "server"))
+                    if (command.command.Equals("!" + server.tag + "server"))
                     {
                         Servermodule.commands.Remove(command);
                     }
@@ -72,11 +72,9 @@ namespace SteamBotLite
 
         public ServerModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
-            
+
             Bot = bot;
             List<ServerInfo> ServerList = new List<ServerInfo>();
-
-            // loading config
 
             int updateInterval = int.Parse(config["updateInterval"].ToString());
             Tuple<string, string, int>[] servers;
@@ -84,12 +82,9 @@ namespace SteamBotLite
             if (File.Exists(ModuleSavedDataFilePath()))
             {
                 ServerList = JsonConvert.DeserializeObject<List<ServerInfo>>(System.IO.File.ReadAllText(ModuleSavedDataFilePath()));
-                if (ServerList.Count > 0)
+                for (int i = 0; i < ServerList.Count; i++)
                 {
-                    foreach (ServerInfo server in ServerList)
-                    {
-                        commands.Add(new Status(bot, server, this));
-                    }
+                    commands.Add(new Status(bot, ServerList[i], this));
                 }
             }
             else
@@ -103,15 +98,24 @@ namespace SteamBotLite
             adminCommands.Add(new ServerAdd(bot, this));
             adminCommands.Add(new ServerRemove(bot, this));
             adminCommands.Add(new FullServerQuery(bot, this));
-            
+
 
             serverUpdate = new BaseTask(updateInterval, new System.Timers.ElapsedEventHandler(SyncServerInfo));
-            ServerUpdated += bot.ServerUpdated;
+            ServerMapChanged += bot.ServerUpdated;
+            ServerMapChanged += ServerModule_ServerMapChanged;
+        }
+
+        private void ServerModule_ServerMapChanged(object sender, ServerInfo e)
+        {
+            if (e.playerCount > 8)
+            {
+                userhandler.BroadcastMessageProcessEvent(e.ToString());
+            }
         }
 
         public class ServerInfo : EventArgs
         {
-            public string serverIP; 
+            public string serverIP;
             public int port;
 
             public string tag;
@@ -143,23 +147,18 @@ namespace SteamBotLite
 
         public void SyncServerInfo(object sender, EventArgs e)
         {
-            int x = 0;
-            foreach (ServerInfo server in serverList.Servers)
+            for (int x = 0; x < serverList.Servers.Count; x++)
             {
-                ServerInfo serverstate = ServerQuery(server);
+                ServerInfo currentserverstate = ServerQuery(serverList.Servers[x]);
 
-                if (serverstate != null)
+                if (currentserverstate != null)
                 {
-                   // Console.WriteLine(string.Format("New Map is {0} Oldy one is {1} and the player count is {2} went from {3}", serverstate.currentMap, serverList[x].currentMap, serverstate.playerCount, serverList[x].playerCount));
-                    
-                    if (!(serverList.Servers[x].currentMap.Equals(serverstate.currentMap)) && (serverstate.playerCount > 3))
+                    if (!(serverList.Servers[x].currentMap.Equals(currentserverstate.currentMap)))
                     {
-                        serverList.Servers[x].update(serverstate);
-                        ServerUpdated(this, serverstate);
-                        userhandler.BroadcastMessageProcessEvent(serverstate.ToString());
+                        ServerMapChanged(this, currentserverstate);
                     }
+                    serverList.Servers[x].update(currentserverstate);
                 }
-                x++;
             }
         }
 
@@ -173,11 +172,11 @@ namespace SteamBotLite
             try
             {
                 Tuple<string, string, int>[] servers = JsonConvert.DeserializeObject<Tuple<string, string, int>[]>(System.IO.File.ReadAllText(ModuleSavedDataFilePath()));
-                // parsing ServerInfos
+
                 foreach (Tuple<string, string, int> servconf in servers)
                 {
                     IPEndPoint ep = new IPEndPoint(System.Net.IPAddress.Parse(servconf.Item2), servconf.Item3);
-                    ServerInfo serverInfo = new ServerInfo(servconf.Item2,servconf.Item3 , servconf.Item1);
+                    ServerInfo serverInfo = new ServerInfo(servconf.Item2, servconf.Item3, servconf.Item1);
                     serverList.Add(serverInfo);
                 }
             }
@@ -224,14 +223,14 @@ namespace SteamBotLite
 
                     //Console.WriteLine(string.Format("{0} Responded with: {1} and: {2}", updatedServer.tag, updatedServer.currentMap, updatedServer.playerCount));
 
-                   // Console.WriteLine(string.Format("{0} Responded with {1}",server.tag, updatedServer.currentMap));
+                    // Console.WriteLine(string.Format("{0} Responded with {1}",server.tag, updatedServer.currentMap));
 
                     client.Close();
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(string.Format("Error from: {0}: {1}",server.tag, ex.Message));  
-                    client.Close();                  
+                    Console.WriteLine(string.Format("Error from: {0}: {1}", server.tag, ex.Message));
+                    client.Close();
                 }
             }
 
@@ -259,7 +258,7 @@ namespace SteamBotLite
                 if (status != null)
                 {
                     server.update(status);
-                  //  servermodule.ServerUpdated(this, server);
+                    //  servermodule.ServerMapChanged(this, server);
                     return server.ToString();
                 }
                 else
@@ -312,15 +311,15 @@ namespace SteamBotLite
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 foreach (ServerInfo server in module.serverList.Servers)
+                {
+                    if (param.Equals(server.tag, StringComparison.OrdinalIgnoreCase))
                     {
-                        if (param.Equals(server.tag, StringComparison.OrdinalIgnoreCase))
-                        {
-                            module.serverList.Remove(server);
-                            return "The server has been removed from the list";
-                        }
+                        module.serverList.Remove(server);
+                        return "The server has been removed from the list";
                     }
-                    return "Server was not found, remember the servername does not include ! preceeding or 'server' afterwards (EUserver would be EU)";
                 }
+                return "Server was not found, remember the servername does not include ! preceeding or 'server' afterwards (EUserver would be EU)";
+            }
         }
 
         // Other commands
@@ -339,7 +338,7 @@ namespace SteamBotLite
                 foreach (ServerInfo server in module.serverList.Servers)
                     if (server.playerCount > 1)
                     {
-                        if (!activeServers.Equals(string.Empty))    
+                        if (!activeServers.Equals(string.Empty))
                             activeServers += "\n";
 
                         activeServers += server.ToString();

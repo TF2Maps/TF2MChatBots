@@ -24,7 +24,7 @@ namespace SteamBotLite
 
         public virtual string GetName ()
         {
-            return "!MOTD";
+            return "MOTD";
         }
 
         MOTDITEM StatusMessageHolder;
@@ -62,7 +62,7 @@ namespace SteamBotLite
             Dictionary<string, string> data = new Dictionary<string, string>();
             data.Add("motd", message);
             data.Add("count", postCount.ToString());
-
+            data.Add("PostLimit", postCountLimit.ToString());
             return JsonConvert.SerializeObject(data);
         }
 
@@ -73,6 +73,7 @@ namespace SteamBotLite
                 Dictionary<string, string> data = JsonConvert.DeserializeObject<Dictionary<string, string>>(System.IO.File.ReadAllText(this.GetType().Name + ".json"));
                 message = data["motd"];
                 postCount = int.Parse(data["count"]);
+                postCountLimit = int.Parse(data["PostLimit"]);
             }
             catch
             {
@@ -164,7 +165,7 @@ namespace SteamBotLite
         abstract public class MotdCommand : BaseCommand
         {
             protected MotdModule motd;
-            public MotdCommand(VBot bot, string command, MotdModule motd) : base(bot, motd.GetName() + command)
+            public MotdCommand(VBot bot, string command, MotdModule motd) : base(bot,"!" + motd.GetName() + command)
             {
                 this.motd = motd;
             }
@@ -212,20 +213,20 @@ namespace SteamBotLite
                 motd.postCount = 0;
                 motd.postCountLimit = motd.DefaultPostCountLimit();
                 motd.savePersistentData();
-                return "MOTD Set to: " + motd.message;
+                return motd.GetName() + " Set to: " + motd.message;
             }
         }
 
         private class SetExtended : MotdCommand
         {
-            public SetExtended(VBot bot, MotdModule motd) : base(bot, "setextended", motd) { }
+            public SetExtended(VBot bot, MotdModule motd) : base(bot, "extendedset", motd) { }
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 string[] parameters = param.Split(new char[] { ' ' }, 2);
 
                 if (parameters.Length < 2)
                 {
-                    return "Incorrect syntax, use: !setextendedmotd <days> <motd>";
+                    return "Incorrect syntax, use: <Number of times to post> <motd>";
                 }
 
                 if (motd.message != null)
@@ -238,15 +239,15 @@ namespace SteamBotLite
                 }
                 catch
                 {
-                    return "Incorrect syntax, use: !setextendedmotd <Number of Days> <motd>";
+                    return "Incorrect syntax, use: <Number of times to post> <motd>";
                 }
 
                 motd.message = parameters[1];
                 motd.setter = Msg.Sender;
                 motd.postCount = 0;
-                motd.postCountLimit = Days * 24;
+                motd.postCountLimit = Days;
                 motd.savePersistentData();
-                return "MOTD Set to: " + motd.message + " | with a post limit of: " + motd.postCountLimit;
+                return motd.GetName() + " Set to: " + motd.message + " | with a post limit of: " + motd.postCountLimit;
             }
         }
 
@@ -268,7 +269,7 @@ namespace SteamBotLite
             public Tick(VBot bot, MotdModule motd) : base(bot, "Tick", motd) { }
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                return "MOTD displayed " + motd.postCount + " times and will display a total of " + motd.postCountLimit + " times in total";
+                return motd.GetName() +" displayed " + motd.postCount + " times and will display a total of " + motd.postCountLimit + " times in total";
             }
         }
 
@@ -277,7 +278,7 @@ namespace SteamBotLite
             public Setter(VBot bot, MotdModule motd) : base(bot, "Setter", motd) { }
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                return "MOTD set by " + motd.setter;
+                return motd.GetName() +" set by " + motd.setter;
             }
         }
         class MOTDITEM

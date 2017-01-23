@@ -29,18 +29,13 @@ namespace SteamBotLite
 
             try
             {
-
                 WebsiteFilesDirectory = config["FilesDirectory"].ToString();
-
-                Console.WriteLine("Directory set to: {0}", WebsiteFilesDirectory);
                 header = System.IO.File.ReadAllText(Path.Combine(WebsiteFilesDirectory, config["HeaderFileName"].ToString()));
-
                 trailer = System.IO.File.ReadAllText(Path.Combine(WebsiteFilesDirectory, config["TrailerFileName"].ToString()));
-
 
                 StartWebServer(config["Address"].ToString());
 
-                //StartWebServer(config["Address"].ToString());
+                bot.HTMLParsers.Add(this);
             }
             catch (Exception exception)
             {

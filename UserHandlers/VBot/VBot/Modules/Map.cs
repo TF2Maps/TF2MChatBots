@@ -51,6 +51,7 @@ namespace SteamBotLite
 
         void MapChange(object sender, NotifyCollectionChangedEventArgs args)
         {
+            
             userhandler.OnMaplistchange(mapList, sender, args);
             ConvertMaplistToTable();
         }
@@ -132,7 +133,7 @@ namespace SteamBotLite
             Map map = mapList.FirstOrDefault(x => x.Filename == args.currentMap);
 
 
-            if (map != null)
+            if (map != null && args.playerCount > 8)
             {
                 ChatroomEntity Submitter = new ChatroomEntity(map.Submitter,ChatroomEntity.Individual.User,null);
                 Console.WriteLine("Found map, sending message to {0}", Submitter);

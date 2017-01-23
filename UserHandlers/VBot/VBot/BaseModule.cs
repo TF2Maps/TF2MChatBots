@@ -38,6 +38,7 @@ namespace SteamBotLite
         public void savePersistentData()
         {
             string jsonData = getPersistentData();
+
             if (Directory.Exists(ModuleSavedDataFilePath()))
             {
                 System.IO.File.WriteAllText(ModuleSavedDataFilePath(), jsonData);

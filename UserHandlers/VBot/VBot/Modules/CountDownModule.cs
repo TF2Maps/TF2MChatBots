@@ -15,7 +15,7 @@ namespace SteamBotLite
 
         public override string GetName()
         {
-            return "!Countdown";
+            return "Countdown";
         }
         public override int DefaultPostCountLimit()
         {
@@ -35,9 +35,9 @@ namespace SteamBotLite
 
                 string hours = (hoursdata.ToString().PadLeft(2, '0'));
                 string minutes = ((postCountLimit - postCount) % 60).ToString().PadLeft(2, '0');
-                message = hours + ":" + minutes;
-
-                userhandler.SetStatusmessageEvent(message);
+                string StatusMessage = hours + ":" + minutes + " " + base.message;
+                
+                userhandler.SetStatusmessageEvent(StatusMessage);
                 
                 postCount++;
                 if (postCount > postCountLimit)

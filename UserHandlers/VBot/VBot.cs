@@ -24,7 +24,7 @@ namespace SteamBotLite
         ImpNaoModule impnaomodule;
         ServerListHolder serverlistmodule;
         CountDownModule countdownmodule;
-         MapWebServer WebServer;
+        MapWebServer WebServer;
 
         public UsersModule usersModule;
 
@@ -44,45 +44,34 @@ namespace SteamBotLite
         /// <param name="SteamConnectionHandler"></param>
         public VBot() 
         {
-            Console.WriteLine("Vbot Initialised");
+            Console.WriteLine("VBot Initialised");
             Console.WriteLine("Loading modules and stuff");
+
             MapChangeEventListiners = new List<ServerMapChangeListiner>();
             HTMLParsers = new List<HTMLFileFromArrayListiners>();
+            
             // loading modules
             WebServer = new MapWebServer(this, jsconfig);
-            HTMLParsers.Add(WebServer);
-
             mapModule = new MapModule(this, jsconfig);
-
             serverlistmodule = new ServerListHolder(this, jsconfig);
-            MapChangeEventListiners.Add(serverlistmodule);
-
             motdModule = new MotdModule(this, jsconfig);
-            
             serverModule = new ServerModule(this, jsconfig);
             usersModule = new UsersModule(this, jsconfig);
             replyModule = new RepliesModule(this, jsconfig);
-            
             searchModule = new SearchModule(this, jsconfig);
             adminmodule = new AdminModule(this, jsconfig);
-
             countdownmodule = new CountDownModule(this, jsconfig);
 
-
             ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule,adminmodule,searchModule, WebServer, serverlistmodule , countdownmodule };
+
             Console.WriteLine("Modules loaded and ModuleList intitialised");
 
-            //We run this to allow the modules to partake in actions requiring all to be loaded
             foreach (BaseModule module in ModuleList)
             {
                 module.OnAllModulesLoaded();
             }
-            
-            
-            
 
             OnMaplistchange(mapModule.mapList);
-
         }
 
         public override void OnLoginCompleted(object sender, EventArgs e)
@@ -137,6 +126,7 @@ namespace SteamBotLite
                 ModuleList.RemoveAt(EntryToRemove);
             }
         }
+
         public void Enablemodule(string ModuleToAdd)
         {
             Type T = Type.GetType("SteamBotLite." + ModuleToAdd); //We attempt to translate the string to an existing type
@@ -204,9 +194,9 @@ namespace SteamBotLite
                // WebServer.MapListUpdate(maplist);
             }
         }
+
         public void ServerUpdated(object sender, ServerModule.ServerInfo args)
         {
-            Console.WriteLine("Entered VBot");
             if (MapChangeEventListiners.Count > 0 )
             {
                 foreach(ServerMapChangeListiner Listiner in MapChangeEventListiners)
