@@ -501,6 +501,7 @@ namespace SteamBotLite
 
         public override void SetStatusMessage(object sender, string message)
         {
+
             var request = new ClientMsgProtobuf<CMsgClientGamesPlayed>(EMsg.ClientGamesPlayed);
 
             var gamePlayed = new CMsgClientGamesPlayed.GamePlayed();

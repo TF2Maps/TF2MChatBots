@@ -8,15 +8,27 @@ using Newtonsoft.Json;
 
 namespace SteamBotLite
 {
-    class AdminModule : BaseModule
+    class AdminModule : BaseModule , OnLoginCompletedListiners
     {
        
-        VBot SteamBot;
+        VBot vbot;
+        string username;
+        string status;
+        bool UseStatus;
 
         public AdminModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
             DeletableModule = false;
-            SteamBot = bot;
+            vbot = bot;
+            
+            username = config["DefaultUsername"].ToString();
+            status = config["DefaultStatus"].ToString();
+            UseStatus = bool.Parse(config["UseStatus"].ToString());
+            loadPersistentData();
+            savePersistentData();
+
+            bot.OnLoginlistiners.Add(this);
+            
             adminCommands.Add(new Reboot(bot, this));
             adminCommands.Add(new Rename(bot, this));
             adminCommands.Add(new RemoveModule(bot, this));
@@ -24,21 +36,35 @@ namespace SteamBotLite
             adminCommands.Add(new GetAllModules(bot, this));
             adminCommands.Add(new Rejoin(bot, this));
             adminCommands.Add(new SetStatusMessage(bot, this));
+            adminCommands.Add(new UnsetStatusMessage(bot, this));
         }
 
         public override string getPersistentData()
         {
-               return "";
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("Username", username);
+            data.Add("Status", status);
+            data.Add("UserStatus", UseStatus.ToString());
+            return JsonConvert.SerializeObject(data);
         }
 
         public override void loadPersistentData()
         {
-            throw new NotImplementedException();
+            try
+            {
+                Dictionary<string, string> data = JsonConvert.DeserializeObject<Dictionary<string, string>>(System.IO.File.ReadAllText(this.GetType().Name + ".json"));
+                username = data["Username"];
+                status = data["Status"];
+            }
+            catch
+            {
+
+            }
         }
 
         public override void OnAllModulesLoaded()
         {
-            foreach(BaseModule module in SteamBot.ModuleList)
+            foreach(BaseModule module in vbot.ModuleList)
             {
                 
                 string[] HeaderNames = { "Command Type", "Command Name" };
@@ -63,24 +89,64 @@ namespace SteamBotLite
                     
                 }
 
-                SteamBot.HTMLFileFromArray(HeaderNames, CommandList, module.GetType().ToString());
+                vbot.HTMLFileFromArray(HeaderNames, CommandList, module.GetType().ToString());
             }
            
+        }
+
+        public void OnLoginCompleted()
+        {
+            if (UseStatus)
+            {
+                vbot.SetStatusmessageEvent(status);
+            }
+            vbot.Username = username;
         }
 
         private class SetStatusMessage : BaseCommand
         {
             // Command to query if a server is active
             VBot bot;
+            AdminModule module;
 
-            public SetStatusMessage(VBot bot, AdminModule module) : base(bot, "!Status")
+            public SetStatusMessage(VBot bot, AdminModule module) : base(bot, "!StatusSet")
             {
+                this.module = module;
                 this.bot = bot;
             }
             protected override string exec(MessageEventArgs Msg, string param)
             {
+                module.status = param;
+                module.UseStatus = true;
+                module.savePersistentData();
                 bot.SetStatusmessageEvent(param);
+                
                 return "Status has been updated";
+            }
+
+            private void Bot_SetStatusmessage(object sender, string e)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        private class UnsetStatusMessage : BaseCommand
+        {
+            // Command to query if a server is active
+            VBot bot;
+            AdminModule module;
+            public UnsetStatusMessage(VBot bot, AdminModule module) : base(bot, "!StatusRemove")
+            {
+                this.module = module;
+                this.bot = bot;
+            }
+            protected override string exec(MessageEventArgs Msg, string param)
+            {
+                module.UseStatus = false;
+                module.savePersistentData();
+                
+                bot.SetStatusmessageEvent(null);
+                return "Status has been removed";
             }
 
             private void Bot_SetStatusmessage(object sender, string e)
@@ -100,7 +166,7 @@ namespace SteamBotLite
             }
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                module.SteamBot.Reboot();
+                module.vbot.Reboot();
                 return "Rebooted";
             }
 
@@ -118,8 +184,8 @@ namespace SteamBotLite
             protected override string exec(MessageEventArgs Msg, string param)
             {
 
-                module.SteamBot.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.LeaveChat);
-                module.SteamBot.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.EnterChat);
+                module.vbot.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.LeaveChat);
+                module.vbot.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.EnterChat);
                 return "Rejoined!";
             }
 
@@ -152,13 +218,18 @@ namespace SteamBotLite
             }
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                string[] command = param.Split(new char[] { ' ' }, 2);
-                if (command.Length > 0)
+
+                if (param.Length > 0)
                 {
-                    module.SteamBot.Username = command[1];
+                    module.vbot.Username = param;
+                    module.username = param;
+                    module.savePersistentData();
                     return "Renamed";
                 }
-                return "There was an error with that name";
+                else
+                {
+                    return "There was no name!";
+                }
             }
 
         }

@@ -49,7 +49,7 @@ namespace SteamBotLite
 
             MapChangeEventListiners = new List<ServerMapChangeListiner>();
             HTMLParsers = new List<HTMLFileFromArrayListiners>();
-            
+            OnLoginlistiners = new List<OnLoginCompletedListiners>();
             // loading modules
             WebServer = new MapWebServer(this, jsconfig);
             mapModule = new MapModule(this, jsconfig);
@@ -74,12 +74,19 @@ namespace SteamBotLite
             OnMaplistchange(mapModule.mapList);
         }
 
+
+        public List<OnLoginCompletedListiners> OnLoginlistiners;
+
         public override void OnLoginCompleted(object sender, EventArgs e)
         {
             if (Autojoin)
                 {
                     base.FireMainChatRoomEvent(ChatroomEventEnum.EnterChat);
                 }
+            foreach (OnLoginCompletedListiners listiner in OnLoginlistiners)
+            {
+                listiner.OnLoginCompleted();
+            }
             Console.WriteLine("UserHandler: {0} Has Loaded", this.GetType());
         }
 
@@ -100,8 +107,6 @@ namespace SteamBotLite
             if (e.ReplyMessage != null)
             {
                 e.InterfaceHandlerDestination.SendChatRoomMessage(this, e);
-                //AppInterface.SendChatRoomMessage(this, e);
-                //base.SendChatRoomMessageProcessEvent(e);
             }
         }
 
