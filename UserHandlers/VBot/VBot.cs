@@ -230,5 +230,10 @@ namespace SteamBotLite
         {
             return usersModule.admincheck(user);
         }
+
+        public void AddMapChangeEventListiner(ServerMapChangeListiner listiner)
+        {
+            MapChangeEventListiners.Add(listiner);
+        }
     }
 }

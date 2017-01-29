@@ -26,6 +26,10 @@ namespace SteamBotLite
         {
         }
 
+        void ModuleHandler.AddMapChangeEventListiner(ServerMapChangeListiner listiner)
+        {
+        }
+
         bool ModuleHandler.admincheck(ChatroomEntity user)
         {
             return false;

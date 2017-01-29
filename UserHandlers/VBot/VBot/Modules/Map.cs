@@ -40,8 +40,7 @@ namespace SteamBotLite
             adminCommands.Add(new Insert(bot, this));
             adminCommands.Add(new Reposition(bot, this));
             adminCommands.Add(new Wipe(bot, this));
-
-           // bot.MapChangeEventListiners.Add(this);
+            bot.AddMapChangeEventListiner(this);
         }
 
         public override void OnAllModulesLoaded()
@@ -230,6 +229,9 @@ namespace SteamBotLite
 
             protected override string exec(MessageEventArgs Msg, string param)
             {
+                param = BaseCommand.RemoveWhiteSpacesFromString(param);
+                Console.WriteLine(param);
+
                 string[] parameters = param.Split(new char[] { ' ' }, 2);
 
                 Map map = new Map();
@@ -594,7 +596,7 @@ namespace SteamBotLite
         }
 
 
-        void ClearMapListWithMessage(string message)
+        public void ClearMapListWithMessage(string message)
         {
             ObservableCollection<Map> TempMapList = new ObservableCollection<Map>();
 
@@ -606,6 +608,7 @@ namespace SteamBotLite
                 userhandler.SendPrivateMessageProcessEvent(Msg);
                 mapList.RemoveAt(0);
             };
+            savePersistentData();
         }
     }
 }

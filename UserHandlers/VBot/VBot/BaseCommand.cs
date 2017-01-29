@@ -22,13 +22,12 @@ namespace SteamBotLite
         {
             string param = "";
             string[] command = message.Split(new char[] { ' ' }, 2);
+
+            param = command[0].Trim();
+
             if (command.Length > 1)
             {
                 param = command[1].Trim();
-            }
-            else
-            {
-                param = command[0].Trim();
             }
 
             return exec(Msg, param);
@@ -55,6 +54,26 @@ namespace SteamBotLite
         protected virtual string exec(MessageEventArgs Msg, string param)
         {
             return null;
+        }
+
+        public static string RemoveWhiteSpacesFromString (string param)
+        {
+            string[] command = param.Split(new char[] { ' ' });
+
+            string returnstring = "";
+
+            for (int i = 0; i < command.Length; i++)
+            {
+                returnstring += command[i].Trim();
+
+                if (command[i].Trim().Length > 0 & i + 1 != command.Length) //We add an extra space if the string isn't empty and not the last string
+                {
+                    returnstring += " ";
+                }
+            }
+
+            return returnstring;
+
         }
     }
 }
