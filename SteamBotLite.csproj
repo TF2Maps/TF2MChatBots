@@ -105,7 +105,7 @@
     <Compile Include="UserHandlers\VBot\VBot\BaseModule.cs" />
     <Compile Include="UserHandlers\VBot\VBot\BaseTask.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\ImpNaoModule.cs" />
-    <Compile Include="UserHandlers\VBot\VBot\Modules\Map.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MapModule.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\Motd.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\AdminModule.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\Replies.cs" />

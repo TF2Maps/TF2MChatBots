@@ -36,11 +36,35 @@ namespace SteamBotLite
             commands.Add(new Update(bot, this));
             commands.Add(new UpdateName(bot, this));
             commands.Add(new Delete(bot, this));
-            commands.Add(new UploadCheck(bot, ServerMapListUrl));
+            commands.Add(new UploadCheck(bot, this));
             adminCommands.Add(new Insert(bot, this));
             adminCommands.Add(new Reposition(bot, this));
             adminCommands.Add(new Wipe(bot, this));
             bot.AddMapChangeEventListiner(this);
+        }
+
+        bool CheckIfMapIsUploaded(string filename)
+        {
+            if (SubstitutingWebPage)
+            {
+                return (MapListUploadCheck.Contains(filename));
+            }
+            else
+            {
+                return SearchClass.CheckDataExistsOnWebPage(ServerMapListUrl, filename);
+            }
+        }
+
+
+        //This exists for testing purposes, Allowing us to emulate a webpage being returned
+
+        bool SubstitutingWebPage = false;
+        string MapListUploadCheck; 
+
+        public void SubstituteWebPageWithString (string data)
+        {
+            SubstitutingWebPage = true;
+            MapListUploadCheck = data;
         }
 
         public override void OnAllModulesLoaded()
@@ -187,16 +211,14 @@ namespace SteamBotLite
             }
         }
 
-        private sealed class UploadCheck : BaseCommand
+        private sealed class UploadCheck : MapCommand
         {
-            string ServerMapListURL;
-            public UploadCheck(ModuleHandler bot, string Website) : base(bot, "!uploadcheck")
-            {
-                ServerMapListURL = Website;
-            }
+            public UploadCheck(ModuleHandler bot, MapModule mapModule) : base(bot, "!uploadcheck", mapModule)
+            {}
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                return SearchClass.CheckDataExistsOnWebPage(ServerMapListURL, param).ToString();
+                return MapModule.CheckIfMapIsUploaded(param).ToString();
             }
         }
 
@@ -220,16 +242,13 @@ namespace SteamBotLite
         private class Add : MapCommand
         {
 
-            public bool uploadcheck(string filename, string Website)
-            {
-                return SearchClass.CheckDataExistsOnWebPage(Website, filename); //TODO develop method to check website
-            }
-
+            
             public Add(ModuleHandler bot, MapModule mapModule) : base(bot, "!add", mapModule) { }
 
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 param = BaseCommand.RemoveWhiteSpacesFromString(param);
+
                 Console.WriteLine(param);
 
                 string[] parameters = param.Split(new char[] { ' ' }, 2);
@@ -257,7 +276,7 @@ namespace SteamBotLite
                     return "Invalid parameters for !add. Syntax: !add <filename> <url> <notes>";
                 }
 
-                if (uploadcheck(map.Filename, MapModule.ServerMapListUrl)) //Check if the map is uploaded
+                if (MapModule.CheckIfMapIsUploaded(map.Filename)) //Check if the map is uploaded
                 {
                     map.DownloadURL = "Uploaded";
                     if (parameters.Length > 1)
@@ -306,10 +325,7 @@ namespace SteamBotLite
         private class Insert : MapCommand
         {
 
-            public bool uploadcheck(string filename, string Website)
-            {
-                return SearchClass.CheckDataExistsOnWebPage(Website, filename); //TODO develop method to check website
-            }
+            
 
             public Insert(ModuleHandler bot, MapModule mapModule) : base(bot, "!insert", mapModule) { }
 
@@ -348,7 +364,7 @@ namespace SteamBotLite
 
                 map.Notes = string.Format("Inserted in position {0} by {1} //", index, msg.Sender.identifier.ToString());
 
-                if (uploadcheck(map.Filename, MapModule.ServerMapListUrl)) //Check if the map is uploaded
+                if (MapModule.CheckIfMapIsUploaded(map.Filename)) //Check if the map is uploaded
                 {
                     map.DownloadURL = "Uploaded";
                     if (parameters.Length > 1)
@@ -522,6 +538,7 @@ namespace SteamBotLite
                     if (MapExists)
                     {
                         MapModule.mapList[Index].Filename = parameters[1];
+
                         if (parameters.Length > 2)
                         {
                             MapModule.mapList[Index].DownloadURL = parameters[2];
