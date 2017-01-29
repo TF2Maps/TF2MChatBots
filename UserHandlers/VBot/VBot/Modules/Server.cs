@@ -11,7 +11,7 @@ using System.IO;
 
 namespace SteamBotLite
 {
-    class ServerModule : BaseModule
+    public class ServerModule : BaseModule
     {
         public event EventHandler<ServerInfo> ServerMapChanged;
 
@@ -70,7 +70,7 @@ namespace SteamBotLite
         }
 
 
-        public ServerModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
+        public ServerModule(VBot bot, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
 
             Bot = bot;

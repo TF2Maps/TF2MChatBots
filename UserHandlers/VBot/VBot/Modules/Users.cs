@@ -9,14 +9,14 @@ using Newtonsoft.Json;
 
 namespace SteamBotLite
 {
-    class UsersModule : BaseModule
+    public class UsersModule : BaseModule
     {
         public List<string> admins = new List<string>();
         public List<string> bans = new List<string>();
 
         
 
-        public UsersModule(VBot bot, Dictionary<string, object> config) : base(bot, config)
+        public UsersModule(VBot bot, Dictionary<string, Dictionary<string, object>> config) : base(bot, config)
         {
             DeletableModule = false;
             loadPersistentData();

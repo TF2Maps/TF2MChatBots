@@ -11,7 +11,7 @@ namespace SteamBotLite
 {
     class CountDownModule : MotdModule
     {
-        public CountDownModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig){ }
+        public CountDownModule(VBot bot, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig){ }
 
         public override string GetName()
         {

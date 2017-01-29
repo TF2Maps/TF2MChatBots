@@ -8,12 +8,12 @@ using SteamKit2;
 
 namespace SteamBotLite
 {
-    abstract class BaseCommand
+    public abstract class BaseCommand
     {
         public String command { get; protected set; }
-        protected VBot userhandler;
+        protected ModuleHandler userhandler;
         
-        public BaseCommand(VBot bot, string command)
+        public BaseCommand(ModuleHandler bot, string command)
         {
             this.userhandler = bot;
             this.command = command;

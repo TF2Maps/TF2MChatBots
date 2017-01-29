@@ -96,6 +96,7 @@
     <Compile Include="UserHandlers\VBot\OnLoginCompletedListiners.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Interfaces\HTMLFileFromArray.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Interfaces\Interface1.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\ModuleHandler.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\CountDownModule.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\MapWebServer.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\SearchClass.cs" />

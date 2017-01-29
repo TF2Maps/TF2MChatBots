@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SteamBotLite
 {
-    interface ServerMapChangeListiner
+    public interface ServerMapChangeListiner
     {
         void OnMapChange(ServerModule.ServerInfo args);
     }

@@ -16,7 +16,7 @@ namespace SteamBotLite
         string status;
         bool UseStatus;
 
-        public AdminModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
+        public AdminModule(VBot bot, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
             DeletableModule = false;
             vbot = bot;

@@ -31,7 +31,7 @@ namespace SteamBotLite
 
         private BaseTask motdPost;
 
-        public MotdModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
+        public MotdModule(VBot bot, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
             // loading config 
             int updateInterval = int.Parse(config["updateInterval"].ToString());

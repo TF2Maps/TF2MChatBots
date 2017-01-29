@@ -8,31 +8,43 @@ using Newtonsoft.Json;
 
 namespace SteamBotLite
 {
-    abstract class BaseModule
+    public abstract class BaseModule
     {
         public List<BaseCommand> commands {get; private set;}
         public List<BaseCommand> adminCommands {get; private set;}
         public List<BaseTask> tasks { get; private set;}
+
         public string ModuleSavedDataFilePath()
         {
-          //  Console.WriteLine("Path: {0}", Path.Combine(userhandler.GetType().Name, this.GetType().Name + ".json"));
             return Path.Combine(userhandler.GetType().Name, this.GetType().Name + ".json");
         }
         
-        protected VBot userhandler;
+        protected ModuleHandler userhandler;
 
         public bool DeletableModule = true;
 
-        private Dictionary<string, object> ConfigFilePath = JsonConvert.DeserializeObject<Dictionary<string, object>>(System.IO.File.ReadAllText(@"config.json"));
+        
         public Dictionary<string, object> config;
 
-        public BaseModule(VBot bot, Dictionary<string, object> Jsconfig)
+        public BaseModule(ModuleHandler bot, Dictionary<string, Dictionary<string,object>> Jsconfig)
         {
             this.config = JsonConvert.DeserializeObject<Dictionary<string, object>>(Jsconfig[this.GetType().Name].ToString());
-            this.userhandler = bot;            
+            LoadDependencies(bot);
+        }
+
+        public BaseModule(ModuleHandler bot, Dictionary<string, object> Jsconfig)
+        {
+            this.config = (Dictionary<string, object>)Jsconfig;
+            LoadDependencies(bot);
+        }
+
+        void LoadDependencies (ModuleHandler bot)
+        {
+            this.userhandler = bot;
             commands = new List<BaseCommand>();
             adminCommands = new List<BaseCommand>();
             tasks = new List<BaseTask>();
+
         }
 
         public void savePersistentData()

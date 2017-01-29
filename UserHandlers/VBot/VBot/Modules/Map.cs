@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace SteamBotLite
 {
-    class MapModule : BaseModule , ServerMapChangeListiner
+    public class MapModule : BaseModule , ServerMapChangeListiner
     {
         // public List<Map> mapList = new List<Map>();  //OLD MAP SYSTEM
         public ObservableCollection<Map> mapList = new ObservableCollection<Map>();
@@ -18,7 +18,7 @@ namespace SteamBotLite
 
 
 
-        public MapModule(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
+        public MapModule(ModuleHandler bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
 
             loadPersistentData();
@@ -41,7 +41,7 @@ namespace SteamBotLite
             adminCommands.Add(new Reposition(bot, this));
             adminCommands.Add(new Wipe(bot, this));
 
-            bot.MapChangeEventListiners.Add(this);
+           // bot.MapChangeEventListiners.Add(this);
         }
 
         public override void OnAllModulesLoaded()
@@ -65,6 +65,8 @@ namespace SteamBotLite
                 string[] Data = new string[] { entry.Filename, entry.DownloadURL, entry.Notes, entry.SubmitterName };
                 DataEntries.Add(Data);
             }
+
+
             userhandler.HTMLFileFromArray(HeaderNames, DataEntries, "CurrentMaps");
 
         }
@@ -76,7 +78,7 @@ namespace SteamBotLite
 
             public string DownloadURL { get; set; }
             public string Notes { get; set; }
-
+            public bool Uploaded { get; set; }
             int MaxCharacters = 27;
             private string filename;
 
@@ -152,17 +154,44 @@ namespace SteamBotLite
         {
             protected MapModule MapModule;
 
-            public MapCommand(VBot bot, string command, MapModule mapMod)
+            public MapCommand(ModuleHandler bot, string command, MapModule mapMod)
                 : base(bot, command)
             {
                 this.MapModule = mapMod;
+            }
+            Map ParseStringToMap(string message)
+            {
+                string[] parameters = message.Split(new char[] { ' ' }, 2);
+                string trailer = parameters[1];
+
+                Map map = new Map();
+                map.Filename = parameters[0];
+
+                if (MapIsUploadedToWebsite(map.Filename, MapModule.ServerMapListUrl)){
+                    map.Uploaded = true;
+                }
+                else{
+                    string[] TrailerSplitByFirstWord = trailer.Split(new char[] { ' ' }, 2);
+
+                    map.DownloadURL = TrailerSplitByFirstWord[0];
+
+                    trailer = TrailerSplitByFirstWord[1];
+                }
+                map.Notes = trailer;
+
+                return map; 
+            }
+
+            public bool MapIsUploadedToWebsite(string filename, string Website)
+            {
+                return SearchClass.CheckDataExistsOnWebPage(Website, filename); //TODO develop method to check website
             }
         }
 
         private sealed class UploadCheck : BaseCommand
         {
             string ServerMapListURL;
-            public UploadCheck(VBot bot, string Website) : base(bot, "!uploadcheck")
+            public UploadCheck(ModuleHandler bot, string Website) : base(bot, "!uploadcheck")
             {
                 ServerMapListURL = Website;
             }
@@ -175,7 +204,7 @@ namespace SteamBotLite
         private sealed class UpdateName : BaseCommand
         {
             MapModule mapmodule;
-            public UpdateName(VBot bot, MapModule module) : base(bot, "!nameupdate")
+            public UpdateName(ModuleHandler bot, MapModule module) : base(bot, "!nameupdate")
             {
                 mapmodule = module;
             }
@@ -197,7 +226,7 @@ namespace SteamBotLite
                 return SearchClass.CheckDataExistsOnWebPage(Website, filename); //TODO develop method to check website
             }
 
-            public Add(VBot bot, MapModule mapModule) : base(bot, "!add", mapModule) { }
+            public Add(ModuleHandler bot, MapModule mapModule) : base(bot, "!add", mapModule) { }
 
             protected override string exec(MessageEventArgs Msg, string param)
             {
@@ -280,7 +309,7 @@ namespace SteamBotLite
                 return SearchClass.CheckDataExistsOnWebPage(Website, filename); //TODO develop method to check website
             }
 
-            public Insert(VBot bot, MapModule mapModule) : base(bot, "!insert", mapModule) { }
+            public Insert(ModuleHandler bot, MapModule mapModule) : base(bot, "!insert", mapModule) { }
 
             protected override string exec(MessageEventArgs msg, string param)
             {
@@ -352,7 +381,7 @@ namespace SteamBotLite
 
         private class Maps : MapCommand
         {
-            public Maps(VBot bot, MapModule mapMod) : base(bot, "!maps", mapMod) { }
+            public Maps(ModuleHandler bot, MapModule mapMod) : base(bot, "!maps", mapMod) { }
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 var maps = MapModule.mapList;
@@ -410,7 +439,7 @@ namespace SteamBotLite
 
         private class Reposition : MapCommand
         {
-            public Reposition(VBot bot, MapModule mapMod) : base(bot, "!reposition", mapMod) { }
+            public Reposition(ModuleHandler bot, MapModule mapMod) : base(bot, "!reposition", mapMod) { }
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 string[] parameters = param.Split(' ');
@@ -444,7 +473,7 @@ namespace SteamBotLite
 
 
                     // Map editedMap = MapModule.mapList.Find(map => map.filename.Equals(parameters[0])); //OLD Map CODE
-                    if (editedMap.Submitter.Equals(Msg.Sender.identifier.ToString()) | (userhandler.usersModule.admincheck(Msg.Sender)))
+                    if (editedMap.Submitter.Equals(Msg.Sender.identifier.ToString()) | (userhandler.admincheck(Msg.Sender)))
                     {
                         MapModule.mapList.Remove(editedMap);
                         editedMap.Notes += string.Format("Map repositioned to {0} by {1} // ", index, Msg.Sender.identifier.ToString());
@@ -463,7 +492,7 @@ namespace SteamBotLite
 
         private class Update : MapCommand
         {
-            public Update(VBot bot, MapModule mapMod) : base(bot, "!update", mapMod) { }
+            public Update(ModuleHandler bot, MapModule mapMod) : base(bot, "!update", mapMod) { }
             protected override string exec(MessageEventArgs msg, string param)
             {
                 string[] parameters = param.Split(' ');
@@ -478,7 +507,7 @@ namespace SteamBotLite
                     bool MapExists = false;
                     foreach (Map Entry in MapModule.mapList)
                     {
-                        if (Entry.Filename.Equals(parameters[0]) && (Entry.Submitter.ToString().Equals(msg.Sender.identifier.ToString()) | (userhandler.usersModule.admincheck(msg.Sender))))
+                        if (Entry.Filename.Equals(parameters[0]) && (Entry.Submitter.ToString().Equals(msg.Sender.identifier.ToString()) | (userhandler.admincheck(msg.Sender))))
                         {
                             MapExists = true;
                             break;
@@ -509,7 +538,7 @@ namespace SteamBotLite
 
         private class Delete : MapCommand
         {
-            public Delete(VBot bot, MapModule mapMod) : base(bot, "!delete", mapMod) { }
+            public Delete(ModuleHandler bot, MapModule mapMod) : base(bot, "!delete", mapMod) { }
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 string[] parameters = param.Split(' ');
@@ -524,7 +553,7 @@ namespace SteamBotLite
                     }
                     else
                     {
-                        if ((deletedMap.Submitter.Equals(Msg.Sender.identifier.ToString())) || (userhandler.usersModule.admincheck(Msg.Sender)))
+                        if ((deletedMap.Submitter.Equals(Msg.Sender.identifier.ToString())) || (userhandler.admincheck(Msg.Sender)))
                         {
                             MapModule.mapList.Remove(deletedMap);
                             MapModule.savePersistentData();
@@ -545,7 +574,7 @@ namespace SteamBotLite
         private class Wipe : MapCommand
         {
             MapModule module;
-            public Wipe(VBot bot, MapModule mapMod) : base(bot, "!wipe", mapMod)
+            public Wipe(ModuleHandler bot, MapModule mapMod) : base(bot, "!wipe", mapMod)
             {
                 module = mapMod;
             }

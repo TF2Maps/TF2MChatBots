@@ -7,7 +7,7 @@ using System.Collections.ObjectModel;
 
 namespace SteamBotLite
 {
-    class VBot : UserHandler , HTMLFileFromArrayListiners
+    public class VBot : UserHandler , HTMLFileFromArrayListiners , ModuleHandler
     {
         
         public string Username = "V2Bot";
@@ -16,7 +16,7 @@ namespace SteamBotLite
 
         // Class members
         MotdModule motdModule;
-        MapModule mapModule;
+        public MapModule mapModule;
         ServerModule serverModule;
         RepliesModule replyModule;
         AdminModule adminmodule;
@@ -32,11 +32,11 @@ namespace SteamBotLite
 
         public List<HTMLFileFromArrayListiners> HTMLParsers;
 
-        public List<BaseCommand> chatCommands = new List<BaseCommand>();
-        public List<BaseCommand> chatAdminCommands = new List<BaseCommand>();
+        List<BaseCommand> chatCommands = new List<BaseCommand>();
+        List<BaseCommand> chatAdminCommands = new List<BaseCommand>();
         public List<ServerMapChangeListiner> MapChangeEventListiners = new List<ServerMapChangeListiner>();
         // Loading Config
-        Dictionary<string, object> jsconfig = JsonConvert.DeserializeObject<Dictionary<string, object>>(System.IO.File.ReadAllText(@"config.json"));
+        Dictionary<string, Dictionary<string,object>> jsconfig = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string,object>>>(System.IO.File.ReadAllText(@"config.json"));
 
         /// <summary>
         /// Do not try using steamfriends, steamuser and all that since it'll be uninitialised at this point 
@@ -52,7 +52,9 @@ namespace SteamBotLite
             OnLoginlistiners = new List<OnLoginCompletedListiners>();
             // loading modules
             WebServer = new MapWebServer(this, jsconfig);
-            mapModule = new MapModule(this, jsconfig);
+
+            mapModule = new MapModule(this, jsconfig[mapModule.GetType().ToString()]);
+
             serverlistmodule = new ServerListHolder(this, jsconfig);
             motdModule = new MotdModule(this, jsconfig);
             serverModule = new ServerModule(this, jsconfig);
@@ -222,6 +224,11 @@ namespace SteamBotLite
             {
                 Listiner.HTMLFileFromArray(Headernames, Data, TableKey);
             }
+        }
+
+        public bool admincheck(ChatroomEntity user)
+        {
+            return usersModule.admincheck(user);
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Timers;
 
 namespace SteamBotLite
 {
-    class BaseTask
+    public class BaseTask
     {
         Timer timer;
         public BaseTask(int delay, ElapsedEventHandler e)

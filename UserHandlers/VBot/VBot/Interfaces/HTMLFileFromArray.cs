@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SteamBotLite
 {
-    interface HTMLFileFromArrayListiners
+    public interface HTMLFileFromArrayListiners
     {
         void HTMLFileFromArray(string[] Headernames, List<string[]> Data, string TableKey);
     }
