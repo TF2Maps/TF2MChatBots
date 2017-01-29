@@ -53,7 +53,7 @@ namespace MapModuleTests
         [TestInitialize()]
         public void Initialize()
         {
-        //    module = new MapModule(new TestUserHandler(), MakeConfig());
+            module = new MapModule(new TestUserHandler(), MakeConfig());
         }
 
         // Use TestCleanup to run code after each test has run
@@ -73,7 +73,7 @@ namespace MapModuleTests
             Message.ReceivedMessage = AddCommand  +" "+  Mapname  +" "+  url +" "+  notes;
             Message.Sender = TestUser;
 
-            FireCommand(Message , module);
+            Console.WriteLine(FireCommand(Message , module));
 
             MapModule.Map TestMap = module.mapList[0];
             

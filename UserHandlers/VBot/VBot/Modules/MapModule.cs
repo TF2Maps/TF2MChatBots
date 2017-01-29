@@ -16,8 +16,6 @@ namespace SteamBotLite
         int MaxMapNumber = 10;
         string ServerMapListUrl;
 
-
-
         public MapModule(ModuleHandler bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
 
@@ -72,9 +70,73 @@ namespace SteamBotLite
 
         }
 
+        class MapValidityCheck {
+            public bool IsValid = true;
+            public string ReturnMessage;
+
+            public void SetInvalid(string message) {
+                IsValid = false;
+                ReturnMessage = message;
+            }
+        }
+
+        string AddMapToList (Map map)
+        {
+            MapValidityCheck MapCheck = CheckIfValid(map);
+
+            if (MapCheck.IsValid) {
+                mapList.Add(map);
+                Console.WriteLine("Added map?");
+                savePersistentData();
+                return string.Format("{0} Has been added to the list!", map.Filename);
+            }
+            else {
+                return MapCheck.ReturnMessage;
+            }
+        }
+
+        
+        private MapValidityCheck CheckIfValid(Map map)
+        {
+
+            MapValidityCheck ValidityCheck = new MapValidityCheck();
+
+            try
+            {
+
+                if (map.Uploaded == true ) { }
+                else {
+                    if (map.DownloadURL != null & map.DownloadURL.StartsWith("http", StringComparison.OrdinalIgnoreCase)) { }
+                    else {
+                        throw new ArgumentException("Map isn't uploaded");
+                    }
+                }
+
+                if (map.Filename.Any(c => char.IsUpper(c))) {
+                    throw new ArgumentException("It includes an uppercase letter");
+                }
+
+                if (map.Filename.Length > 27) {
+                    throw new ArgumentException("It includes too many characters: " + "27");
+                }
+
+                if (mapList.Any(m => m.Filename.Equals(map.Filename))) {
+                    throw new ArgumentException("Your map has been rejected as it already exists in the map list!");
+                }
+            }
+            catch (ArgumentException ex) {
+                ValidityCheck.SetInvalid(ex.Message);
+            }
+            catch (NullReferenceException ex)
+            {
+                throw new ArgumentException("Map isn't uploaded");
+            }
+
+            return ValidityCheck;
+        }
+
         void MapChange(object sender, NotifyCollectionChangedEventArgs args)
         {
-            
             userhandler.OnMaplistchange(mapList, sender, args);
             ConvertMaplistToTable();
         }
@@ -101,30 +163,7 @@ namespace SteamBotLite
             public bool Uploaded { get; set; }
             int MaxCharacters = 27;
             private string filename;
-
-
-
-            public string Filename
-            {
-                get
-                {
-                    return filename;
-                }
-                set
-                {
-                    if (value.Length > MaxCharacters)
-                    {
-                        throw new ArgumentException("It includes too many characters: " + MaxCharacters);
-                    }
-
-                    if (value.Any(c => char.IsUpper(c)))
-                    {
-                        throw new ArgumentException("It includes an uppercase letter");
-                    }
-
-                    filename = value;
-                }
-            }
+            public string Filename { get; set; }
         }
 
 
@@ -180,24 +219,40 @@ namespace SteamBotLite
                 this.MapModule = mapMod;
             }
 
+            public Map CleanupAndParseMsgToMap (MessageEventArgs Msg , string param)
+            {
+                string message = RemoveWhiteSpacesFromString(param);
 
-            Map ParseStringToMap(string message)
+                Map map = ParseStringToMap(message);
+                map.Submitter = Msg.Sender.identifier;
+                map.SubmitterName = Msg.Sender.DisplayName;
+
+                return map;
+            }
+
+            public Map ParseStringToMap(string message)
             {
                 string[] parameters = message.Split(new char[] { ' ' }, 2);
-                string trailer = parameters[1];
+                string trailer = "";
+
+                if (parameters.Length > 1) {
+                    trailer = parameters[1];
+                }
 
                 Map map = new Map();
                 map.Filename = parameters[0];
 
-                if (MapIsUploadedToWebsite(map.Filename, MapModule.ServerMapListUrl)){
+                if (MapIsUploadedToWebsite(map.Filename)){
                     map.Uploaded = true;
                 }
-                else{
+                else {
                     string[] TrailerSplitByFirstWord = trailer.Split(new char[] { ' ' }, 2);
 
                     map.DownloadURL = TrailerSplitByFirstWord[0];
 
-                    trailer = TrailerSplitByFirstWord[1];
+                    if (TrailerSplitByFirstWord.Length > 1) {
+                        trailer = TrailerSplitByFirstWord[1];
+                    }
                 }
 
                 map.Notes = trailer;
@@ -205,9 +260,9 @@ namespace SteamBotLite
                 return map; 
             }
 
-            public bool MapIsUploadedToWebsite(string filename, string Website)
+            public bool MapIsUploadedToWebsite(string filename)
             {
-                return SearchClass.CheckDataExistsOnWebPage(Website, filename); //TODO develop method to check website
+                return MapModule.CheckIfMapIsUploaded(filename);
             }
         }
 
@@ -247,78 +302,15 @@ namespace SteamBotLite
 
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                param = BaseCommand.RemoveWhiteSpacesFromString(param);
+                Map UserMap = CleanupAndParseMsgToMap(Msg , param);
+                UserMap.Submitter = Msg.Sender.identifier;
 
-                Console.WriteLine(param);
+                string Reply =  MapModule.AddMapToList(UserMap);
 
-                string[] parameters = param.Split(new char[] { ' ' }, 2);
+                MapModule.savePersistentData();
 
-                Map map = new Map();
-                map.Submitter = Msg.Sender.identifier.ToString();
+                return Reply;
 
-                map.SubmitterName = Msg.Sender.DisplayName;
-
-                try
-                {
-                    map.Filename = parameters[0];
-                }
-                catch (Exception exception)
-                {
-                    return string.Format("Your map is rejected because: {0}", exception.Message);
-                }
-
-                map.Filename = parameters[0];
-                map.Notes = "";
-
-
-                if (parameters[0].Length == 0)
-                {
-                    return "Invalid parameters for !add. Syntax: !add <filename> <url> <notes>";
-                }
-
-                if (MapModule.CheckIfMapIsUploaded(map.Filename)) //Check if the map is uploaded
-                {
-                    map.DownloadURL = "Uploaded";
-                    if (parameters.Length > 1)
-                    {
-                        map.Notes = parameters.Last();
-                    }
-                }
-                else if (parameters.Length > 1) //If its not uploaded check if a URL was there
-                {
-                    parameters = param.Split(new char[] { ' ' }, 3);
-
-                    map.DownloadURL = parameters[1];
-                    
-                    if (!map.DownloadURL.StartsWith("http", StringComparison.OrdinalIgnoreCase))
-                    {
-                        return "Your map is not uploaded and your download URL is invalid!";
-                    }
-
-                    if (parameters.Length > 2)
-                    {
-                        map.Notes = parameters.Last();
-                    }
-                }
-                else
-                {
-                    return "Your map isn't uploaded! Please use include the url with the syntax: !add <filename> <url> (notes)";
-                }
-
-                if (MapModule.mapList.Any(m => m.Filename.Equals(map.Filename)))
-                {
-                    return "Your map has been rejected as it already exists in the map list!";
-                }
-
-                else
-
-                {
-                    MapModule.mapList.Add(map);
-                    MapModule.savePersistentData();
-
-                    string Reply = string.Format("'{0}' is now on the list.", map.Filename);
-                    return Reply;
-                }
             }
         }
 

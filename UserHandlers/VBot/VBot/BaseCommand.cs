@@ -61,12 +61,12 @@ namespace SteamBotLite
             string[] command = param.Split(new char[] { ' ' });
 
             string returnstring = "";
-
+            
             for (int i = 0; i < command.Length; i++)
             {
                 returnstring += command[i].Trim();
 
-                if (command[i].Trim().Length > 0 & i + 1 != command.Length) //We add an extra space if the string isn't empty and not the last string
+                if (command[i].Length > 0 & i + 1 != command.Length) //We add an extra space if the string isn't empty and not the last string
                 {
                     returnstring += " ";
                 }

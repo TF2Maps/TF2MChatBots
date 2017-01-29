@@ -73,7 +73,7 @@ namespace SteamBotLite
                 module.OnAllModulesLoaded();
             }
 
-            OnMaplistchange(mapModule.mapList);
+          //  OnMaplistchange(mapModule.mapList);
         }
 
 
