@@ -88,10 +88,7 @@ namespace SteamBotLite
                 string[] Data = new string[] { entry.Filename, entry.DownloadURL, entry.Notes, entry.SubmitterName };
                 DataEntries.Add(Data);
             }
-
-
             userhandler.HTMLFileFromArray(HeaderNames, DataEntries, "CurrentMaps");
-
         }
 
         public class Map
@@ -182,6 +179,8 @@ namespace SteamBotLite
             {
                 this.MapModule = mapMod;
             }
+
+
             Map ParseStringToMap(string message)
             {
                 string[] parameters = message.Split(new char[] { ' ' }, 2);
@@ -200,6 +199,7 @@ namespace SteamBotLite
 
                     trailer = TrailerSplitByFirstWord[1];
                 }
+
                 map.Notes = trailer;
 
                 return map; 

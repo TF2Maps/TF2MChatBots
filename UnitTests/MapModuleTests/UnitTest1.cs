@@ -85,6 +85,8 @@ namespace MapModuleTests
             Assert.AreNotEqual(TestMap.Filename, Mapname + 1); //Ensure that its a string check
         }
 
+
+
         [TestMethod]
         public void DeleteMap()
         {
@@ -271,6 +273,26 @@ namespace MapModuleTests
             Assert.AreNotEqual(TestMap.Filename, Mapname + 1); //Ensure that its a string check
         }
 
+        [TestMethod]
+        public void UploadedMapAndNote()
+        {
+            module.SubstituteWebPageWithString(Mapname);
+
+            MessageEventArgs Message = new MessageEventArgs(null);
+            Message.ReceivedMessage = AddCommand + " " + Mapname + " " + notes;
+            Message.Sender = TestUser;
+
+            Console.WriteLine(FireCommand(Message, module));
+
+            MapModule.Map TestMap = module.mapList[0];
+
+            Assert.AreEqual(TestMap.Filename, Mapname);
+            Assert.AreEqual(TestMap.Notes, notes);
+            Assert.AreEqual(TestMap.Submitter, identifier);
+
+            Assert.AreNotEqual(TestMap.Filename, Mapname + 1); //Ensure that its a string check
+        }
+
         void AssertMaplistIsEmpty()
         {
             Assert.IsTrue(module.mapList.Count == 0);
@@ -315,7 +337,33 @@ namespace MapModuleTests
             Assert.AreEqual(TestMap.Notes, NewNote);
             Assert.AreEqual(TestMap.Submitter, identifier);
         }
+        [TestMethod]
+        public void UpdateSingleMap()
+        {
+            MessageEventArgs Message = new MessageEventArgs(null);
+            Message.Sender = TestUser;
+            for (int i = 0; i < 3; i++)
+            {
+                Message.ReceivedMessage = AddCommand + " " + Mapname + " " + url + " " + notes;
+                FireCommand(Message, module);
+            }
 
+
+            string NewMapName = "New Map";
+            string NewURL = "HTTP:// NEW URL";
+            string NewNote = "NEW NOTES";
+
+            Message.ReceivedMessage = UpdateCommand + " " + Mapname + 1 + " " + NewMapName + " " + NewURL + " " + NewNote;
+
+            FireCommand(Message, module);
+
+            MapModule.Map TestMap = module.mapList[1];
+
+            Assert.AreEqual(TestMap.Filename, NewMapName);
+            Assert.AreEqual(TestMap.DownloadURL, NewURL);
+            Assert.AreEqual(TestMap.Notes, NewNote);
+            Assert.AreEqual(TestMap.Submitter, identifier);
+        }
 
 
 
