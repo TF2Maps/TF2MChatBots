@@ -65,11 +65,35 @@ namespace SteamBotLite
 
         public ChatroomEntity MainChatRoom;
         public Dictionary<string, object> config;
-        
+
+        public List<string> Whitelist;
+        public List<string> Blacklist;
+        bool WhitelistOnly;
 
         public ApplicationInterface()
         {
             this.config = JsonConvert.DeserializeObject<Dictionary<string, object>>(System.IO.File.ReadAllText(Path.Combine("applicationconfigs" , this.GetType().Name.ToString() + ".json")));
+        
+            Whitelist = JsonConvert.DeserializeObject <List<string>> (config["Whitelist"].ToString());
+            Blacklist = JsonConvert.DeserializeObject<List<string>>(config["BlackList"].ToString());
+            WhitelistOnly = bool.Parse(config["WhitelistOnly"].ToString());
+        }
+
+        public bool CheckEntryValid (string entry)
+        {
+            if (WhitelistOnly) {
+                if (Whitelist.Contains(entry)) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            else if (Blacklist.Contains(entry)) {
+                return false;
+            }
+
+            return true; 
         }
 
 
