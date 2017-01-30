@@ -193,12 +193,12 @@ namespace SteamBotLite
             }
             return response;
         }
-        public void OnMaplistchange(ObservableCollection<MapModule.Map> maplist, object sender = null, NotifyCollectionChangedEventArgs args = null)
+        public void OnMaplistchange(IReadOnlyList<Map> maplist, object sender = null, NotifyCollectionChangedEventArgs args = null)
         {
             base.SetUsernameEventProcess("[" + maplist.Count + "]" + Username);
             if (WebServer != null)
             {
-               // WebServer.MapListUpdate(maplist);
+               WebServer.MapListUpdate(maplist);
             }
         }
 

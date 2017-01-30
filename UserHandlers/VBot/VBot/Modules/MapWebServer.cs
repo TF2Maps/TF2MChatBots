@@ -11,7 +11,7 @@ namespace SteamBotLite
     {
         HttpListener listener;
         MapModule mapmodule;
-        readonly ObservableCollection<MapModule.Map> maplist;
+        IReadOnlyList<Map> maplist;
 
         string responseString = "<HTML><BODY>Website is still initialising</BODY></HTML>";
 
