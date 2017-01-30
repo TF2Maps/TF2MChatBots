@@ -198,7 +198,7 @@ namespace SteamBotLite
             base.SetUsernameEventProcess("[" + maplist.Count + "]" + Username);
             if (WebServer != null)
             {
-               WebServer.MapListUpdate(maplist);
+               //WebServer.MapListUpdate(maplist);
             }
         }
 

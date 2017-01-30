@@ -43,7 +43,7 @@ namespace SteamBotLite
         {
         }
 
-        void ModuleHandler.OnMaplistchange(ObservableCollection<MapModule.Map> mapList, object sender, NotifyCollectionChangedEventArgs args)
+        void ModuleHandler.OnMaplistchange(IReadOnlyList<Map> mapList, object sender, NotifyCollectionChangedEventArgs args)
         {
         }
 

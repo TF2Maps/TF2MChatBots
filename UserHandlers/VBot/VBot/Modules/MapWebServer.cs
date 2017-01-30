@@ -10,8 +10,6 @@ namespace SteamBotLite
     class MapWebServer : BaseModule , HTMLFileFromArrayListiners
     {
         HttpListener listener;
-        MapModule mapmodule;
-        IReadOnlyList<Map> maplist;
 
         string responseString = "<HTML><BODY>Website is still initialising</BODY></HTML>";
 

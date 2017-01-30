@@ -12,7 +12,7 @@ namespace SteamBotLite
     {
         // public List<Map> mapList = new List<Map>();  //OLD MAP SYSTEM
 
-        public MapList mapList;
+        public MapCollection mapList;
 
         int MaxMapNumber = 10;
         string ServerMapListUrl;
@@ -28,6 +28,7 @@ namespace SteamBotLite
 
             userhandler = bot;
             mapList.CollectionChanged += MapChange;
+
             ConvertMaplistToTable();
             commands.Add(new Add(bot, this));
             commands.Add(new Maps(bot, this));
@@ -70,11 +71,9 @@ namespace SteamBotLite
 
         }
 
-
-        
-
         void MapChange(object sender, NotifyCollectionChangedEventArgs args)
         {
+            userhandler.OnMaplistchange(mapList.GetAllMaps(), sender, args);
             ConvertMaplistToTable();
         }
 
@@ -82,6 +81,8 @@ namespace SteamBotLite
         {
             string[] HeaderNames = new string[] { "Filename", "Url", "Notes", "Submitter" };
             List<string[]> DataEntries = new List<string[]>();
+
+            foreach(Map entry in mapList)
             {
                 string[] Data = new string[] { entry.Filename, entry.DownloadURL, entry.Notes, entry.SubmitterName };
                 DataEntries.Add(Data);
@@ -91,7 +92,7 @@ namespace SteamBotLite
 
         public override string getPersistentData()
         {
-            return JsonConvert.SerializeObject(mapList);
+            return JsonConvert.SerializeObject(mapList.GetAllMaps());
         }
 
         public override void loadPersistentData()
@@ -99,10 +100,12 @@ namespace SteamBotLite
             try
             {
                 Console.WriteLine("Loading Map List");
+                mapList = new MapCollection(JsonConvert.DeserializeObject<ObservableCollection<Map>>(System.IO.File.ReadAllText(ModuleSavedDataFilePath())));
                 Console.WriteLine("Loaded Map List");
             }
             catch
             {
+                mapList = new MapCollection(new ObservableCollection<Map>());
                 Console.WriteLine("Error Loading Map List, creating a new one and wiping the old");
             }
         }
@@ -111,18 +114,21 @@ namespace SteamBotLite
         {
             Console.WriteLine("Going to possibly remove {0} Map...", args.currentMap);
 
+            Map map = mapList.GetMapByFilename(args.currentMap);
 
             if (map != null && args.playerCount > 8)
             {
                 ChatroomEntity Submitter = new ChatroomEntity(map.Submitter,ChatroomEntity.Individual.User,null);
                 Console.WriteLine("Found map, sending message to {0}", Submitter);
                 userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = Submitter, ReplyMessage = string.Format("Map {0} is being tested on the {1} server and has been DELETED.", map.Filename, args.tag) });
+                mapList.RemoveMap(map);
                 Console.WriteLine("Map {0} is being tested on the {1} server and has been DELETED.", map.Filename, args.tag);
                 savePersistentData();
             }
             Console.Write("...Not Found");
             return;
         }
+        
 
         abstract public class MapCommand : BaseCommand
         {
@@ -202,6 +208,7 @@ namespace SteamBotLite
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 NotifyCollectionChangedEventArgs args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
+                userhandler.OnMaplistchange(mapmodule.mapList.GetAllMaps(), Msg, args);
                 return "Name has been updated";
             }
         }
@@ -219,6 +226,7 @@ namespace SteamBotLite
                 Map UserMap = CleanupAndParseMsgToMap(Msg , param);
                 UserMap.Submitter = Msg.Sender.identifier;
 
+                string Reply =  MapModule.mapList.AddMap(UserMap);
 
                 MapModule.savePersistentData();
 
@@ -293,6 +301,7 @@ namespace SteamBotLite
                 }
                 string Reply = string.Format("Map '{0}' added.", map.Filename);
 
+                MapModule.mapList.InsertMap(index, map);
 
                 MapModule.savePersistentData();
 
@@ -306,6 +315,7 @@ namespace SteamBotLite
             public Maps(ModuleHandler bot, MapModule mapMod) : base(bot, "!maps", mapMod) { }
             protected override string exec(MessageEventArgs Msg, string param)
             {
+                var maps = MapModule.mapList.GetAllMaps();
                 int maxMaps = MapModule.MaxMapNumber;
                 string chatResponse = "";
                 string pmResponse = "";
@@ -396,7 +406,9 @@ namespace SteamBotLite
                     // Map editedMap = MapModule.mapList.Find(map => map.filename.Equals(parameters[0])); //OLD Map CODE
                     if (editedMap.Submitter.Equals(Msg.Sender.identifier.ToString()) | (userhandler.admincheck(Msg.Sender)))
                     {
+                        MapModule.mapList.RemoveMap(editedMap);
                         editedMap.Notes += string.Format("Map repositioned to {0} by {1} // ", index, Msg.Sender.identifier.ToString());
+                        MapModule.mapList.InsertMap(index, editedMap);
                         MapModule.savePersistentData();
                         return string.Format("Map '{0}' has been repositioned to {1}.", editedMap.Filename, index);
                     }
@@ -414,11 +426,17 @@ namespace SteamBotLite
             public Update(ModuleHandler bot, MapModule mapMod) : base(bot, "!update", mapMod) { }
             protected override string exec(MessageEventArgs msg, string param)
             {
+                //string[] parameters = param.Split(' ');
+                string[] parameters = param.Split(new char[] { ' ' }, 2);
 
+                if (parameters.Length > 1)
                 {
+                    Map NewMapdata = ParseStringToMap(parameters[1]);
+                    return MapModule.mapList.UpdateMap(parameters[0], NewMapdata, msg.Sender);
                 }
                 else
                 {
+                    return string.Format("Invalid parameters for !update. Syntax: !update <Current filename> <New filename> <New Url> <New Notes>");
                 }
             }
         }
@@ -432,6 +450,7 @@ namespace SteamBotLite
 
                 if (parameters.Length > 0)
                 {
+                    Map deletedMap = MapModule.mapList.GetMapByFilename(parameters[0]);
 
                     if (deletedMap == null)
                     {
@@ -441,6 +460,7 @@ namespace SteamBotLite
                     {
                         if ((deletedMap.Submitter.Equals(Msg.Sender.identifier.ToString())) || (userhandler.admincheck(Msg.Sender)))
                         {
+                            MapModule.mapList.RemoveMap(deletedMap);
                             MapModule.savePersistentData();
                             userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = new ChatroomEntity(deletedMap.Submitter,ChatroomEntity.Individual.User,null), ReplyMessage = string.Format("Your map {0} has been deleted from the map list", deletedMap.Filename) });
                             return string.Format("Map '{0}' DELETED.", deletedMap.Filename);
@@ -483,10 +503,13 @@ namespace SteamBotLite
         {
             ObservableCollection<Map> TempMapList = new ObservableCollection<Map>();
 
+            while (mapList.GetSize() > 0)
             {
                 MessageEventArgs Msg = new MessageEventArgs(null);
                 Msg.ReplyMessage = string.Format("Hi, the Maplist has been cleared and your map was removed for the following reason: {0}", message);
+                Msg.Destination = new ChatroomEntity(mapList.GetMap(0).Submitter, ChatroomEntity.Individual.User, null);
                 userhandler.SendPrivateMessageProcessEvent(Msg);
+                mapList.RemoveMap(0);
             };
             savePersistentData();
         }

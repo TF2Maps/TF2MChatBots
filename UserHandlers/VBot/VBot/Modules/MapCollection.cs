@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SteamBotLite
 {
-    public class MapList
+    public class MapCollection
     {
         /// <summary>
         /// This class is a wrapper for an observerable collection, in order to ensure validity of inputs
@@ -16,7 +16,7 @@ namespace SteamBotLite
         /// 
         ObservableCollection<Map> mapList = new ObservableCollection<Map>();
         
-        public MapList (ObservableCollection<Map> inputlist)
+        public MapCollection (ObservableCollection<Map> inputlist)
         {
             this.mapList = inputlist;
             mapList.CollectionChanged += MapList_CollectionChanged;
@@ -43,8 +43,6 @@ namespace SteamBotLite
 
         public int GetSize() { return mapList.Count; }
 
-        
-
         public IEnumerator<Map> GetEnumerator ()
         {
             return mapList.GetEnumerator();
@@ -57,7 +55,6 @@ namespace SteamBotLite
             if (MapCheck.IsValid)
             {
                 mapList.Add(map);
-                Console.WriteLine("Added map?");
                 return string.Format("{0} Has been added to the list!", map.Filename);
             }
             else {
@@ -79,7 +76,7 @@ namespace SteamBotLite
                 {
 
                     mapList[entry].Filename = NewMapData.Filename ?? mapList[entry].Filename;
-                    mapList[entry].DownloadURL = NewMapData.DownloadURL ?? mapList[entry].DownloadURL;
+                    mapList[entry].DownloadURL = NewMapData.DownloadURL;
                     mapList[entry].Notes = NewMapData.Notes ?? mapList[entry].Notes;
                     mapList[entry].Uploaded = NewMapData.Uploaded;
 

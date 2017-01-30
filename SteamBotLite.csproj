@@ -98,7 +98,7 @@
     <Compile Include="UserHandlers\VBot\VBot\Interfaces\Interface1.cs" />
     <Compile Include="UserHandlers\VBot\VBot\ModuleHandler.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\CountDownModule.cs" />
-    <Compile Include="UserHandlers\VBot\VBot\Modules\MapList.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MapCollection.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\MapWebServer.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\SearchClass.cs" />
     <Compile Include="UserHandlers\VBot\VBot.cs" />
