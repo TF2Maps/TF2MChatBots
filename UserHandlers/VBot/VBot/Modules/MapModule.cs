@@ -16,10 +16,19 @@ namespace SteamBotLite
 
         int MaxMapNumber = 10;
         string ServerMapListUrl;
+        
+        public MapModule(VBot bot, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
+        {
+            LoadModule(bot);
 
+        }
         public MapModule(ModuleHandler bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
+            LoadModule(bot);
+        }
 
+        void LoadModule (ModuleHandler bot)
+        {
             loadPersistentData();
 
             ServerMapListUrl = config["ServerMapListUrl"].ToString();

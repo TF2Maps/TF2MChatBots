@@ -26,9 +26,12 @@ namespace SteamBotLite
         
         public Dictionary<string, object> config;
 
-        public BaseModule(ModuleHandler bot, Dictionary<string, Dictionary<string,object>> Jsconfig)
+        public BaseModule(ModuleHandler bot, Dictionary<string, Dictionary<string,object>> Config)
         {
-            this.config = JsonConvert.DeserializeObject<Dictionary<string, object>> (Jsconfig[this.GetType().Name].ToString());
+            //this.config = config;
+            string ThisObject = this.GetType().Name.ToString();
+            Console.WriteLine(ThisObject);
+            this.config = Config[ThisObject];
             LoadDependencies(bot);
         }
 
