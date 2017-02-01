@@ -9,42 +9,47 @@ using Newtonsoft.Json;
 namespace SteamBotLite
 {
     
-    public struct ChatroomEntity
+    public class ChatroomEntity
     {
-        public enum Individual {User, Chatroom };
         public enum AdminStatus { Unknown, Other, False, True};
         public ApplicationInterface Application;
         public object identifier;
-        public Individual EntityClass;
         public AdminStatus Rank;
         public string DisplayName;
         public object ExtraData;
 
-        public ChatroomEntity(object identifier, Individual EntityClassification, ApplicationInterface Application, string DisplayName = "", AdminStatus Rank = AdminStatus.Unknown , object ParentIdentifier = null, object ExtraData = null)
+        public ChatroomEntity(object identifier, ApplicationInterface Application, string DisplayName = "", AdminStatus Rank = AdminStatus.Unknown , object ParentIdentifier = null, object ExtraData = null)
         {
             this.identifier = identifier;
-            this.EntityClass = EntityClassification;
             this.Rank = Rank;
             this.Application = Application;
             this.DisplayName = DisplayName;
-            if (ParentIdentifier != null)
-            {
+
+            if (ParentIdentifier != null) {
                 this.ParentIdentifier = ParentIdentifier;
                 IsChild = true;
             }
-            else
-            {
+            else {
                 this.ParentIdentifier = null;
                 IsChild = false;
             }
+
             this.ExtraData = ExtraData;
             
         }
         
         
+        
         public object ParentIdentifier;
         bool IsChild;
     }
+
+    public class Chatroom : ChatroomEntity {
+        public ChatroomEntity(object identifier, ApplicationInterface Application, string DisplayName = "", AdminStatus Rank = AdminStatus.Unknown, object ParentIdentifier = null, object ExtraData = null)
+        {
+        };
+    public class User : ChatroomEntity {
+    };
 
     public class MessageEventArgs : EventArgs
     {
@@ -63,7 +68,7 @@ namespace SteamBotLite
         public abstract class ApplicationInterface
     {
 
-        public ChatroomEntity MainChatRoom;
+        public List<ChatroomEntity> MainChatroomsCollection;
         public Dictionary<string, object> config;
 
         public List<string> Whitelist;
@@ -111,8 +116,8 @@ namespace SteamBotLite
             userhandler.SetUsernameEvent += SetUsername;
             userhandler.RebootEvent += Reboot;
             userhandler.BroadcastMessageEvent += BroadCastMessage;
-            userhandler.MainChatRoomJoin += EnterMainChatRoom;
-            userhandler.MainChatRoomLeave += LeaveMainChatroom;
+            userhandler.MainChatRoomJoin += JoinAllChatrooms;
+            userhandler.MainChatRoomLeave += LeaveAllChatrooms;
             userhandler.ChatMemberInfoEvent += ChatMemberInfoEvent;
             userhandler.SetStatusmessage += SetStatusMessage;
         }
@@ -198,14 +203,21 @@ namespace SteamBotLite
         public abstract void EnterChatRoom (object sender, ChatroomEntity ChatroomEntity);
         public abstract void LeaveChatroom (object sender, ChatroomEntity ChatroomEntity);
 
-        public void EnterMainChatRoom(object sender, EventArgs e)
+        
+        public void JoinAllChatrooms(object sender, EventArgs e)
         {
-            EnterChatRoom(sender, MainChatRoom);
+            foreach(ChatroomEntity entry in MainChatroomsCollection)
+            {
+                EnterChatRoom(sender, entry);
+            }
         }
 
-        public void LeaveMainChatroom(object sender, EventArgs e)
+        public void LeaveAllChatrooms(object sender, EventArgs e)
         {
-            LeaveChatroom(sender, MainChatRoom);
+            foreach (ChatroomEntity entry in MainChatroomsCollection)
+            {
+                LeaveChatroom(sender, entry);
+            }
         }
 
         public abstract void Reboot(object sender, EventArgs e);

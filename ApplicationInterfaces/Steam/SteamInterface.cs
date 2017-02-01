@@ -83,10 +83,24 @@ namespace SteamBotLite
             string pass = config["password"].ToString();
             bool shouldrememberpass = (bool)config["ShouldRememberPassword"];
             SteamBotData SteamBotLoginData = new SteamBotData(user,pass, shouldrememberpass);
-            MainChatRoom = new ChatroomEntity(ulong.Parse(config["GroupChatID"].ToString()), ChatroomEntity.Individual.Chatroom, this);
+            
+            ChatroomWhiteList = new List<ChatroomEntity>();
+
+            foreach(string chatroom in Whitelist)
+            {
+
+                ChatroomEntity ChatroomEntry = new ChatroomEntity(ulong.Parse(chatroom),    ChatroomEntity.Individual.Chatroom, this);
+                ChatroomWhiteList.Add(ChatroomEntry);
+            }
+
             LoginData = SteamBotLoginData.LoginData;
             ResetConnection(SteamBotLoginData);
         }
+
+        List<ChatroomEntity> ChatroomWhiteList;
+        
+        
+
         /// <summary>
         /// Creates an instance of SteamConnectionHandler with the data given and logs in, also can be fired to reset the bot
         /// </summary>
@@ -221,9 +235,9 @@ namespace SteamBotLite
 
             AnnounceLoginCompleted();
 
-            foreach (string Chatroom in Whitelist)
+            foreach (ChatroomEntity Chatroom in ChatroomWhiteList)
             {
-                SteamFriends.JoinChat(new SteamID(Chatroom));
+                SteamFriends.JoinChat(new SteamID((ulong)Chatroom.identifier));
             }
 
         }
@@ -240,6 +254,7 @@ namespace SteamBotLite
 
             // at this point, we can go online on friends, so lets do that
             SteamFriends.SetPersonaState(EPersonaState.Online); //Set the State to Online
+            
         }
         /// <summary>
         /// A method to Login using the given Data
@@ -423,6 +438,7 @@ namespace SteamBotLite
 
         void Chatmemberinfo(SteamFriends.ChatMemberInfoCallback callback)
         {
+            
             if (callback.StateChangeInfo.StateChange != EChatMemberStateChange.Entered)
             {
 
@@ -467,9 +483,9 @@ namespace SteamBotLite
 
         public override void BroadCastMessage(object sender, string message)
         {
-            foreach (string Chatroom in Whitelist)
+            foreach (ChatroomEntity Chatroom in ChatroomWhiteList)
             {
-                SteamFriends.SendChatRoomMessage(new SteamID(Chatroom), EChatEntryType.ChatMsg, message);
+                SteamFriends.SendChatRoomMessage(new SteamID((ulong)Chatroom.identifier), EChatEntryType.ChatMsg, message);
             }
         }
 

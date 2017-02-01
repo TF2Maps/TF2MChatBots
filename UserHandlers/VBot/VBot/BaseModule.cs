@@ -28,7 +28,6 @@ namespace SteamBotLite
 
         public BaseModule(ModuleHandler bot, Dictionary<string, Dictionary<string,object>> Config)
         {
-            //this.config = config;
             string ThisObject = this.GetType().Name.ToString();
             Console.WriteLine(ThisObject);
             this.config = Config[ThisObject];
