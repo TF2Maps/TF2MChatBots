@@ -88,8 +88,7 @@ namespace SteamBotLite
 
             foreach(string chatroom in Whitelist)
             {
-
-                ChatroomEntity ChatroomEntry = new ChatroomEntity(ulong.Parse(chatroom),    ChatroomEntity.Individual.Chatroom, this);
+                ChatroomEntity ChatroomEntry = new User (ulong.Parse(chatroom) , this);
                 ChatroomWhiteList.Add(ChatroomEntry);
             }
 
@@ -409,7 +408,7 @@ namespace SteamBotLite
         {
             MessageEventArgs NewMessageData = new MessageEventArgs(this);
             NewMessageData.ReceivedMessage = callback.Message;
-            NewMessageData.Sender = new ChatroomEntity(callback.Sender,ChatroomEntity.Individual.User,this);
+            NewMessageData.Sender = new ChatroomEntity(callback.Sender,this);
             NewMessageData.Destination = NewMessageData.Sender;
             NewMessageData.Sender.DisplayName = SteamFriends.GetFriendPersonaName(callback.Sender);
             base.PrivateMessageProcessEvent(NewMessageData);
@@ -423,9 +422,11 @@ namespace SteamBotLite
                 MessageEventArgs NewMessageData = new MessageEventArgs(this);
                 NewMessageData.ReceivedMessage = callback.Message;
 
-                NewMessageData.Chatroom = new ChatroomEntity(callback.ChatRoomID, ChatroomEntity.Individual.Chatroom, this, callback.ChatRoomID.ToString());
+                NewMessageData.Chatroom = new Chatroom(callback.ChatRoomID,  this);
+                NewMessageData.Sender.DisplayName = (callback.ChatRoomID.ToString());
 
-                NewMessageData.Sender = new ChatroomEntity(callback.ChatterID, ChatroomEntity.Individual.User, this, SteamFriends.GetFriendPersonaName(callback.ChatterID));
+                NewMessageData.Sender = new User(callback.ChatterID, this);
+                NewMessageData.Sender.DisplayName = SteamFriends.GetFriendPersonaName(callback.ChatterID);
 
                 NewMessageData.Destination = NewMessageData.Chatroom;
 
@@ -447,11 +448,11 @@ namespace SteamBotLite
             {
                 if (callback.StateChangeInfo.MemberInfo.Permissions.HasFlag(EChatPermission.MemberDefault))
                 {
-                    ChatMemberInfoProcessEvent(new ChatroomEntity(callback.StateChangeInfo.ChatterActedOn,ChatroomEntity.Individual.Chatroom,this,null), true);
+                    ChatMemberInfoProcessEvent(new ChatroomEntity(callback.StateChangeInfo.ChatterActedOn,this), true);
                 }
                 else
                 {
-                    ChatMemberInfoProcessEvent(new ChatroomEntity(callback.StateChangeInfo.ChatterActedOn,ChatroomEntity.Individual.Chatroom,this,null), false);
+                    ChatMemberInfoProcessEvent(new ChatroomEntity(callback.StateChangeInfo.ChatterActedOn,this), false);
                 }
             }
         }

@@ -44,6 +44,7 @@ namespace SteamBotLite
         /// <param name="SteamConnectionHandler"></param>
         public VBot() 
         {
+            SetUsernameEvent += VBot_SetUsernameEvent;
             Console.WriteLine("VBot Initialised");
             Console.WriteLine("Loading modules and stuff");
 
@@ -76,6 +77,10 @@ namespace SteamBotLite
           //  OnMaplistchange(mapModule.mapList);
         }
 
+        private void VBot_SetUsernameEvent(object sender, string e)
+        {
+            this.Username = e;
+        }
 
         public List<OnLoginCompletedListiners> OnLoginlistiners;
 
@@ -85,8 +90,7 @@ namespace SteamBotLite
                 {
                     base.FireMainChatRoomEvent(ChatroomEventEnum.EnterChat);
                 }
-            foreach (OnLoginCompletedListiners listiner in OnLoginlistiners)
-            {
+            foreach (OnLoginCompletedListiners listiner in OnLoginlistiners) {
                 listiner.OnLoginCompleted();
             }
             Console.WriteLine("UserHandler: {0} Has Loaded", this.GetType());
@@ -234,6 +238,21 @@ namespace SteamBotLite
         public void AddMapChangeEventListiner(ServerMapChangeListiner listiner)
         {
             MapChangeEventListiners.Add(listiner);
+        }
+
+        public void AddLoginEventListiner(OnLoginCompletedListiners listiner)
+        {
+            OnLoginlistiners.Add(listiner);
+        }
+
+        void ModuleHandler.SetUsernameEvent(string Username)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<BaseModule> GetAllModules()
+        {
+            return ModuleList;
         }
     }
 }

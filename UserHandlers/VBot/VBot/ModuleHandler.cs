@@ -10,8 +10,13 @@ namespace SteamBotLite
         void HTMLFileFromArray(string[] headerNames, List<string[]> dataEntries, string v);
         void SendPrivateMessageProcessEvent(MessageEventArgs messageEventArgs);
         void SetStatusmessageEvent(string statusMessage);
+        void SetUsernameEvent(string Username);
         void BroadcastMessageProcessEvent(string message);
         bool admincheck(ChatroomEntity user);
         void AddMapChangeEventListiner(ServerMapChangeListiner listiner);
+        void AddLoginEventListiner(OnLoginCompletedListiners listiner);
+        void Disablemodule(string param);
+        void Enablemodule(string param);
+        List<BaseModule> GetAllModules();
     }
 }

@@ -3,12 +3,12 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4FE85902-9F12-4C1F-B1FB-AFBFEE39D65D}</ProjectGuid>
+    <ProjectGuid>{E57959E7-7D25-49F7-BF11-4E70AFC386E2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MapModuleTests</RootNamespace>
-    <AssemblyName>MapModuleTests</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <RootNamespace>SteamBotLiteUsersModuleTest</RootNamespace>
+    <AssemblyName>SteamBotLiteUsersModuleTest</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -45,22 +45,17 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework">
-          <Private>False</Private>
-        </Reference>
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
       </ItemGroup>
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="AdminModuleUnitTests.cs" />
-    <Compile Include="TestUserHandler.cs" />
-    <Compile Include="MapModuleUnitTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UsersModuleTests.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\UsersModuleUsersModuleTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\SteamBotLite.csproj">
-      <Project>{d74c1993-f305-4333-b7a5-4b51600cad1f}</Project>
+    <ProjectReference Include="..\SteamBotLite.csproj">
+      <Project>{D74C1993-F305-4333-B7A5-4B51600CAD1F}</Project>
       <Name>SteamBotLite</Name>
     </ProjectReference>
   </ItemGroup>

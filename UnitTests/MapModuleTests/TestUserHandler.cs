@@ -26,17 +26,38 @@ namespace SteamBotLite
         {
         }
 
+        void ModuleHandler.AddLoginEventListiner(OnLoginCompletedListiners listiner)
+        {
+            throw new NotImplementedException();
+        }
+
         void ModuleHandler.AddMapChangeEventListiner(ServerMapChangeListiner listiner)
         {
         }
 
         bool ModuleHandler.admincheck(ChatroomEntity user)
         {
-            return false;
+            if (user.Rank == ChatroomEntity.AdminStatus.True) {
+                return true;
+            }
+            else {
+                return false;
+            }
         }
 
         void ModuleHandler.BroadcastMessageProcessEvent(string message)
         {
+        }
+
+        void ModuleHandler.Disablemodule(string param) {
+        }
+
+        void ModuleHandler.Enablemodule(string param)
+        {
+        }
+
+        List<BaseModule> ModuleHandler.GetAllModules() {
+            return new List<BaseModule>();
         }
 
         void ModuleHandler.HTMLFileFromArray(string[] headerNames, List<string[]> dataEntries, string v)
@@ -53,6 +74,11 @@ namespace SteamBotLite
 
         void ModuleHandler.SetStatusmessageEvent(string statusMessage)
         {
+        }
+
+        void ModuleHandler.SetUsernameEvent(string Username)
+        {
+            throw new NotImplementedException();
         }
     }
 }

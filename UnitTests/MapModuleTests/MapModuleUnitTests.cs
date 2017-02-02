@@ -33,8 +33,7 @@ namespace MapModuleTests
         
 
         public SyntaxUnitTests() {
-            TestUser = new ChatroomEntity();
-            TestUser.identifier = identifier;
+            TestUser = new User(identifier, null);
             module = new MapModule(new TestUserHandler(), MakeConfig());
             
         }
@@ -53,6 +52,8 @@ namespace MapModuleTests
         [TestInitialize()]
         public void Initialize()
         {
+            module = new MapModule(new TestUserHandler(), MakeConfig());
+            TestUser = new User(identifier, null);
             module = new MapModule(new TestUserHandler(), MakeConfig());
         }
 
@@ -113,6 +114,36 @@ namespace MapModuleTests
             
             FireCommand(Message, module);
             AssertMaplistSize(0);
+        }
+
+        [TestMethod]
+        public void AdminDeleteMap()
+        {
+            MessageEventArgs Message = new MessageEventArgs(null);
+            Message.ReceivedMessage = DeleteCommand + " " + Mapname;
+
+            Message.Sender = new User(TestUser.identifier.ToString() + 1, null);
+            Message.Sender.Rank = ChatroomEntity.AdminStatus.True;
+
+            RegularSyntax();
+
+            Console.WriteLine(FireCommand(Message, module));
+            AssertMaplistSize(0);
+        }
+
+        [TestMethod]
+        public void NonAdminDeleteMapFail()
+        {
+            MessageEventArgs Message = new MessageEventArgs(null);
+            Message.ReceivedMessage = DeleteCommand + " " + Mapname;
+
+            Message.Sender = new User(TestUser.identifier.ToString() + 1, null);
+            Message.Sender.Rank = ChatroomEntity.AdminStatus.False;
+
+            RegularSyntax();
+
+            FireCommand(Message, module);
+            AssertMaplistSize(1);
         }
 
         [TestMethod]
@@ -185,6 +216,8 @@ namespace MapModuleTests
 
             MessageEventArgs Message = new MessageEventArgs(null);
             Message.ReceivedMessage = WipeCommand;
+            Message.Sender = new User(1, null);
+
             Message.Sender.Rank = ChatroomEntity.AdminStatus.True;
 
             FireCommand(Message, module);

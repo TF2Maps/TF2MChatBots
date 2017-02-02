@@ -48,6 +48,7 @@ namespace SteamBotLite
             adminCommands.Add(new Insert(bot, this));
             adminCommands.Add(new Reposition(bot, this));
             adminCommands.Add(new Wipe(bot, this));
+
             bot.AddMapChangeEventListiner(this);
         }
 
@@ -127,7 +128,8 @@ namespace SteamBotLite
 
             if (map != null && args.playerCount > 8)
             {
-                ChatroomEntity Submitter = new ChatroomEntity(map.Submitter,ChatroomEntity.Individual.User,null);
+                User Submitter = new User(map.Submitter,null);
+
                 Console.WriteLine("Found map, sending message to {0}", Submitter);
                 userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = Submitter, ReplyMessage = string.Format("Map {0} is being tested on the {1} server and has been DELETED.", map.Filename, args.tag) });
                 mapList.RemoveMap(map);
@@ -471,7 +473,7 @@ namespace SteamBotLite
                         {
                             MapModule.mapList.RemoveMap(deletedMap);
                             MapModule.savePersistentData();
-                            userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = new ChatroomEntity(deletedMap.Submitter,ChatroomEntity.Individual.User,null), ReplyMessage = string.Format("Your map {0} has been deleted from the map list", deletedMap.Filename) });
+                            userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = new User(deletedMap.Submitter,null), ReplyMessage = string.Format("Your map {0} has been deleted from the map list", deletedMap.Filename) });
                             return string.Format("Map '{0}' DELETED.", deletedMap.Filename);
                         }
                         else
@@ -516,7 +518,7 @@ namespace SteamBotLite
             {
                 MessageEventArgs Msg = new MessageEventArgs(null);
                 Msg.ReplyMessage = string.Format("Hi, the Maplist has been cleared and your map was removed for the following reason: {0}", message);
-                Msg.Destination = new ChatroomEntity(mapList.GetMap(0).Submitter, ChatroomEntity.Individual.User, null);
+                Msg.Destination = new User(mapList.GetMap(0).Submitter,  null);
                 userhandler.SendPrivateMessageProcessEvent(Msg);
                 mapList.RemoveMap(0);
             };

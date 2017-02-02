@@ -8,35 +8,34 @@ using Newtonsoft.Json;
 
 namespace SteamBotLite
 {
-    class AdminModule : BaseModule , OnLoginCompletedListiners
+    public class AdminModule : BaseModule , OnLoginCompletedListiners
     {
-       
-        VBot vbot;
+
+        UserHandler userhandler;
+        ModuleHandler modulehandler;
         string username;
         string status;
         bool UseStatus;
 
-        public AdminModule(VBot bot, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
+        public AdminModule(ModuleHandler handler, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(handler, Jsconfig)
         {
             DeletableModule = false;
-            vbot = bot;
-            
+            this.modulehandler = handler;
+
             username = config["DefaultUsername"].ToString();
             status = config["DefaultStatus"].ToString();
             UseStatus = bool.Parse(config["UseStatus"].ToString());
             loadPersistentData();
             savePersistentData();
 
-            bot.OnLoginlistiners.Add(this);
-            
-            adminCommands.Add(new Reboot(bot, this));
-            adminCommands.Add(new Rename(bot, this));
-            adminCommands.Add(new RemoveModule(bot, this));
-            adminCommands.Add(new AddModule(bot, this));
-            adminCommands.Add(new GetAllModules(bot, this));
-            adminCommands.Add(new Rejoin(bot, this));
-            adminCommands.Add(new SetStatusMessage(bot, this));
-            adminCommands.Add(new UnsetStatusMessage(bot, this));
+            handler.AddLoginEventListiner(this);
+
+            adminCommands.Add(new RemoveModule(handler, this));
+            adminCommands.Add(new AddModule(handler, this));
+            adminCommands.Add(new GetAllModules(handler, this));
+
+            adminCommands.Add(new Reboot(handler, this));
+            adminCommands.Add(new Rejoin(userhandler, modulehandler, this));
         }
 
         public override string getPersistentData()
@@ -64,7 +63,7 @@ namespace SteamBotLite
 
         public override void OnAllModulesLoaded()
         {
-            foreach(BaseModule module in vbot.ModuleList)
+            foreach(BaseModule module in modulehandler.GetAllModules())
             {
                 
                 string[] HeaderNames = { "Command Type", "Command Name" };
@@ -89,87 +88,33 @@ namespace SteamBotLite
                     
                 }
 
-                vbot.HTMLFileFromArray(HeaderNames, CommandList, module.GetType().ToString());
+                modulehandler.HTMLFileFromArray(HeaderNames, CommandList, module.GetType().ToString());
             }
            
         }
 
         public void OnLoginCompleted()
         {
-            if (UseStatus)
-            {
-                vbot.SetStatusmessageEvent(status);
+            if (UseStatus)  {
+                userhandler.SetStatusmessageEvent(status);
             }
-            vbot.Username = username;
+
+            modulehandler.SetUsernameEvent(username);
         }
 
-        private class SetStatusMessage : BaseCommand
-        {
-            // Command to query if a server is active
-            VBot bot;
-            AdminModule module;
-
-            public SetStatusMessage(VBot bot, AdminModule module) : base(bot, "!StatusSet")
-            {
-                this.module = module;
-                this.bot = bot;
-            }
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                module.status = param;
-                module.UseStatus = true;
-                module.savePersistentData();
-                bot.SetStatusmessageEvent(param);
-                
-                return "Status has been updated";
-            }
-
-            private void Bot_SetStatusmessage(object sender, string e)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        private class UnsetStatusMessage : BaseCommand
-        {
-            // Command to query if a server is active
-            VBot bot;
-            AdminModule module;
-            public UnsetStatusMessage(VBot bot, AdminModule module) : base(bot, "!StatusRemove")
-            {
-                this.module = module;
-                this.bot = bot;
-            }
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                module.UseStatus = false;
-                module.savePersistentData();
-                
-                bot.SetStatusmessageEvent(null);
-                return "Status has been removed";
-            }
-
-            private void Bot_SetStatusmessage(object sender, string e)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
+       
         private class Reboot : BaseCommand
         {
             // Command to query if a server is active
             AdminModule module;
             
-            public Reboot(VBot bot, AdminModule module) : base(bot, "!Reboot")
-            {
+            public Reboot(ModuleHandler bot, AdminModule module) : base(bot, "!Reboot")  {
                 this.module = module;
             }
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                module.vbot.Reboot();
+            protected override string exec(MessageEventArgs Msg, string param)  {
+                module.userhandler.Reboot();
                 return "Rebooted";
             }
-
         }
 
         private class Rejoin : BaseCommand
@@ -177,77 +122,34 @@ namespace SteamBotLite
             // Command to query if a server is active
             AdminModule module;
 
-            public Rejoin(VBot bot, AdminModule module) : base(bot, "!Rejoin")
+            public Rejoin(UserHandler bot, ModuleHandler modulehandler , AdminModule module) : base(modulehandler, "!Rejoin")
             {
                 this.module = module;
             }
             protected override string exec(MessageEventArgs Msg, string param)
             {
 
-                module.vbot.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.LeaveChat);
-                module.vbot.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.EnterChat);
+                module.userhandler.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.LeaveChat);
+                module.userhandler.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.EnterChat);
                 return "Rejoined!";
             }
 
         }
 
-        private class CheckStatus : BaseCommand
-        {
-            // Command to query if a server is active
-            AdminModule module;
-
-            public CheckStatus(VBot bot, AdminModule module) : base(bot, "!CheckData")
-            {
-                this.module = module;
-            }
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                return Msg.Sender.Rank.ToString();
-            }
-
-        }
-
-        private class Rename : BaseCommand
-        {
-            // Command to query if a server is active
-            AdminModule module;
-
-            public Rename(VBot bot, AdminModule module) : base(bot, "!Rename")
-            {
-                this.module = module;
-            }
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-
-                if (param.Length > 0)
-                {
-                    module.vbot.Username = param;
-                    module.username = param;
-                    module.savePersistentData();
-                    return "Renamed";
-                }
-                else
-                {
-                    return "There was no name!";
-                }
-            }
-
-        }
-        
         private class RemoveModule : BaseCommand
         {
             // Command to query if a server is active
             AdminModule module;
-            VBot botty;
+            ModuleHandler ModuleHandler;
 
-            public RemoveModule(VBot bot, AdminModule module) : base(bot, "!ModuleRemove")
+            public RemoveModule(ModuleHandler bot, AdminModule module) : base(bot, "!ModuleRemove")
             {
                 this.module = module;
-                botty = bot;
+                ModuleHandler = bot;
             }
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                botty.Disablemodule(param);
+                ModuleHandler.Disablemodule(param);
                 return "Removing Module...";
             }
 
@@ -257,16 +159,16 @@ namespace SteamBotLite
         {
             // Command to query if a server is active
             AdminModule module;
-            VBot botty;
+            ModuleHandler modulehandler;
 
-            public AddModule(VBot bot, AdminModule module) : base(bot, "!ModuleAdd")
+            public AddModule(ModuleHandler bot, AdminModule module) : base(bot, "!ModuleAdd")
             {
                 this.module = module;
-                botty = bot;
+                modulehandler = bot;
             }
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                botty.Enablemodule(param);
+                modulehandler.Enablemodule(param);
                 return "Adding Module...";
             }
 
@@ -276,21 +178,21 @@ namespace SteamBotLite
         {
             // Command to query if a server is active
             AdminModule module;
-            VBot botty;
+            ModuleHandler modulehandler;
 
-            public GetAllModules(VBot bot, AdminModule module) : base(bot, "!ModuleList")
+            public GetAllModules(ModuleHandler bot, AdminModule module) : base(bot, "!ModuleList")
             {
                 this.module = module;
-                botty = bot;
+                this.modulehandler = bot;
             }
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 string Response = "";
-                foreach (BaseModule ModuleEntry in botty.ModuleList)
-                {
+
+                foreach (BaseModule ModuleEntry in modulehandler.GetAllModules()) {
                     Response += ModuleEntry.GetType().Name.ToString() + " ";
                 }
-                botty.Disablemodule(param);
+
                 return Response;
             }
 

@@ -54,8 +54,9 @@ namespace SteamBotLite
         public event EventHandler<string> SetUsernameEvent;
 
         //The event-invoking method that derived classes can override.
-        protected virtual void SetUsernameEventProcess(string e)
+        public virtual void SetUsernameEventProcess(string e)
         {
+            
             // Make a temporary copy of the event to avoid possibility of
             // a race condition if the last subscriber unsubscribes
             // immediately after the null check and before the event is raised.
@@ -131,9 +132,6 @@ namespace SteamBotLite
         //The event-invoking method that derived classes can override.
         public virtual void BroadcastMessageProcessEvent(string message)
         {
-            // Make a temporary copy of the event to avoid possibility of
-            // a race condition if the last subscriber unsubscribes
-            // immediately after the null check and before the event is raised.
             EventHandler<string> handler = BroadcastMessageEvent;
             if (handler != null)
             {

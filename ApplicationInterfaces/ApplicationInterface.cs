@@ -14,41 +14,36 @@ namespace SteamBotLite
         public enum AdminStatus { Unknown, Other, False, True};
         public ApplicationInterface Application;
         public object identifier;
-        public AdminStatus Rank;
-        public string DisplayName;
+        public AdminStatus Rank = AdminStatus.Unknown;
+        public string DisplayName = "";
         public object ExtraData;
-
-        public ChatroomEntity(object identifier, ApplicationInterface Application, string DisplayName = "", AdminStatus Rank = AdminStatus.Unknown , object ParentIdentifier = null, object ExtraData = null)
-        {
-            this.identifier = identifier;
-            this.Rank = Rank;
-            this.Application = Application;
-            this.DisplayName = DisplayName;
-
-            if (ParentIdentifier != null) {
-                this.ParentIdentifier = ParentIdentifier;
-                IsChild = true;
-            }
-            else {
-                this.ParentIdentifier = null;
-                IsChild = false;
-            }
-
-            this.ExtraData = ExtraData;
-            
-        }
-        
-        
-        
         public object ParentIdentifier;
         bool IsChild;
+
+        public ChatroomEntity(object identifier, ApplicationInterface Application) {
+            this.identifier = identifier;
+            this.Application = Application;
+        }
+
+        public bool UserEquals (ChatroomEntity OtherEntity) {
+            return OtherEntity.identifier.ToString().Equals(this.identifier.ToString());
+        }
+
+        public bool UserEquals(string OtherUserIdentifier)
+        {
+            return this.identifier.ToString().Equals(OtherUserIdentifier);
+        }
+
     }
 
     public class Chatroom : ChatroomEntity {
-        public ChatroomEntity(object identifier, ApplicationInterface Application, string DisplayName = "", AdminStatus Rank = AdminStatus.Unknown, object ParentIdentifier = null, object ExtraData = null)
-        {
-        };
+        public Chatroom(object identifier, ApplicationInterface Application) : base(identifier,Application)
+        { }
+    }
+
     public class User : ChatroomEntity {
+        public User(object identifier, ApplicationInterface Application) : base(identifier,Application)
+        { }
     };
 
     public class MessageEventArgs : EventArgs
@@ -65,8 +60,8 @@ namespace SteamBotLite
         }
     }
 
-        public abstract class ApplicationInterface
-    {
+    public abstract class ApplicationInterface
+        {
 
         public List<ChatroomEntity> MainChatroomsCollection;
         public Dictionary<string, object> config;
@@ -74,6 +69,9 @@ namespace SteamBotLite
         public List<string> Whitelist;
         public List<string> Blacklist;
         bool WhitelistOnly;
+
+
+        public List<string> MessagingList;
 
         public ApplicationInterface()
         {
@@ -83,7 +81,7 @@ namespace SteamBotLite
             Blacklist = JsonConvert.DeserializeObject<List<string>>(config["BlackList"].ToString());
             WhitelistOnly = bool.Parse(config["WhitelistOnly"].ToString());
         }
-
+        
         public bool CheckEntryValid (string entry)
         {
             if (WhitelistOnly) {
@@ -101,11 +99,26 @@ namespace SteamBotLite
             return true; 
         }
 
+        public enum TickThreadState { Running, Stopped };
 
+        public TickThreadState TickThread = TickThreadState.Running;
+
+        public abstract void tick();
+
+        public void StartTickThreadLoop()
+        {
+            while (TickThread == TickThreadState.Running)
+            {
+                tick();
+            }
+        }
+
+        public abstract void Reboot(object sender, EventArgs e);
+
+        
         public abstract void SendChatRoomMessage(object sender, MessageEventArgs messagedata);
         public abstract void SendPrivateMessage(object sender, MessageEventArgs messagedata);
         public abstract void BroadCastMessage(object sender, string message);
-
 
         public void AssignUserHandler(UserHandler userhandler)
         {
@@ -122,12 +135,6 @@ namespace SteamBotLite
             userhandler.SetStatusmessage += SetStatusMessage;
         }
 
-
-        /* I beleive there is no benefit to making this role mandatory
-        public abstract void ReceiveChatRoomMessage(ChatroomEntity ChatroomEntity, string Message);
-        public abstract void ReceivePrivateMessage(ChatroomEntity ChatroomEntity, string Message);
-        */
-
         public class ChatMemberInfoEventArgs
         {
             ChatroomEntity User;
@@ -139,12 +146,8 @@ namespace SteamBotLite
         //The event-invoking method that derived classes can override.
         protected virtual void ChatRoomMessageProcessEvent(MessageEventArgs e)
         {
-            // Make a temporary copy of the event to avoid possibility of
-            // a race condition if the last subscriber unsubscribes
-            // immediately after the null check and before the event is raised.
             EventHandler<MessageEventArgs> handler = ChatRoomMessageEvent;
-            if (handler != null)
-            {
+            if (handler != null) {
                 handler(this, e);
             }
         }
@@ -154,28 +157,18 @@ namespace SteamBotLite
         //The event-invoking method that derived classes can override.
         protected virtual void PrivateMessageProcessEvent(MessageEventArgs e)
         {
-            // Make a temporary copy of the event to avoid possibility of
-            // a race condition if the last subscriber unsubscribes
-            // immediately after the null check and before the event is raised.
             EventHandler<MessageEventArgs> handler = PrivateMessageEvent;
-            if (handler != null)
-            {
+            if (handler != null) {
                 handler(this, e);
             }
         }
 
-        
-
         public event EventHandler<Tuple<ChatroomEntity, bool>> ChatMemberInfoEvent;
-        //The event-invoking method that derived classes can override.
+
         protected virtual void ChatMemberInfoProcessEvent(ChatroomEntity e , bool isadmin)
         {
-            // Make a temporary copy of the event to avoid possibility of
-            // a race condition if the last subscriber unsubscribes
-            // immediately after the null check and before the event is raised.
             EventHandler<Tuple<ChatroomEntity, bool>> handler = ChatMemberInfoEvent;
-            if (handler != null)
-            {
+            if (handler != null) {
                 handler(this, new Tuple<ChatroomEntity, bool>(e,isadmin));
             }
         }
@@ -184,12 +177,8 @@ namespace SteamBotLite
 
         protected virtual void AnnounceLoginCompleted()
         {
-            // Make a temporary copy of the event to avoid possibility of
-            // a race condition if the last subscriber unsubscribes
-            // immediately after the null check and before the event is raised.
             EventHandler handler = AnnounceLoginCompletedEvent;
-            if (handler != null)
-            {
+            if (handler != null) {
                 AnnounceLoginCompletedEvent(this , null);
             }
         }
@@ -204,42 +193,19 @@ namespace SteamBotLite
         public abstract void LeaveChatroom (object sender, ChatroomEntity ChatroomEntity);
 
         
-        public void JoinAllChatrooms(object sender, EventArgs e)
-        {
-            foreach(ChatroomEntity entry in MainChatroomsCollection)
-            {
+        public void JoinAllChatrooms(object sender, EventArgs e) {
+            foreach(ChatroomEntity entry in MainChatroomsCollection) {
                 EnterChatRoom(sender, entry);
             }
         }
 
-        public void LeaveAllChatrooms(object sender, EventArgs e)
-        {
-            foreach (ChatroomEntity entry in MainChatroomsCollection)
-            {
+        public void LeaveAllChatrooms(object sender, EventArgs e) {
+            foreach (ChatroomEntity entry in MainChatroomsCollection) {
                 LeaveChatroom(sender, entry);
             }
         }
 
-        public abstract void Reboot(object sender, EventArgs e);
-
-        public abstract void SetUsername(object sender, string Username);
-        public abstract string GetUsername();
-
-        public abstract string GetOthersUsername(object sender, ChatroomEntity user);
-
-        public abstract void tick();
-
-        public enum TickThreadState { Running , Stopped};
-
-        public TickThreadState TickThread = TickThreadState.Running;
-
-        public void StartTickThreadLoop()
-        {
-            while (TickThread == TickThreadState.Running)
-            {
-                tick();
-            }
-        }
+        
 
         public string Username
         {
@@ -253,5 +219,9 @@ namespace SteamBotLite
                SetUsername(this, value);
             }
         }
+
+        public abstract string GetUsername();
+        public abstract void SetUsername(object sender, string Username);
+        public abstract string GetOthersUsername(object sender, ChatroomEntity user);
     }
 }
