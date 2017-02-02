@@ -15,6 +15,7 @@ namespace SteamBotLite
         bool admincheck(ChatroomEntity user);
         void AddMapChangeEventListiner(ServerMapChangeListiner listiner);
         void AddLoginEventListiner(OnLoginCompletedListiners listiner);
+        void AddListChangeEventListiner(MapListChangeListiner listiner);
         void Disablemodule(string param);
         void Enablemodule(string param);
         List<BaseModule> GetAllModules();

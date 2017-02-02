@@ -415,6 +415,7 @@ namespace SteamBotLite
             NewMessageData.ReceivedMessage = callback.Message;
 
             NewMessageData.Chatroom = new Chatroom(callback.ChatRoomID, this);
+            NewMessageData.Chatroom.DisplayName = (callback.ChatRoomID.ToString());
 
             NewMessageData.Sender = new User(callback.ChatterID, this);
             NewMessageData.Sender.DisplayName = SteamFriends.GetFriendPersonaName(callback.ChatterID);

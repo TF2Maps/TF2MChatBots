@@ -94,7 +94,8 @@
     <Compile Include="ApplicationInterfaces\Discord\Accounts\DiscordAccountVBot.cs" />
     <Compile Include="ApplicationInterfaces\Discord\Accounts\DiscordAccountVFun.cs" />
     <Compile Include="UserHandlers\VBot\OnLoginCompletedListiners.cs" />
-    <Compile Include="UserHandlers\VBot\VBot\Interfaces\HTMLFileFromArray.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Interfaces\HTMLFileFromArray - Copy.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Interfaces\MapListChangeListiners.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Interfaces\Interface1.cs" />
     <Compile Include="UserHandlers\VBot\VBot\ModuleHandler.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\CountDownModule.cs" />

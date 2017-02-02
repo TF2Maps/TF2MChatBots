@@ -10,9 +10,6 @@ namespace SteamBotLite
     public class VBot : UserHandler , HTMLFileFromArrayListiners , ModuleHandler
     {
         
-        public string Username = "V2Bot";
-        public string UsernamePrefix = "";
-        
         bool Autojoin = true; 
 
         // Class members
@@ -36,6 +33,9 @@ namespace SteamBotLite
 
         List<BaseCommand> chatCommands = new List<BaseCommand>();
         List<BaseCommand> chatAdminCommands = new List<BaseCommand>();
+
+        public List<MapListChangeListiner> ListChangeEventListiners = new List<MapListChangeListiner>();
+
         public List<ServerMapChangeListiner> MapChangeEventListiners = new List<ServerMapChangeListiner>();
         // Loading Config
         Dictionary<string, Dictionary<string,object>> jsconfig = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string,object>>>(System.IO.File.ReadAllText(@"config.json"));
@@ -53,6 +53,7 @@ namespace SteamBotLite
             MapChangeEventListiners = new List<ServerMapChangeListiner>();
             HTMLParsers = new List<HTMLFileFromArrayListiners>();
             OnLoginlistiners = new List<OnLoginCompletedListiners>();
+            ListChangeEventListiners = new List<MapListChangeListiner>();
             // loading modules
             WebServer = new MapWebServer(this, jsconfig);
 
@@ -81,35 +82,27 @@ namespace SteamBotLite
         }
 
         
-        public void SetUsernameEventProcess(object sender, string e)
-        {
-            base.SetUsernameEventProcess(UsernamePrefix + Username);
-        }
-
         public void UpdateUsernameEvent(object sender, string e)
         {
-            this.Username = e;
+            base.SetUsernameEventProcess(e);
         }
 
-        void SetUsernamePrefix(string prefix)
-        {
-            this.UsernamePrefix = prefix;
-        }
+        
+        
 
         public void OnMaplistchange(IReadOnlyList<Map> maplist, object sender = null, NotifyCollectionChangedEventArgs args = null)
         {
-            string param = "[" + maplist.Count + "]";
-            SetUsernamePrefix(param);
 
-            base.SetUsernameEventProcess(UsernamePrefix + Username);
-
-            if (WebServer != null)
+            foreach (MapListChangeListiner listiner in ListChangeEventListiners)
             {
-                //WebServer.MapListUpdate(maplist);
+                listiner.MaplistChange(maplist);
             }
         }
 
-
+        public void AddListChangeEventListiner(MapListChangeListiner listiner)
+        {
+            ListChangeEventListiners.Add(listiner);
+        }
 
         public List<OnLoginCompletedListiners> OnLoginlistiners;
 
@@ -273,5 +266,6 @@ namespace SteamBotLite
         {
             return ModuleList;
         }
+
     }
 }

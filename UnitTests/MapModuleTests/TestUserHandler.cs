@@ -26,9 +26,12 @@ namespace SteamBotLite
         {
         }
 
+        void ModuleHandler.AddListChangeEventListiner(MapListChangeListiner listiner)
+        {
+        }
+
         void ModuleHandler.AddLoginEventListiner(OnLoginCompletedListiners listiner)
         {
-            throw new NotImplementedException();
         }
 
         void ModuleHandler.AddMapChangeEventListiner(ServerMapChangeListiner listiner)

@@ -8,16 +8,19 @@ using Newtonsoft.Json;
 
 namespace SteamBotLite
 {
-    public class IdentityModule : BaseModule, OnLoginCompletedListiners
+    public class IdentityModule : BaseModule, OnLoginCompletedListiners , MapListChangeListiner
     {
         UserHandler userhandler;
         ModuleHandler modulehandler;
+        string UsernamePrefix = "";
         string username;
         string status;
         bool UseStatus;
 
         public IdentityModule(UserHandler bot, ModuleHandler handler, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(handler, Jsconfig)
         {
+            handler.AddListChangeEventListiner(this);
+
             DeletableModule = false;
             userhandler = bot;
             this.modulehandler = handler;
@@ -37,7 +40,7 @@ namespace SteamBotLite
         }
 
         public override void OnAllModulesLoaded() {
-            userhandler.SetUsernameEventProcess(username);
+            userhandler.SetUsernameEventProcess(UsernamePrefix + username);
         }
 
 
@@ -64,12 +67,23 @@ namespace SteamBotLite
             }
         }
 
+        string getusername ()
+        {
+            return UsernamePrefix + username;
+        }
         public void OnLoginCompleted()
         {
             if (UseStatus) {
                 userhandler.SetStatusmessageEvent(status);
             }
-            modulehandler.UpdateUsernameEvent(this, username);
+            modulehandler.UpdateUsernameEvent(this, getusername());
+        }
+
+        public void MaplistChange(IReadOnlyList<Map> maplist)
+        {
+            string param = "[" + maplist.Count + "]";
+            UsernamePrefix = param;
+            userhandler.SetUsernameEventProcess(getusername());
         }
 
         private class SetStatusMessage : BaseCommand
