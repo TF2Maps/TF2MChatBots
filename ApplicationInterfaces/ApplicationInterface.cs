@@ -63,7 +63,16 @@ namespace SteamBotLite
     public abstract class ApplicationInterface
         {
 
-        public List<ChatroomEntity> MainChatroomsCollection;
+        public virtual List<ChatroomEntity> GetMainChatroomsCollection()
+        {
+            List<ChatroomEntity> Chatrooms = new List<ChatroomEntity>();
+            foreach (string item in Whitelist)
+            {
+                Chatrooms.Add(new ChatroomEntity(item, this));
+            }
+            return Chatrooms;
+        }
+
         public Dictionary<string, object> config;
 
         public List<string> Whitelist;
@@ -194,13 +203,13 @@ namespace SteamBotLite
 
         
         public void JoinAllChatrooms(object sender, EventArgs e) {
-            foreach(ChatroomEntity entry in MainChatroomsCollection) {
+            foreach(ChatroomEntity entry in GetMainChatroomsCollection()) {
                 EnterChatRoom(sender, entry);
             }
         }
 
         public void LeaveAllChatrooms(object sender, EventArgs e) {
-            foreach (ChatroomEntity entry in MainChatroomsCollection) {
+            foreach (ChatroomEntity entry in GetMainChatroomsCollection()) {
                 LeaveChatroom(sender, entry);
             }
         }

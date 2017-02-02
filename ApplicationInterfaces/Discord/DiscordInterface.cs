@@ -13,15 +13,26 @@ namespace SteamBotLite
     {
         private DiscordClient _client;
         string Token;
-        ulong[] BroadCastChatrooms = new ulong[] { };
+
+        List<ulong> BroadCastChatrooms;
 
         public DiscordInterface()
         {
             TickThread = TickThreadState.Stopped;
-
             Token = config["Token"].ToString();
-            BroadCastChatrooms = (ulong[])JsonConvert.DeserializeObject(config["BroadCastChatrooms"].ToString(),BroadCastChatrooms.GetType());
-            
+            BroadCastChatrooms = new List<ulong>();
+
+            if (bool.Parse(config["UseWhitelistAsBroadCastChatrooms"].ToString()))  {
+                foreach (string item in Whitelist)  {
+                    BroadCastChatrooms.Add(ulong.Parse(item));
+                }
+            }
+            else {
+                foreach (string item in JsonConvert.DeserializeObject<List<string>>(config["Whitelist"].ToString()))  {
+                    BroadCastChatrooms.Add(ulong.Parse(item));
+                }
+            }
+
             _client = new DiscordClient();
             ConnectionProcess(Token, _client);
             _client.MessageReceived += _client_MessageReceived;

@@ -13,18 +13,13 @@ namespace SteamBotLite
 
         UserHandler userhandler;
         ModuleHandler modulehandler;
-        string username;
-        string status;
-        bool UseStatus;
 
-        public AdminModule(ModuleHandler handler, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(handler, Jsconfig)
+        public AdminModule(ModuleHandler handler, UserHandler userhandler, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(handler, Jsconfig)
         {
             DeletableModule = false;
             this.modulehandler = handler;
+            this.userhandler = userhandler;
 
-            username = config["DefaultUsername"].ToString();
-            status = config["DefaultStatus"].ToString();
-            UseStatus = bool.Parse(config["UseStatus"].ToString());
             loadPersistentData();
             savePersistentData();
 
@@ -40,25 +35,11 @@ namespace SteamBotLite
 
         public override string getPersistentData()
         {
-            Dictionary<string, string> data = new Dictionary<string, string>();
-            data.Add("Username", username);
-            data.Add("Status", status);
-            data.Add("UserStatus", UseStatus.ToString());
-            return JsonConvert.SerializeObject(data);
+            return null;
         }
 
         public override void loadPersistentData()
         {
-            try
-            {
-                Dictionary<string, string> data = JsonConvert.DeserializeObject<Dictionary<string, string>>(System.IO.File.ReadAllText(this.GetType().Name + ".json"));
-                username = data["Username"];
-                status = data["Status"];
-            }
-            catch
-            {
-
-            }
         }
 
         public override void OnAllModulesLoaded()
@@ -95,11 +76,6 @@ namespace SteamBotLite
 
         public void OnLoginCompleted()
         {
-            if (UseStatus)  {
-                userhandler.SetStatusmessageEvent(status);
-            }
-
-            modulehandler.SetUsernameEvent(username);
         }
 
        

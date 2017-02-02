@@ -78,7 +78,7 @@ namespace SteamBotLite
 
         public override void OnAllModulesLoaded()
         {
-
+            userhandler.OnMaplistchange(mapList.GetAllMaps(), null, null);
         }
 
         void MapChange(object sender, NotifyCollectionChangedEventArgs args)

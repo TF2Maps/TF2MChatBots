@@ -11,6 +11,7 @@ namespace SteamBotLite
     {
         
         public string Username = "V2Bot";
+        public string UsernamePrefix = "";
         
         bool Autojoin = true; 
 
@@ -25,6 +26,7 @@ namespace SteamBotLite
         ServerListHolder serverlistmodule;
         CountDownModule countdownmodule;
         MapWebServer WebServer;
+        IdentityModule identitymodule;
 
         public UsersModule usersModule;
 
@@ -44,7 +46,7 @@ namespace SteamBotLite
         /// <param name="SteamConnectionHandler"></param>
         public VBot() 
         {
-            SetUsernameEvent += VBot_SetUsernameEvent;
+           // base.SetUsernameEvent += UpdateUsernameEvent;
             Console.WriteLine("VBot Initialised");
             Console.WriteLine("Loading modules and stuff");
 
@@ -62,10 +64,11 @@ namespace SteamBotLite
             usersModule = new UsersModule(this, jsconfig);
             replyModule = new RepliesModule(this, jsconfig);
             searchModule = new SearchModule(this, jsconfig);
-            adminmodule = new AdminModule(this, jsconfig);
+            adminmodule = new AdminModule(this,this, jsconfig);
+            identitymodule = new IdentityModule(this, this, jsconfig);
             countdownmodule = new CountDownModule(this, jsconfig);
 
-            ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule,adminmodule,searchModule, WebServer, serverlistmodule , countdownmodule };
+            ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,identitymodule , usersModule,replyModule,adminmodule,searchModule, WebServer, serverlistmodule , countdownmodule };
 
             Console.WriteLine("Modules loaded and ModuleList intitialised");
 
@@ -77,10 +80,36 @@ namespace SteamBotLite
           //  OnMaplistchange(mapModule.mapList);
         }
 
-        private void VBot_SetUsernameEvent(object sender, string e)
+        
+        public void SetUsernameEventProcess(object sender, string e)
+        {
+            base.SetUsernameEventProcess(UsernamePrefix + Username);
+        }
+
+        public void UpdateUsernameEvent(object sender, string e)
         {
             this.Username = e;
         }
+
+        void SetUsernamePrefix(string prefix)
+        {
+            this.UsernamePrefix = prefix;
+        }
+
+        public void OnMaplistchange(IReadOnlyList<Map> maplist, object sender = null, NotifyCollectionChangedEventArgs args = null)
+        {
+            string param = "[" + maplist.Count + "]";
+            SetUsernamePrefix(param);
+
+            base.SetUsernameEventProcess(UsernamePrefix + Username);
+
+            if (WebServer != null)
+            {
+                //WebServer.MapListUpdate(maplist);
+            }
+        }
+
+
 
         public List<OnLoginCompletedListiners> OnLoginlistiners;
 
@@ -197,14 +226,7 @@ namespace SteamBotLite
             }
             return response;
         }
-        public void OnMaplistchange(IReadOnlyList<Map> maplist, object sender = null, NotifyCollectionChangedEventArgs args = null)
-        {
-            base.SetUsernameEventProcess("[" + maplist.Count + "]" + Username);
-            if (WebServer != null)
-            {
-               //WebServer.MapListUpdate(maplist);
-            }
-        }
+        
 
         public void ServerUpdated(object sender, ServerModule.ServerInfo args)
         {
@@ -245,10 +267,7 @@ namespace SteamBotLite
             OnLoginlistiners.Add(listiner);
         }
 
-        void ModuleHandler.SetUsernameEvent(string Username)
-        {
-            throw new NotImplementedException();
-        }
+        
 
         public List<BaseModule> GetAllModules()
         {

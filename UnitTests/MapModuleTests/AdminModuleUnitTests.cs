@@ -44,7 +44,7 @@ namespace MapModuleTests
         [TestInitialize()]
         public void Initialize()
         {
-            module = new AdminModule(new TestUserHandler(), MakeConfig());
+            //module = new AdminModule(new TestUserHandler(), MakeConfig());
             TestUser = new User(identifier, null);
         }
 
@@ -52,7 +52,7 @@ namespace MapModuleTests
         [TestCleanup()]
         public void Cleanup()
         {
-            module = new AdminModule(new TestUserHandler() , MakeConfig());
+           // module = new AdminModule(new TestUserHandler() , MakeConfig());
         }
 
     }

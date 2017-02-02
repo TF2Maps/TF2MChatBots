@@ -76,9 +76,9 @@ namespace SteamBotLite
         {
         }
 
-        void ModuleHandler.SetUsernameEvent(string Username)
+
+        void ModuleHandler.UpdateUsernameEvent(object sender, string Username)
         {
-            throw new NotImplementedException();
         }
     }
 }

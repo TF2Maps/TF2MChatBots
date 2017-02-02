@@ -36,7 +36,9 @@ namespace SteamBotLite
             adminCommands.Add(new UnsetStatusMessage(userhandler, modulehandler, this));
         }
 
-        public override void OnAllModulesLoaded() { }
+        public override void OnAllModulesLoaded() {
+            userhandler.SetUsernameEventProcess(username);
+        }
 
 
         public override string getPersistentData()
@@ -67,7 +69,7 @@ namespace SteamBotLite
             if (UseStatus) {
                 userhandler.SetStatusmessageEvent(status);
             }
-            modulehandler.SetUsernameEvent(username);
+            modulehandler.UpdateUsernameEvent(this, username);
         }
 
         private class SetStatusMessage : BaseCommand

@@ -114,7 +114,7 @@
     <Compile Include="UserHandlers\VBot\VBot\Modules\SearchModule.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\Server.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\ServerListHolder.cs" />
-    <Compile Include="UserHandlers\VBot\VBot\Modules\Users.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\UsersModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
