@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace SteamBotLite
 {
-    public interface ServerMapChangeListiner
+    public interface MapListChangeListiner
     {
-        void OnMapChange(ServerModule.ServerInfo args);
+        void MaplistChange(IReadOnlyList<Map> maplist);
     }
 }

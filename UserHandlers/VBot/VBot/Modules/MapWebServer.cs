@@ -10,8 +10,6 @@ namespace SteamBotLite
     class MapWebServer : BaseModule , HTMLFileFromArrayListiners
     {
         HttpListener listener;
-        MapModule mapmodule;
-        readonly ObservableCollection<MapModule.Map> maplist;
 
         string responseString = "<HTML><BODY>Website is still initialising</BODY></HTML>";
 
@@ -23,7 +21,7 @@ namespace SteamBotLite
 
         //string prefix, ObservableCollection<MapModule.Map> Maplist)
 
-        public MapWebServer(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
+        public MapWebServer(VBot bot, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
             WebsiteTables = new Dictionary<string, string>();
 

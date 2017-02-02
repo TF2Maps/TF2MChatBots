@@ -94,9 +94,13 @@
     <Compile Include="ApplicationInterfaces\Discord\Accounts\DiscordAccountVBot.cs" />
     <Compile Include="ApplicationInterfaces\Discord\Accounts\DiscordAccountVFun.cs" />
     <Compile Include="UserHandlers\VBot\OnLoginCompletedListiners.cs" />
-    <Compile Include="UserHandlers\VBot\VBot\Interfaces\HTMLFileFromArray.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Interfaces\HTMLFileFromArray - Copy.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Interfaces\MapListChangeListiners.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Interfaces\Interface1.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\ModuleHandler.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\CountDownModule.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\IdentityModule.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MapCollection.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\MapWebServer.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\SearchClass.cs" />
     <Compile Include="UserHandlers\VBot\VBot.cs" />
@@ -104,14 +108,14 @@
     <Compile Include="UserHandlers\VBot\VBot\BaseModule.cs" />
     <Compile Include="UserHandlers\VBot\VBot\BaseTask.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\ImpNaoModule.cs" />
-    <Compile Include="UserHandlers\VBot\VBot\Modules\Map.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MapModule.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\Motd.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\AdminModule.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\Replies.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\SearchModule.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\Server.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\ServerListHolder.cs" />
-    <Compile Include="UserHandlers\VBot\VBot\Modules\Users.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\UsersModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

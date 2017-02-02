@@ -9,22 +9,30 @@ using Newtonsoft.Json;
 
 namespace SteamBotLite
 {
-    class UsersModule : BaseModule
+    public class UsersModule : BaseModule
     {
         public List<string> admins = new List<string>();
         public List<string> bans = new List<string>();
 
-        
-
-        public UsersModule(VBot bot, Dictionary<string, object> config) : base(bot, config)
+        public UsersModule(ModuleHandler bot, Dictionary<string, Dictionary<string, object>> config) : base(bot, config)
         {
             DeletableModule = false;
             loadPersistentData();
+            commands.Add(new CheckStatus(bot, this));
         }
 
-        public override void OnAllModulesLoaded()
+        public override void OnAllModulesLoaded() { }
+
+        private class CheckStatus : BaseCommand
         {
-           
+            UsersModule module;
+
+            public CheckStatus(ModuleHandler bot, UsersModule module) : base(bot, "!CheckAdmin") {
+                this.module = module;
+            }
+            protected override string exec(MessageEventArgs Msg, string param) {
+                return module.admincheck(Msg.Sender).ToString();
+            }
 
         }
 
@@ -53,13 +61,13 @@ namespace SteamBotLite
             if (IsAdmin)
             {
                 Console.WriteLine("Admin entered");
-                if (!admins.Any(s => info.Equals(s))) //if an admin is not in the list
+                if (!admins.Any(s => info.UserEquals(s))) //if an admin is not in the list
                 {
                     admins.Add(info.identifier.ToString());
                     savePersistentData();
                 }
             }
-            else if (admins.Any(s => info.Equals(s))) //if it's not an admin but he's in the list
+            else if (admins.Any(s => info.UserEquals(s))) //if it's not an admin but he's in the list
             {
                 admins.Remove(info.identifier.ToString());
                 savePersistentData();
@@ -69,12 +77,12 @@ namespace SteamBotLite
         public bool admincheck(ChatroomEntity UserToVerify)
         {
             string data = UserToVerify.identifier.ToString();
-            if (UserToVerify.Rank == ChatroomEntity.AdminStatus.True | (admins.Any(s => UserToVerify.identifier.ToString().Equals(s))))
-            {
+
+            
+            if (UserToVerify.Rank == ChatroomEntity.AdminStatus.True | (admins.Any(s => UserToVerify.UserEquals(s)))) {
                 return true;
             }
-            else
-            {
+            else {
                 return false;
             }
         }

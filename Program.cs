@@ -29,16 +29,13 @@ namespace SteamBotLite
             List<ApplicationInterface> Bots = new List<ApplicationInterface>();
 
             SteamAccountVBot SteamPlatformInterface = new SteamAccountVBot();
-            DiscordAccountVFun DiscordPlatformInterfaceFun = new DiscordAccountVFun();
             DiscordAccountVBot DiscordPlatformInterfaceRelay = new DiscordAccountVBot();
 
             Bots.Add(SteamPlatformInterface);
             Bots.Add(DiscordPlatformInterfaceRelay);
-            Bots.Add(DiscordPlatformInterfaceFun);
 
             //Link userhandlers and classes that are two way//
             AssignConnection(VbotHandler, DiscordPlatformInterfaceRelay);
-            AssignConnection(VbotHandler, DiscordPlatformInterfaceFun);
             AssignConnection(VbotHandler, SteamPlatformInterface);
             AssignConnection(consolehandler, DiscordPlatformInterfaceRelay);
             AssignConnection(consolehandler, SteamPlatformInterface);

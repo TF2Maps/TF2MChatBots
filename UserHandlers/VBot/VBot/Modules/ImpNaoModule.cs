@@ -286,7 +286,7 @@ namespace SteamBotLite
                     }
                     else
                     {
-                        if ((deletedMap.password.Equals(Msg.ToString())) || (userhandler.usersModule.admincheck(Msg.Sender)))
+                        if ((deletedMap.password.Equals(Msg.ToString())) || (userhandler.admincheck(Msg.Sender)))
                         {
                             impnaomodule.DeleteMapOnline(parameters[0], Msg.Sender);
                             return string.Format("Map '{0}' DELETED.", deletedMap.name);

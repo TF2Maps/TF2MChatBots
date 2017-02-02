@@ -23,7 +23,7 @@ namespace SteamBotLite
         string[] Header = new string[] { "Map", "Time Played" };
         HTMLFileFromArrayListiners listiner;
 
-        public ServerListHolder(VBot bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
+        public ServerListHolder(VBot bot, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
             loadPersistentData();
 

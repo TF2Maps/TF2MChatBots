@@ -7,16 +7,14 @@ using System.Collections.ObjectModel;
 
 namespace SteamBotLite
 {
-    class VBot : UserHandler , HTMLFileFromArrayListiners
+    public class VBot : UserHandler , HTMLFileFromArrayListiners , ModuleHandler
     {
-        
-        public string Username = "V2Bot";
         
         bool Autojoin = true; 
 
         // Class members
         MotdModule motdModule;
-        MapModule mapModule;
+        public MapModule mapModule;
         ServerModule serverModule;
         RepliesModule replyModule;
         AdminModule adminmodule;
@@ -25,6 +23,7 @@ namespace SteamBotLite
         ServerListHolder serverlistmodule;
         CountDownModule countdownmodule;
         MapWebServer WebServer;
+        IdentityModule identitymodule;
 
         public UsersModule usersModule;
 
@@ -32,11 +31,14 @@ namespace SteamBotLite
 
         public List<HTMLFileFromArrayListiners> HTMLParsers;
 
-        public List<BaseCommand> chatCommands = new List<BaseCommand>();
-        public List<BaseCommand> chatAdminCommands = new List<BaseCommand>();
+        List<BaseCommand> chatCommands = new List<BaseCommand>();
+        List<BaseCommand> chatAdminCommands = new List<BaseCommand>();
+
+        public List<MapListChangeListiner> ListChangeEventListiners = new List<MapListChangeListiner>();
+
         public List<ServerMapChangeListiner> MapChangeEventListiners = new List<ServerMapChangeListiner>();
         // Loading Config
-        Dictionary<string, object> jsconfig = JsonConvert.DeserializeObject<Dictionary<string, object>>(System.IO.File.ReadAllText(@"config.json"));
+        Dictionary<string, Dictionary<string,object>> jsconfig = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string,object>>>(System.IO.File.ReadAllText(@"config.json"));
 
         /// <summary>
         /// Do not try using steamfriends, steamuser and all that since it'll be uninitialised at this point 
@@ -44,25 +46,30 @@ namespace SteamBotLite
         /// <param name="SteamConnectionHandler"></param>
         public VBot() 
         {
+           // base.SetUsernameEvent += UpdateUsernameEvent;
             Console.WriteLine("VBot Initialised");
             Console.WriteLine("Loading modules and stuff");
 
             MapChangeEventListiners = new List<ServerMapChangeListiner>();
             HTMLParsers = new List<HTMLFileFromArrayListiners>();
             OnLoginlistiners = new List<OnLoginCompletedListiners>();
+            ListChangeEventListiners = new List<MapListChangeListiner>();
             // loading modules
             WebServer = new MapWebServer(this, jsconfig);
+
             mapModule = new MapModule(this, jsconfig);
+
             serverlistmodule = new ServerListHolder(this, jsconfig);
             motdModule = new MotdModule(this, jsconfig);
             serverModule = new ServerModule(this, jsconfig);
             usersModule = new UsersModule(this, jsconfig);
             replyModule = new RepliesModule(this, jsconfig);
             searchModule = new SearchModule(this, jsconfig);
-            adminmodule = new AdminModule(this, jsconfig);
+            adminmodule = new AdminModule(this,this, jsconfig);
+            identitymodule = new IdentityModule(this, this, jsconfig);
             countdownmodule = new CountDownModule(this, jsconfig);
 
-            ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,usersModule,replyModule,adminmodule,searchModule, WebServer, serverlistmodule , countdownmodule };
+            ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,identitymodule , usersModule,replyModule,adminmodule,searchModule, WebServer, serverlistmodule , countdownmodule };
 
             Console.WriteLine("Modules loaded and ModuleList intitialised");
 
@@ -71,9 +78,31 @@ namespace SteamBotLite
                 module.OnAllModulesLoaded();
             }
 
-            OnMaplistchange(mapModule.mapList);
+          //  OnMaplistchange(mapModule.mapList);
         }
 
+        
+        public void UpdateUsernameEvent(object sender, string e)
+        {
+            base.SetUsernameEventProcess(e);
+        }
+
+        
+        
+
+        public void OnMaplistchange(IReadOnlyList<Map> maplist, object sender = null, NotifyCollectionChangedEventArgs args = null)
+        {
+
+            foreach (MapListChangeListiner listiner in ListChangeEventListiners)
+            {
+                listiner.MaplistChange(maplist);
+            }
+        }
+
+        public void AddListChangeEventListiner(MapListChangeListiner listiner)
+        {
+            ListChangeEventListiners.Add(listiner);
+        }
 
         public List<OnLoginCompletedListiners> OnLoginlistiners;
 
@@ -83,8 +112,7 @@ namespace SteamBotLite
                 {
                     base.FireMainChatRoomEvent(ChatroomEventEnum.EnterChat);
                 }
-            foreach (OnLoginCompletedListiners listiner in OnLoginlistiners)
-            {
+            foreach (OnLoginCompletedListiners listiner in OnLoginlistiners) {
                 listiner.OnLoginCompleted();
             }
             Console.WriteLine("UserHandler: {0} Has Loaded", this.GetType());
@@ -191,14 +219,7 @@ namespace SteamBotLite
             }
             return response;
         }
-        public void OnMaplistchange(ObservableCollection<MapModule.Map> maplist, object sender = null, NotifyCollectionChangedEventArgs args = null)
-        {
-            base.SetUsernameEventProcess("[" + maplist.Count + "]" + Username);
-            if (WebServer != null)
-            {
-               // WebServer.MapListUpdate(maplist);
-            }
-        }
+        
 
         public void ServerUpdated(object sender, ServerModule.ServerInfo args)
         {
@@ -223,5 +244,28 @@ namespace SteamBotLite
                 Listiner.HTMLFileFromArray(Headernames, Data, TableKey);
             }
         }
+
+        public bool admincheck(ChatroomEntity user)
+        {
+            return usersModule.admincheck(user);
+        }
+
+        public void AddMapChangeEventListiner(ServerMapChangeListiner listiner)
+        {
+            MapChangeEventListiners.Add(listiner);
+        }
+
+        public void AddLoginEventListiner(OnLoginCompletedListiners listiner)
+        {
+            OnLoginlistiners.Add(listiner);
+        }
+
+        
+
+        public List<BaseModule> GetAllModules()
+        {
+            return ModuleList;
+        }
+
     }
 }

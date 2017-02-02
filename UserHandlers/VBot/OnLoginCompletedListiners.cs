@@ -1,6 +1,6 @@
 ﻿namespace SteamBotLite
 {
-    interface OnLoginCompletedListiners
+    public interface OnLoginCompletedListiners
     {
         void OnLoginCompleted();
     }

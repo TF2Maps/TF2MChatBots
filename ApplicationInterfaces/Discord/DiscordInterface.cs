@@ -13,15 +13,26 @@ namespace SteamBotLite
     {
         private DiscordClient _client;
         string Token;
-        ulong[] BroadCastChatrooms = new ulong[] { };
+
+        List<ulong> BroadCastChatrooms;
 
         public DiscordInterface()
         {
             TickThread = TickThreadState.Stopped;
-
             Token = config["Token"].ToString();
-            BroadCastChatrooms = (ulong[])JsonConvert.DeserializeObject(config["BroadCastChatrooms"].ToString(),BroadCastChatrooms.GetType());
-            
+            BroadCastChatrooms = new List<ulong>();
+
+            if (bool.Parse(config["UseWhitelistAsBroadCastChatrooms"].ToString()))  {
+                foreach (string item in Whitelist)  {
+                    BroadCastChatrooms.Add(ulong.Parse(item));
+                }
+            }
+            else {
+                foreach (string item in JsonConvert.DeserializeObject<List<string>>(config["Whitelist"].ToString()))  {
+                    BroadCastChatrooms.Add(ulong.Parse(item));
+                }
+            }
+
             _client = new DiscordClient();
             ConnectionProcess(Token, _client);
             _client.MessageReceived += _client_MessageReceived;
@@ -32,7 +43,7 @@ namespace SteamBotLite
             Console.WriteLine(e.Message.RawText);
             if (!e.Message.IsAuthor)
             {
-                ChatroomEntity user = new ChatroomEntity(e.User.Id, ChatroomEntity.Individual.User, this);
+                SteamBotLite.User user = new SteamBotLite.User(e.User.Id, this);
                 user.DisplayName = e.User.Name;
                 user.ExtraData = e.User;
                 
@@ -50,7 +61,7 @@ namespace SteamBotLite
                 Msg.ReceivedMessage = e.Message.RawText;
                 Msg.Sender = user;
 
-                Msg.Chatroom = new ChatroomEntity(e.Message.Channel, ChatroomEntity.Individual.Chatroom, this, "", ChatroomEntity.AdminStatus.Unknown, e.Message.Server);
+                Msg.Chatroom = new Chatroom(e.Message.Channel,  this);
                 
                 if (e.Message.Channel != null)
                 {
@@ -124,7 +135,7 @@ namespace SteamBotLite
         {
             try
             {
-                User user = (User)messagedata.Sender.ExtraData;
+                Discord.User user = (Discord.User)messagedata.Sender.ExtraData;
                 
                 Console.WriteLine("Casted Fine To Discord");
                 SendLargeMessage(user, messagedata.ReplyMessage);
@@ -135,7 +146,7 @@ namespace SteamBotLite
             }
         }
          
-        public void SendLargeMessage (User user , string message)
+        public void SendLargeMessage (Discord.User user , string message)
         {
             while (message.Length > 1999)
             {

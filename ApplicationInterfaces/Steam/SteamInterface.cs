@@ -83,10 +83,14 @@ namespace SteamBotLite
             string pass = config["password"].ToString();
             bool shouldrememberpass = (bool)config["ShouldRememberPassword"];
             SteamBotData SteamBotLoginData = new SteamBotData(user,pass, shouldrememberpass);
-            MainChatRoom = new ChatroomEntity(ulong.Parse(config["GroupChatID"].ToString()), ChatroomEntity.Individual.Chatroom, this);
+            
             LoginData = SteamBotLoginData.LoginData;
             ResetConnection(SteamBotLoginData);
         }
+        
+
+        
+
         /// <summary>
         /// Creates an instance of SteamConnectionHandler with the data given and logs in, also can be fired to reset the bot
         /// </summary>
@@ -217,8 +221,15 @@ namespace SteamBotLite
         void OnFriendsList(SteamFriends.FriendsListCallback callback)
         {
             // at this point, the client has received it's friends list
-            Console.WriteLine("Logon?");
-            AnnounceLoginCompleted();         
+            Console.WriteLine("Steam Logged in");
+
+            AnnounceLoginCompleted();
+
+            foreach (ChatroomEntity Chatroom in GetMainChatroomsCollection())
+            {
+                SteamFriends.JoinChat(new SteamID(ulong.Parse(Chatroom.identifier.ToString())));
+            }
+
         }
         /// <summary>
         /// Now that we're logged in, lets go online so we can properly interact on steamfriends.
@@ -233,6 +244,7 @@ namespace SteamBotLite
 
             // at this point, we can go online on friends, so lets do that
             SteamFriends.SetPersonaState(EPersonaState.Online); //Set the State to Online
+            
         }
         /// <summary>
         /// A method to Login using the given Data
@@ -387,22 +399,26 @@ namespace SteamBotLite
         {
             MessageEventArgs NewMessageData = new MessageEventArgs(this);
             NewMessageData.ReceivedMessage = callback.Message;
-            NewMessageData.Sender = new ChatroomEntity(callback.Sender,ChatroomEntity.Individual.User,this);
+            NewMessageData.Sender = new ChatroomEntity(callback.Sender,this);
             NewMessageData.Destination = NewMessageData.Sender;
             NewMessageData.Sender.DisplayName = SteamFriends.GetFriendPersonaName(callback.Sender);
             base.PrivateMessageProcessEvent(NewMessageData);
 
-            // UserHandlerClass.ProcessPrivateMessage(new ChatroomEntity(callback.Sender), callback.Message);
         }
 
         void ReceiveChatMessage(SteamFriends.ChatMsgCallback callback)
         {
+          //  if (CheckEntryValid(callback.ChatRoomID.ConvertToUInt64().ToString())) //TODO get this code working
+          //  { }
+
             MessageEventArgs NewMessageData = new MessageEventArgs(this);
             NewMessageData.ReceivedMessage = callback.Message;
 
-            NewMessageData.Chatroom = new ChatroomEntity(callback.ChatRoomID,ChatroomEntity.Individual.Chatroom,this,callback.ChatRoomID.ToString());
+            NewMessageData.Chatroom = new Chatroom(callback.ChatRoomID, this);
+            NewMessageData.Chatroom.DisplayName = (callback.ChatRoomID.ToString());
 
-            NewMessageData.Sender = new ChatroomEntity(callback.ChatterID,ChatroomEntity.Individual.User,this, SteamFriends.GetFriendPersonaName(callback.ChatterID));
+            NewMessageData.Sender = new User(callback.ChatterID, this);
+            NewMessageData.Sender.DisplayName = SteamFriends.GetFriendPersonaName(callback.ChatterID);
 
             NewMessageData.Destination = NewMessageData.Chatroom;
 
@@ -410,11 +426,12 @@ namespace SteamBotLite
 
             base.ChatRoomMessageProcessEvent(NewMessageData);
 
-          
+
         }
 
         void Chatmemberinfo(SteamFriends.ChatMemberInfoCallback callback)
         {
+            
             if (callback.StateChangeInfo.StateChange != EChatMemberStateChange.Entered)
             {
 
@@ -423,11 +440,11 @@ namespace SteamBotLite
             {
                 if (callback.StateChangeInfo.MemberInfo.Permissions.HasFlag(EChatPermission.MemberDefault))
                 {
-                    ChatMemberInfoProcessEvent(new ChatroomEntity(callback.StateChangeInfo.ChatterActedOn,ChatroomEntity.Individual.Chatroom,this,null), true);
+                    ChatMemberInfoProcessEvent(new ChatroomEntity(callback.StateChangeInfo.ChatterActedOn,this), true);
                 }
                 else
                 {
-                    ChatMemberInfoProcessEvent(new ChatroomEntity(callback.StateChangeInfo.ChatterActedOn,ChatroomEntity.Individual.Chatroom,this,null), false);
+                    ChatMemberInfoProcessEvent(new ChatroomEntity(callback.StateChangeInfo.ChatterActedOn,this), false);
                 }
             }
         }
@@ -459,12 +476,16 @@ namespace SteamBotLite
 
         public override void BroadCastMessage(object sender, string message)
         {
-            SteamFriends.SendChatRoomMessage(new SteamID((ulong)MainChatRoom.identifier), EChatEntryType.ChatMsg, message);
+            foreach (ChatroomEntity Chatroom in GetMainChatroomsCollection())
+            {
+                SteamFriends.SendChatRoomMessage(new SteamID((ulong.Parse(Chatroom.identifier.ToString()))), EChatEntryType.ChatMsg, message);
+            }
         }
 
         public override void EnterChatRoom(object sender, ChatroomEntity ChatroomEntity)
         {
-            SteamFriends.JoinChat(new SteamID((ulong)ChatroomEntity.identifier));
+            ulong item = ulong.Parse(ChatroomEntity.identifier.ToString());
+            SteamFriends.JoinChat(new SteamID(item));
         }
 
         public override void ReceiveChatMemberInfo(ChatroomEntity ChatroomEntity, bool AdminStatus)
@@ -474,7 +495,8 @@ namespace SteamBotLite
 
         public override void LeaveChatroom(object sender, ChatroomEntity ChatroomEntity)
         {
-            SteamFriends.LeaveChat(new SteamID((ulong)ChatroomEntity.identifier));
+            ulong item = ulong.Parse(ChatroomEntity.identifier.ToString());
+            SteamFriends.LeaveChat(new SteamID(item));
         }
 
         public override void SetUsername(object sender, string Username)
