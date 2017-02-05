@@ -8,6 +8,6 @@ namespace SteamBotLite
 {
     public interface ServerMapChangeListiner
     {
-        void OnMapChange(ServerModule.ServerInfo args);
+        void OnMapChange(ServerInfo args);
     }
 }

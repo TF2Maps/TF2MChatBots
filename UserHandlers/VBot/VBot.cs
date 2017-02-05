@@ -7,7 +7,7 @@ using System.Collections.ObjectModel;
 
 namespace SteamBotLite
 {
-    public class VBot : UserHandler , HTMLFileFromArrayListiners , ModuleHandler
+    public class VBot : UserHandler, HTMLFileFromArrayListiners, ModuleHandler
     {
         
         bool Autojoin = true; 
@@ -92,7 +92,6 @@ namespace SteamBotLite
 
         public void OnMaplistchange(IReadOnlyList<Map> maplist, object sender = null, NotifyCollectionChangedEventArgs args = null)
         {
-
             foreach (MapListChangeListiner listiner in ListChangeEventListiners)
             {
                 listiner.MaplistChange(maplist);
@@ -221,7 +220,7 @@ namespace SteamBotLite
         }
         
 
-        public void ServerUpdated(object sender, ServerModule.ServerInfo args)
+        public void ServerUpdated(object sender, ServerInfo args)
         {
             if (MapChangeEventListiners.Count > 0 )
             {

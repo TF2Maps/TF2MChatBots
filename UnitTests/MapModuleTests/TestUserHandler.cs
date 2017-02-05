@@ -75,6 +75,10 @@ namespace SteamBotLite
         {
         }
 
+        void ModuleHandler.ServerUpdated(object sender, ServerInfo args)
+        {
+        }
+
         void ModuleHandler.SetStatusmessageEvent(string statusMessage)
         {
         }

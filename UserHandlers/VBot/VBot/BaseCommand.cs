@@ -35,12 +35,10 @@ namespace SteamBotLite
 
         public virtual bool CheckCommandExists(MessageEventArgs Msg, string Message)
         {
-            if (Message.StartsWith(command, StringComparison.OrdinalIgnoreCase))
-            {
+            if (Message.StartsWith(command, StringComparison.OrdinalIgnoreCase)) {
                 return true;
             }
-            else
-            {
+            else {
                 return false;
             }
         }

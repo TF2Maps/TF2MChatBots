@@ -53,6 +53,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AdminModuleUnitTests.cs" />
+    <Compile Include="ServerModuleUnitTests.cs" />
     <Compile Include="TestUserHandler.cs" />
     <Compile Include="MapModuleUnitTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -66,7 +66,7 @@ namespace SteamBotLite
             }
         }
 
-        public void OnMapChange(ServerModule.ServerInfo args)
+        public void OnMapChange(ServerInfo args)
         {
           //  Tuple<string,string,string> entry = new Tuple<string, string, string>()
             PlayEntry entry = new PlayEntry(args.playerCount.ToString(), args.serverIP, System.DateTime.Now.ToShortDateString() + " : " + System.DateTime.Now.ToShortTimeString());

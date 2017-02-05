@@ -65,7 +65,7 @@ namespace SteamBotLite
             }
         }
 
-        public void HandleEvent(object sender, ServerModule.ServerInfo args)
+        public void HandleEvent(object sender, ServerInfo args)
         {
         }
 

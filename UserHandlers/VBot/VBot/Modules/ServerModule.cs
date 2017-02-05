@@ -20,57 +20,14 @@ namespace SteamBotLite
 
         public ServerList serverList;
 
-        public VBot Bot;
+        public ModuleHandler Bot;
 
-        public class ServerList
-        {
-            ServerModule Servermodule;
+        
 
-            public ServerList(ServerModule module, List<ServerInfo> serverlist)
-            {
-                Servermodule = module;
-                ServerListObject = serverlist;
-            }
-
-            List<ServerInfo> ServerListObject { get; }
-
-            public IReadOnlyList<ServerInfo> Servers
-            {
-                get
-                {
-                    return ServerListObject.AsReadOnly();
-                }
-            }
-
-            public void Add(ServerInfo server)
-            {
-                ServerListObject.Add(server);
-                Servermodule.commands.Add((new Status(Servermodule.Bot, server, Servermodule)));
-                Servermodule.savePersistentData();
-            }
-            public void Remove(ServerInfo server)
-            {
-
-                foreach (BaseCommand command in Servermodule.commands)
-                {
-                    if (command.command.Equals("!" + server.tag + "server"))
-                    {
-                        Servermodule.commands.Remove(command);
-                    }
-                }
-                ServerListObject.Remove(server);
-
-                Servermodule.savePersistentData();
-            }
-        }
-
-        public override void OnAllModulesLoaded()
-        {
-
-        }
+        public override void OnAllModulesLoaded() { }
 
 
-        public ServerModule(VBot bot, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
+        public ServerModule(ModuleHandler bot, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
 
             Bot = bot;
@@ -95,14 +52,20 @@ namespace SteamBotLite
 
             serverList = new ServerList(this, ServerList);
             commands.Add(new Active(bot, this));
+            commands.Add(new SpecificServerStatus(bot, this));
             adminCommands.Add(new ServerAdd(bot, this));
             adminCommands.Add(new ServerRemove(bot, this));
             adminCommands.Add(new FullServerQuery(bot, this));
 
-
             serverUpdate = new BaseTask(updateInterval, new System.Timers.ElapsedEventHandler(SyncServerInfo));
+
             ServerMapChanged += bot.ServerUpdated;
             ServerMapChanged += ServerModule_ServerMapChanged;
+        }
+
+        public string NameToserverCommand (string servername)
+        {
+            return "!" + servername.ToLower() + "server";
         }
 
         private void ServerModule_ServerMapChanged(object sender, ServerInfo e)
@@ -113,37 +76,7 @@ namespace SteamBotLite
             }
         }
 
-        public class ServerInfo : EventArgs
-        {
-            public string serverIP;
-            public int port;
-
-            public string tag;
-            public int playerCount;
-            public int capacity;
-            public string currentMap = "";
-
-            public ServerInfo(string serverIP, int port, string tag)
-            {
-                this.serverIP = serverIP;
-                this.port = port;
-                this.tag = tag;
-            }
-
-            public void update(ServerInfo updated)
-            {
-                this.playerCount = updated.playerCount;
-                this.capacity = updated.capacity;
-                this.currentMap = updated.currentMap;
-            }
-
-            public override string ToString()
-            {
-                return this.tag + " server is now on " + this.currentMap +
-                    " - " + this.playerCount + "/" + this.capacity +
-                    " - join: steam://connect/" + this.serverIP + ":" + this.port;
-            }
-        }
+        
 
         public void SyncServerInfo(object sender, EventArgs e)
         {
@@ -186,57 +119,68 @@ namespace SteamBotLite
             }
         }
 
+        
         // queries a server and returns a <string, int> Tuple (filename, playercount)
-        public static ServerInfo ServerQuery(ServerInfo server)
+        public  ServerInfo ServerQuery(ServerInfo server)
         {
-            ServerInfo updatedServer = null;
-            // request server infos
-            IPEndPoint localEndpoint = new IPEndPoint(IPAddress.Any, 0);
-
-            using (var client = new UdpClient(new IPEndPoint(IPAddress.Any, 0)))
+            if (IsEmulating) //For testing purposes, we can assign and set an emulated serverinfo response
             {
-                client.Client.ReceiveTimeout = 5000;
-                client.Client.SendTimeout = 5000;
-
-                client.Connect(new IPEndPoint(System.Net.IPAddress.Parse(server.serverIP), server.port));
-
-                var request = new List<byte>();
-                request.AddRange(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0x54 });
-                request.AddRange(Encoding.ASCII.GetBytes("Source Engine Query\0"));
-                var requestArr = request.ToArray();
-                client.Send(requestArr, requestArr.Length);
-
-                try
-                {
-                    var data = client.Receive(ref localEndpoint).Skip(6).ToArray();
-
-                    updatedServer = new ServerInfo(server.serverIP, server.port, server.tag);
-                    string[] serverinfos = Encoding.ASCII.GetString(data).Split(new char[] { '\0' }, 5);
-                    // getting and sanitizing filename
-                    updatedServer.currentMap = serverinfos[1].Split('.')[0].Replace("workshop/", "");
-                    // getting playerount
-                    updatedServer.playerCount = (int)Encoding.ASCII.GetBytes(serverinfos[4]).Skip(2).ToArray()[0];
-                    // getting server capacity
-                    updatedServer.capacity = (int)Encoding.ASCII.GetBytes(serverinfos[4]).Skip(2).ToArray()[1];
-
-                    //Console.WriteLine(string.Format("{0} Responded with {1} and {2}",updatedServer.tag, updatedServer.currentMap,updatedServer.playerCount));
-
-                    //Console.WriteLine(string.Format("{0} Responded with: {1} and: {2}", updatedServer.tag, updatedServer.currentMap, updatedServer.playerCount));
-
-                    // Console.WriteLine(string.Format("{0} Responded with {1}",server.tag, updatedServer.currentMap));
-
-                    client.Close();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(string.Format("Error from: {0}: {1}", server.tag, ex.Message));
-                    client.Close();
-                }
+                return EmulatedServerInfo;
             }
+            else
+            {
+                ServerInfo updatedServer = null;
+                // request server infos
+                IPEndPoint localEndpoint = new IPEndPoint(IPAddress.Any, 0);
 
-            return updatedServer;
+                using (var client = new UdpClient(new IPEndPoint(IPAddress.Any, 0)))
+                {
+                    client.Client.ReceiveTimeout = 5000;
+                    client.Client.SendTimeout = 5000;
+
+                    client.Connect(new IPEndPoint(System.Net.IPAddress.Parse(server.serverIP), server.port));
+
+                    var request = new List<byte>();
+                    request.AddRange(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0x54 });
+                    request.AddRange(Encoding.ASCII.GetBytes("Source Engine Query\0"));
+                    var requestArr = request.ToArray();
+                    client.Send(requestArr, requestArr.Length);
+
+                    try
+                    {
+                        var data = client.Receive(ref localEndpoint).Skip(6).ToArray();
+
+                        updatedServer = new ServerInfo(server.serverIP, server.port, server.tag);
+                        string[] serverinfos = Encoding.ASCII.GetString(data).Split(new char[] { '\0' }, 5);
+                        // getting and sanitizing filename
+                        updatedServer.currentMap = serverinfos[1].Split('.')[0].Replace("workshop/", "");
+                        // getting playerount
+                        updatedServer.playerCount = (int)Encoding.ASCII.GetBytes(serverinfos[4]).Skip(2).ToArray()[0];
+                        // getting server capacity
+                        updatedServer.capacity = (int)Encoding.ASCII.GetBytes(serverinfos[4]).Skip(2).ToArray()[1];
+
+                        client.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(string.Format("Error from: {0}: {1}", server.tag, ex.Message));
+                        client.Close();
+                    }
+                }
+
+                return updatedServer;
+            }
         }
 
+        //For Testing Purposes
+        private ServerInfo EmulatedServerInfo;
+        private bool IsEmulating = false;
+
+        public void EmulateServerQuery(ServerInfo Response)
+        {
+            EmulatedServerInfo = Response;
+            IsEmulating = true;
+        }
 
         // Special status commands
 
@@ -246,7 +190,7 @@ namespace SteamBotLite
             ServerInfo server;
             ServerModule servermodule;
 
-            public Status(VBot bot, ServerInfo server, ServerModule module) : base(bot, "!" + server.tag.ToLower() + "server")
+            public Status(ModuleHandler bot, ServerInfo server, ServerModule module) : base(bot, module.NameToserverCommand(server.tag))
             {
                 this.server = server;
                 servermodule = module;
@@ -254,11 +198,10 @@ namespace SteamBotLite
             }
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                ServerInfo status = ServerQuery(server);
+                ServerInfo status = servermodule.ServerQuery(server);
                 if (status != null)
                 {
                     server.update(status);
-                    //  servermodule.ServerMapChanged(this, server);
                     return server.ToString();
                 }
                 else
@@ -266,18 +209,67 @@ namespace SteamBotLite
             }
         }
 
+        private sealed class SpecificServerStatus : BaseCommand
+        {
+            // Automaticaly generated status command for each server under the config
+            ServerModule servermodule;
+
+            public SpecificServerStatus(ModuleHandler bot, ServerModule module) : base(bot, "")
+            {
+                servermodule = module;
+
+            }
+            protected override string exec(MessageEventArgs Msg, string param)
+            {
+                foreach (ServerInfo server in servermodule.serverList)
+                {
+                    if (server.tag.Equals(param))
+                    {
+                        return servermodule.ServerQuery(server).ToString();
+                    }
+                }
+                return "An error occured when querying the server!";
+            }
+
+            public override bool CheckCommandExists(MessageEventArgs Msg, string Message)
+            {
+                foreach (ServerInfo server in servermodule.serverList)
+                {
+                    if (Message.StartsWith(servermodule.NameToserverCommand(server.tag), StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+
+                }
+                return false;
+            }
+            
+            public override string[] GetCommmand()
+            {
+                int AmountOfServers = servermodule.serverList.Count();
+                string[] ServerList = new string[AmountOfServers];
+
+                for (int x = 0; x < AmountOfServers; x++ )
+                {
+                    ServerList[AmountOfServers] = servermodule.NameToserverCommand(servermodule.serverList.Servers[x].tag);
+                }
+
+                return ServerList;
+            }
+        }
+
         private class ServerAdd : BaseCommand
         {
             ServerModule module;
-            public ServerAdd(VBot bot, ServerModule module) : base(bot, "!serveradd")
+            public ServerAdd(ModuleHandler bot, ServerModule module) : base(bot, "!serveradd")
             {
                 this.module = module;
-
             }
 
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 string[] parameters = param.Split(new char[] { ' ' });
+
                 if (parameters.Length > 2)
                 {
                     try
@@ -304,7 +296,7 @@ namespace SteamBotLite
         {
             ServerModule module;
 
-            public ServerRemove(VBot bot, ServerModule module) : base(bot, "!serverremove")
+            public ServerRemove(ModuleHandler bot, ServerModule module) : base(bot, "!serverremove")
             {
                 this.module = module;
             }
@@ -328,7 +320,7 @@ namespace SteamBotLite
         {
             // Command to query if a server is active
             ServerModule module;
-            public Active(VBot bot, ServerModule module) : base(bot, "!Active")
+            public Active(ModuleHandler bot, ServerModule module) : base(bot, "!Active")
             {
                 this.module = module;
             }
@@ -351,7 +343,7 @@ namespace SteamBotLite
         {
             // Command to query if a server is active
             ServerModule module;
-            public FullServerQuery(VBot bot, ServerModule module) : base(bot, "!Serverquery")
+            public FullServerQuery(ModuleHandler bot, ServerModule module) : base(bot, "!Serverquery")
             {
                 this.module = module;
             }

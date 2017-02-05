@@ -120,7 +120,7 @@ namespace SteamBotLite
             }
         }
 
-        public void OnMapChange(ServerModule.ServerInfo args)
+        public void OnMapChange(ServerInfo args)
         {
             Console.WriteLine("Going to possibly remove {0} Map...", args.currentMap);
 
