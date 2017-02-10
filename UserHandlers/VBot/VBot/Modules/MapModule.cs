@@ -515,16 +515,19 @@ namespace SteamBotLite
             }
         }
 
-        private class Delete : MapCommand
+        private class Delete : BaseCommand
         {
-            public Delete(ModuleHandler bot, MapModule mapMod) : base(bot, "!delete", mapMod , "!delete <mapname>") { }
-            public override string runcommand(MessageEventArgs Msg, string param)
+            MapModule module;
+            public Delete(ModuleHandler bot, MapModule mapMod) : base(bot, "!delete") {
+                module = mapMod;
+            }
+            protected override string exec(MessageEventArgs Msg, string param)
             {
                 string[] parameters = param.Split(' ');
 
                 if (parameters.Length > 0)
                 {
-                    Map deletedMap = MapModule.mapList.GetMapByFilename(parameters[0]);
+                    Map deletedMap = module.mapList.GetMapByFilename(parameters[0]);
 
                     if (deletedMap == null)
                     {
@@ -534,8 +537,8 @@ namespace SteamBotLite
                     {
                         if ((deletedMap.Submitter.Equals(Msg.Sender.identifier.ToString())) || (userhandler.admincheck(Msg.Sender)))
                         {
-                            MapModule.mapList.RemoveMap(deletedMap);
-                            MapModule.savePersistentData();
+                            module.mapList.RemoveMap(deletedMap);
+                            module.savePersistentData();
                             userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = new User(deletedMap.Submitter,null), ReplyMessage = string.Format("Your map {0} has been deleted from the map list", deletedMap.Filename) });
                             return string.Format("Map '{0}' DELETED.", deletedMap.Filename);
                         }
@@ -550,14 +553,14 @@ namespace SteamBotLite
 
         }
 
-        private class Wipe : BaseCommand
+        private class Wipe : MapCommand
         {
             MapModule module;
-            public Wipe(ModuleHandler bot, MapModule mapMod) : base(bot, "!wipe")
+            public Wipe(ModuleHandler bot, MapModule mapMod) : base(bot, "!wipe" , mapMod, "!wipe <reason>")
             {
                 module = mapMod;
             }
-            protected override string exec(MessageEventArgs Msg, string param)
+            public override string runcommand(MessageEventArgs Msg, string param)
             {
                 if (!string.IsNullOrEmpty(param))
                 {
