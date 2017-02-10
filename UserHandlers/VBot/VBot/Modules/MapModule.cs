@@ -168,12 +168,31 @@ namespace SteamBotLite
         abstract public class MapCommand : BaseCommand
         {
             protected MapModule MapModule;
+            string syntax;
+            string command;
 
-            public MapCommand(ModuleHandler bot, string command, MapModule mapMod)
-                : base(bot, command)
+            public MapCommand(ModuleHandler bot, string command, MapModule mapMod, string Syntax): base(bot, command)
             {
                 this.MapModule = mapMod;
+                this.syntax = Syntax;
+                this.command = command;
             }
+
+            protected override string exec(MessageEventArgs Msg, string param)
+            {
+                string[] commandsplit = param.Split(new char[] { ' ' }, 2);
+
+                if((commandsplit[0].StartsWith(command, StringComparison.OrdinalIgnoreCase)))
+                {
+                    return "Incorrect Syntax!: " + syntax; 
+                }
+                else
+                {
+                    return runcommand(Msg,param);
+                }
+            }
+
+            public abstract string runcommand(MessageEventArgs Msg, string param);
 
             public Map CleanupAndParseMsgToMap (MessageEventArgs Msg , string param)
             {
@@ -224,10 +243,10 @@ namespace SteamBotLite
 
         private sealed class UploadCheck : MapCommand
         {
-            public UploadCheck(ModuleHandler bot, MapModule mapModule) : base(bot, "!uploadcheck", mapModule)
+            public UploadCheck(ModuleHandler bot, MapModule mapModule) : base(bot, "!uploadcheck", mapModule , "!uploadcheck <mapname>")
             {}
 
-            protected override string exec(MessageEventArgs Msg, string param)
+            public override string runcommand(MessageEventArgs Msg, string param)
             {
                 return MapModule.CheckIfMapIsUploaded(param).ToString();
             }
@@ -273,10 +292,9 @@ namespace SteamBotLite
         private class Add : MapCommand
         {
 
-            
-            public Add(ModuleHandler bot, MapModule mapModule) : base(bot, "!add", mapModule) { }
+            public Add(ModuleHandler bot, MapModule mapModule) : base(bot, "!add", mapModule , "!add <mapname> <url> <notes>") { }
 
-            protected override string exec(MessageEventArgs Msg, string param)
+            public override string runcommand(MessageEventArgs Msg, string param)
             {
                 Map UserMap = CleanupAndParseMsgToMap(Msg , param);
                 UserMap.Submitter = Msg.Sender.identifier;
@@ -292,12 +310,9 @@ namespace SteamBotLite
 
         private class Insert : MapCommand
         {
+            public Insert(ModuleHandler bot, MapModule mapModule) : base(bot, "!insert", mapModule , "!insert <index> <filename> <url> <notes>") { }
 
-            
-
-            public Insert(ModuleHandler bot, MapModule mapModule) : base(bot, "!insert", mapModule) { }
-
-            protected override string exec(MessageEventArgs msg, string param)
+            public override string runcommand(MessageEventArgs msg, string param)
             {
                 string[] parameters = param.Split(new char[] { ' ' }, 3);
                 int index;
@@ -365,13 +380,18 @@ namespace SteamBotLite
             }
         }
 
-        private class Maps : MapCommand
+        private class Maps : BaseCommand
         {
-            public Maps(ModuleHandler bot, MapModule mapMod) : base(bot, "!maps", mapMod) { }
+            MapModule module;
+            public Maps(ModuleHandler bot, MapModule mapMod) : base(bot, "!maps") {
+                module = mapMod;
+            }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                var maps = MapModule.mapList.GetAllMaps();
-                int maxMaps = MapModule.MaxMapNumber;
+                
+                var maps = module.mapList.GetAllMaps();
+                int maxMaps = module.MaxMapNumber;
                 string chatResponse = "";
                 string pmResponse = "";
 
@@ -425,8 +445,8 @@ namespace SteamBotLite
 
         private class Reposition : MapCommand
         {
-            public Reposition(ModuleHandler bot, MapModule mapMod) : base(bot, "!reposition", mapMod) { }
-            protected override string exec(MessageEventArgs Msg, string param)
+            public Reposition(ModuleHandler bot, MapModule mapMod) : base(bot, "!reposition", mapMod , "!reposition <new position> <filename>") { }
+            public override string runcommand(MessageEventArgs Msg, string param)
             {
                 string[] parameters = param.Split(' ');
 
@@ -478,10 +498,9 @@ namespace SteamBotLite
 
         private class Update : MapCommand
         {
-            public Update(ModuleHandler bot, MapModule mapMod) : base(bot, "!update", mapMod) { }
-            protected override string exec(MessageEventArgs msg, string param)
+            public Update(ModuleHandler bot, MapModule mapMod) : base(bot, "!update", mapMod , "!update <Current Filename> <New filename> <New Url> <new notes>") { }
+            public override string runcommand(MessageEventArgs msg, string param)
             {
-                //string[] parameters = param.Split(' ');
                 string[] parameters = param.Split(new char[] { ' ' }, 2);
 
                 if (parameters.Length > 1)
@@ -498,8 +517,8 @@ namespace SteamBotLite
 
         private class Delete : MapCommand
         {
-            public Delete(ModuleHandler bot, MapModule mapMod) : base(bot, "!delete", mapMod) { }
-            protected override string exec(MessageEventArgs Msg, string param)
+            public Delete(ModuleHandler bot, MapModule mapMod) : base(bot, "!delete", mapMod , "!delete <mapname>") { }
+            public override string runcommand(MessageEventArgs Msg, string param)
             {
                 string[] parameters = param.Split(' ');
 
@@ -531,10 +550,10 @@ namespace SteamBotLite
 
         }
 
-        private class Wipe : MapCommand
+        private class Wipe : BaseCommand
         {
             MapModule module;
-            public Wipe(ModuleHandler bot, MapModule mapMod) : base(bot, "!wipe", mapMod)
+            public Wipe(ModuleHandler bot, MapModule mapMod) : base(bot, "!wipe")
             {
                 module = mapMod;
             }
@@ -543,7 +562,7 @@ namespace SteamBotLite
                 if (!string.IsNullOrEmpty(param))
                 {
                     module.ClearMapListWithMessage(param);
-                    MapModule.savePersistentData();
+                    module.savePersistentData();
                     return "The map list has been DELETED.";
                 }
                 else

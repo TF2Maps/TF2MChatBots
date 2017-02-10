@@ -251,7 +251,7 @@ namespace SteamBotLite
 
                 for (int x = 0; x < AmountOfServers; x++ )
                 {
-                    ServerList[AmountOfServers] = servermodule.NameToserverCommand(servermodule.serverList.Servers[x].tag);
+                    ServerList[x] = servermodule.NameToserverCommand(servermodule.serverList.Servers[x].tag);
                 }
 
                 return ServerList;
