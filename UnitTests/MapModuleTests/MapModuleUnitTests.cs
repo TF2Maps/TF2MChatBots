@@ -104,6 +104,41 @@ namespace MapModuleTests
         }
 
         [TestMethod]
+        public void CheckPersistanceOfExtraData()
+        {
+            string command = "!forceuploaded" + " " + "True" + " " + "Map Not Uploaded";
+            MessageEventArgs Message = new MessageEventArgs(null);
+            Message.ReceivedMessage = command;
+            Message.Sender = TestUser;
+            
+            FireAdminCommand(Message,module);
+
+            Message = new MessageEventArgs(null);
+            Message.ReceivedMessage = AddCommand + " " + Mapname + " " + url + " " + notes;
+            Message.Sender = TestUser;
+
+            FireCommand(Message, module);
+
+            AssertMaplistSize(0);
+
+            module = module = new MapModule(new TestUserHandler(), MakeConfig());
+            
+            
+            command = "!forceuploaded" + " " + "false" + " " + "Map Not Uploaded";
+            Message.ReceivedMessage = command;
+            FireAdminCommand(Message, module);
+            Assert.IsFalse(module.mapList.AllowOnlyUploadedMaps);
+            
+            module = module = new MapModule(new TestUserHandler(), MakeConfig());
+
+            RegularSyntax();
+
+            AssertMaplistSize(1);
+
+
+        }
+
+        [TestMethod]
         public void DeleteMap()
         {
             MessageEventArgs Message = new MessageEventArgs(null);

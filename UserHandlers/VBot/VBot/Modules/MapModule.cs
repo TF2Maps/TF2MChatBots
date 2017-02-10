@@ -34,10 +34,6 @@ namespace SteamBotLite
             ServerMapListUrl = config["ServerMapListUrl"].ToString();
             MaxMapNumber = int.Parse(config["MaxMapList"].ToString());
 
-            bool AllowOnlyUploadedMaps = bool.Parse(config["ForceMapsToBeUploaded"].ToString());
-            string RejectUnUploadedMapsReply = config["ForceMapsToBeUploadedErrMsg"].ToString();
-            mapList.RestrictMapsToBeUploaded(AllowOnlyUploadedMaps, RejectUnUploadedMapsReply);
-
             Console.WriteLine("URL list is now {0} and maximum map number {1}", ServerMapListUrl, MaxMapNumber);
 
             userhandler = bot;
@@ -111,13 +107,13 @@ namespace SteamBotLite
             Dictionary<string, string> PersistantData = new Dictionary<string, string>();
             PersistantData.Add("Maplist", JsonConvert.SerializeObject(mapList.GetAllMaps()));
 
-            Dictionary<string, object> ConfigData = new Dictionary<string, object>(JsonConvert.DeserializeObject<Dictionary<string, object>>(PersistantData["Config"]));
+            Dictionary<string, object> ConfigData = new Dictionary<string, object>();
             ConfigData.Add("AllowOnlyUploadedMaps", mapList.AllowOnlyUploadedMaps.ToString());
             ConfigData.Add("AllowOnlyUploadedMapsErrMsg",mapList.ForceMapsToBeUploadedErrorResponse);
 
             PersistantData.Add("Config", JsonConvert.SerializeObject(ConfigData));
 
-            return JsonConvert.SerializeObject(mapList.GetAllMaps());
+            return JsonConvert.SerializeObject(PersistantData);
         }
 
         public override void loadPersistentData()
@@ -125,7 +121,9 @@ namespace SteamBotLite
             try
             {
                 Console.WriteLine("Loading Map List");
-                Dictionary<string, string> PersistantData = JsonConvert.DeserializeObject<Dictionary<string, string>>(ModuleSavedDataFilePath());
+               
+
+                Dictionary<string, string> PersistantData = JsonConvert.DeserializeObject<Dictionary<string, string>>(System.IO.File.ReadAllText(ModuleSavedDataFilePath()));
                 mapList = new MapCollection(JsonConvert.DeserializeObject<ObservableCollection<Map>>(PersistantData["Maplist"].ToString()));
 
                 Dictionary<string, object> MetaData = new Dictionary<string, object>(JsonConvert.DeserializeObject<Dictionary<string, object>>(PersistantData["Config"]));
@@ -138,6 +136,10 @@ namespace SteamBotLite
             catch
             {
                 mapList = new MapCollection(new ObservableCollection<Map>());
+                mapList.RestrictMapsToBeUploaded(false,"TESTING");
+                
+                savePersistentData();
+
                 Console.WriteLine("Error Loading Map List, creating a new one and wiping the old");
             }
         }
@@ -244,7 +246,9 @@ namespace SteamBotLite
                 bool AllowOnlyUploadedMaps = bool.Parse(parameters[0]);
                 string RejectUnUploadedMapsReply = parameters[1];
                 mapmodule.mapList.RestrictMapsToBeUploaded(AllowOnlyUploadedMaps, RejectUnUploadedMapsReply);
-                
+
+                mapmodule.savePersistentData();
+
                 return string.Format("Config has been updated, forcing maps to be uploaded has been set to: {0} with an error msg {1}",mapmodule.mapList.AllowOnlyUploadedMaps.ToString(), mapmodule.mapList.ForceMapsToBeUploadedErrorResponse);
             }
         }
