@@ -33,6 +33,11 @@ namespace SteamBotLite
 
             ServerMapListUrl = config["ServerMapListUrl"].ToString();
             MaxMapNumber = int.Parse(config["MaxMapList"].ToString());
+
+            bool AllowOnlyUploadedMaps = bool.Parse(config["ForceMapsToBeUploaded"].ToString());
+            string RejectUnUploadedMapsReply = config["ForceMapsToBeUploadedErrMsg"].ToString();
+            mapList.RestrictMapsToBeUploaded(AllowOnlyUploadedMaps, RejectUnUploadedMapsReply);
+
             Console.WriteLine("URL list is now {0} and maximum map number {1}", ServerMapListUrl, MaxMapNumber);
 
             userhandler = bot;
@@ -48,6 +53,7 @@ namespace SteamBotLite
             adminCommands.Add(new Insert(bot, this));
             adminCommands.Add(new Reposition(bot, this));
             adminCommands.Add(new Wipe(bot, this));
+            adminCommands.Add(new AllowOnlyUploadedMapsSetter(bot, this));
 
             bot.AddMapChangeEventListiner(this);
         }
@@ -102,6 +108,15 @@ namespace SteamBotLite
 
         public override string getPersistentData()
         {
+            Dictionary<string, string> PersistantData = new Dictionary<string, string>();
+            PersistantData.Add("Maplist", JsonConvert.SerializeObject(mapList.GetAllMaps()));
+
+            Dictionary<string, object> ConfigData = new Dictionary<string, object>(JsonConvert.DeserializeObject<Dictionary<string, object>>(PersistantData["Config"]));
+            ConfigData.Add("AllowOnlyUploadedMaps", mapList.AllowOnlyUploadedMaps.ToString());
+            ConfigData.Add("AllowOnlyUploadedMapsErrMsg",mapList.ForceMapsToBeUploadedErrorResponse);
+
+            PersistantData.Add("Config", JsonConvert.SerializeObject(ConfigData));
+
             return JsonConvert.SerializeObject(mapList.GetAllMaps());
         }
 
@@ -110,7 +125,14 @@ namespace SteamBotLite
             try
             {
                 Console.WriteLine("Loading Map List");
-                mapList = new MapCollection(JsonConvert.DeserializeObject<ObservableCollection<Map>>(System.IO.File.ReadAllText(ModuleSavedDataFilePath())));
+                Dictionary<string, string> PersistantData = JsonConvert.DeserializeObject<Dictionary<string, string>>(ModuleSavedDataFilePath());
+                mapList = new MapCollection(JsonConvert.DeserializeObject<ObservableCollection<Map>>(PersistantData["Maplist"].ToString()));
+
+                Dictionary<string, object> MetaData = new Dictionary<string, object>(JsonConvert.DeserializeObject<Dictionary<string, object>>(PersistantData["Config"]));
+                bool AllowOnlyUploadedMaps = (bool.Parse(MetaData["AllowOnlyUploadedMaps"].ToString()));
+                string AllowOnlyUploadedMapsErrMsg = MetaData["AllowOnlyUploadedMapsErrMsg"].ToString();
+                mapList.RestrictMapsToBeUploaded(AllowOnlyUploadedMaps, AllowOnlyUploadedMapsErrMsg);
+
                 Console.WriteLine("Loaded Map List");
             }
             catch
@@ -206,6 +228,24 @@ namespace SteamBotLite
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 return MapModule.CheckIfMapIsUploaded(param).ToString();
+            }
+        }
+
+        private sealed class AllowOnlyUploadedMapsSetter : BaseCommand
+        {
+            MapModule mapmodule;
+            public AllowOnlyUploadedMapsSetter(ModuleHandler bot, MapModule module) : base(bot, "!forceuploaded")
+            {
+                mapmodule = module;
+            }
+            protected override string exec(MessageEventArgs Msg, string param)
+            {
+                string[] parameters = param.Split(new char[] { ' ' }, 2);
+                bool AllowOnlyUploadedMaps = bool.Parse(parameters[0]);
+                string RejectUnUploadedMapsReply = parameters[1];
+                mapmodule.mapList.RestrictMapsToBeUploaded(AllowOnlyUploadedMaps, RejectUnUploadedMapsReply);
+                
+                return string.Format("Config has been updated, forcing maps to be uploaded has been set to: {0} with an error msg {1}",mapmodule.mapList.AllowOnlyUploadedMaps.ToString(), mapmodule.mapList.ForceMapsToBeUploadedErrorResponse);
             }
         }
 

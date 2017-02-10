@@ -15,11 +15,13 @@ namespace SteamBotLite
         /// </summary>
         /// 
         ObservableCollection<Map> mapList = new ObservableCollection<Map>();
-        
-        public MapCollection (ObservableCollection<Map> inputlist)
+
+        public MapCollection(ObservableCollection<Map> inputlist)
         {
             this.mapList = inputlist;
             mapList.CollectionChanged += MapList_CollectionChanged;
+
+            AllowOnlyUploadedMaps = false;
         }
 
         private void MapList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
@@ -27,21 +29,30 @@ namespace SteamBotLite
         }
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
-        private ObservableCollection<Map>  GetMaplist  () { return mapList; }
-        
-        public Map  GetMap  (int position) { return mapList[position]; }
+        private ObservableCollection<Map> GetMaplist() { return mapList; }
+
+        public Map GetMap(int position) { return mapList[position]; }
 
         public IReadOnlyList<Map> GetAllMaps() { return mapList; }
 
-        public Map GetMapByFilename   (string filename) { return mapList.FirstOrDefault(x => x.Filename == filename); }
+        public Map GetMapByFilename(string filename) { return mapList.FirstOrDefault(x => x.Filename == filename); }
 
-        public void  RemoveMap  (Map map) { mapList.Remove(map); }
+        public void RemoveMap(Map map) { mapList.Remove(map); }
 
-        public void  RemoveMap  (int position) { mapList.RemoveAt(position); }
+        public void RemoveMap(int position) { mapList.RemoveAt(position); }
 
-        public void  InsertMap  (int position , Map map ) { mapList.Insert(position, map); }
+        public void InsertMap(int position, Map map) { mapList.Insert(position, map); }
 
         public int GetSize() { return mapList.Count; }
+
+        public bool AllowOnlyUploadedMaps { get; private set; }
+        public string ForceMapsToBeUploadedErrorResponse { get; private set; }
+
+        public void RestrictMapsToBeUploaded (bool ForceMapsToBeUploaded, string ErrorMessage)
+        {
+            this.AllowOnlyUploadedMaps = ForceMapsToBeUploaded;
+            ForceMapsToBeUploadedErrorResponse = ErrorMessage;
+        }
 
         public IEnumerator<Map> GetEnumerator ()
         {
@@ -74,7 +85,6 @@ namespace SteamBotLite
 
                 if (mapList[entry].Submitter.ToString().Equals(User.identifier.ToString()) | User.Rank == ChatroomEntity.AdminStatus.True)
                 {
-
                     mapList[entry].Filename = NewMapData.Filename ?? mapList[entry].Filename;
                     mapList[entry].DownloadURL = NewMapData.DownloadURL;
                     mapList[entry].Notes = NewMapData.Notes ?? mapList[entry].Notes;
@@ -101,7 +111,7 @@ namespace SteamBotLite
             int index = 0;
             foreach (Map Entry in mapList)
             {
-                if (Entry.Filename.Equals(mapName) /*&& (Entry.Submitter.ToString().Equals(msg.Sender.identifier.ToString()) | (userhandler.admincheck(msg.Sender)))*/)
+                if (Entry.Filename.Equals(mapName))
                 {
                     ReturnData.MapExistsInList = true;
                     ReturnData.MapEntry = index;
@@ -114,21 +124,20 @@ namespace SteamBotLite
             return ReturnData;
         }
 
-        
-
         private MapValidityCheck CheckIfValid(Map map)
         {
-
             MapValidityCheck ValidityCheck = new MapValidityCheck();
-
             try
             {
-
                 if (map.Uploaded == true) { }
                 else {
+                    if (AllowOnlyUploadedMaps) {
+                        throw new ArgumentException(ForceMapsToBeUploadedErrorResponse);
+                    }
+
                     if (map.DownloadURL != null & map.DownloadURL.StartsWith("http", StringComparison.OrdinalIgnoreCase)) { }
                     else {
-                        throw new ArgumentException("Map isn't uploaded");
+                        throw new ArgumentException("Your map isn't uploaded, and doesn't include a URL!");
                     }
                 }
 

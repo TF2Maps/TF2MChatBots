@@ -11,6 +11,7 @@ namespace SteamBotLite
     public abstract class BaseCommand
     {
         public String command { get; protected set; }
+        
         protected ModuleHandler userhandler;
         
         public BaseCommand(ModuleHandler bot, string command)
