@@ -1,5 +1,5 @@
 # SteamBotLite
-Needs a name-change, it does bot stuff for TF2Maps. Easily configurable. 
+Needs a name-change, it does bot stuff for TF2Maps on the Steam and Discord platforms and is easily configurable and modifiable 
 
 #USE AT YOUR OWN RISK
 
