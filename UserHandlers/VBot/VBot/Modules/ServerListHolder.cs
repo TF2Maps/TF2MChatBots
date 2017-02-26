@@ -38,7 +38,6 @@ namespace SteamBotLite
             UpdateList();
 
             bot.AddMapChangeEventListiner(this);
-            Console.WriteLine("REACHED END");
         }
 
         public override void OnAllModulesLoaded()
@@ -150,7 +149,6 @@ namespace SteamBotLite
                 {
                     mis.CopyTo(dstream);
                 }
-                Console.WriteLine(Convert.ToBase64String(output.ToArray()));
                 return Convert.ToBase64String(output.ToArray());
             }
         }
@@ -163,8 +161,6 @@ namespace SteamBotLite
             {
                 return null;
             }
-            Console.WriteLine("DECOMPRESSING");
-            Console.WriteLine(data);
 
             byte[] persistantdata = Convert.FromBase64String((data));
 
@@ -181,11 +177,9 @@ namespace SteamBotLite
 
         public override void loadPersistentData()
         {
-            Console.WriteLine("Beginning load");
             if (File.Exists(ModuleSavedDataFilePath()))
             {
                 string data = System.IO.File.ReadAllText(ModuleSavedDataFilePath());
-                
                 string DataAsString = Decompress(data);
                 if ( string.IsNullOrEmpty(DataAsString) ) {
                     MapTests = new Dictionary<string, List<PlayEntry>>();
