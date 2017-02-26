@@ -18,7 +18,7 @@ namespace SteamBotLite
         public RepliesModule(VBot bot, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
             
-            SaveDataFile = this.GetType().Name + ".json";
+            SaveDataFile = ModuleSavedDataFilePath();
 
             Responses = GetDataDictionary();
 
