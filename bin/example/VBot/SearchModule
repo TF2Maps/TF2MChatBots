@@ -1,0 +1,18 @@
+[  
+  {  
+    "URLPrefix":"https://www.google.com.au/search?q=",
+    "URLSuffix":"+site%3Adeveloper.valvesoftware.com",
+    "Command":"!VDC",
+    "SpiderPrefix":"url?q=",
+    "SpiderSuffix":"&amp;",
+    "IsCustomUrl":true
+  },
+  {  
+    "URLPrefix":"https://www.google.com.au/search?q=",
+    "URLSuffix":"+site%3Atf2maps.net",
+    "Command":"!TF2M",
+    "SpiderPrefix":"url?q=",
+    "SpiderSuffix":"&amp;",
+    "IsCustomUrl":true
+  }
+]
