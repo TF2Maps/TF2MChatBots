@@ -1,0 +1,11 @@
+{  
+    "username":"<PUT USERNAME HERE>",
+    "password":"<PUT PASSWORD HERE>",
+    "ShouldRememberPassword":true,
+    "BotControlClass":"SteamBotLite.VBot",
+    "Whitelist":["103582791429594873"],
+    "BlackList":[],
+    "WhitelistOnly":true	
+}
+
+

@@ -59,7 +59,7 @@ namespace SteamBotLite
 
             mapModule = new MapModule(this, jsconfig);
 
-            serverlistmodule = new ServerListHolder(this, jsconfig);
+            serverlistmodule = new ServerListHolder(this, this, jsconfig);
             motdModule = new MotdModule(this, jsconfig);
             serverModule = new ServerModule(this, jsconfig);
             usersModule = new UsersModule(this, jsconfig);

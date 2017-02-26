@@ -1,0 +1,67 @@
+{  
+   "ServerModule":{  
+      "updateInterval":40000,
+      "Servers":[  
+         {  
+            "Item1":"US",
+            "Item2":"70.42.74.31",
+            "Item3":27015
+         },
+         {  
+            "Item1":"EU",
+            "Item2":"31.186.251.51",
+            "Item3":27015
+         },
+         {  
+            "Item1":"AU",
+            "Item2":"103.231.91.60",
+            "Item3":27035
+         }
+      ]
+   },
+   "MotdModule":{  
+      "updateInterval":3600000
+   },
+
+   "CountDownModule":{  
+      "updateInterval":60000
+   },
+
+   "MapModule":{  
+      "ServerMapListUrl":"https://redirect.tf2maps.net/maps/",
+      "MaxMapList":10
+   },
+   "UsersModule":{  
+
+   },
+   "RepliesModule":{  
+
+   },
+   "IdentityModule":{ 
+	"DefaultUsername":"VBot",
+	"DefaultStatus":"http://vbot.site",
+	"UseStatus":true 
+
+   },
+	"AdminModule":
+	{
+	},
+
+   "SearchModule":{  
+
+   },
+   "ImpNaoModule":{  
+
+   },
+   "MapWebServer":{  
+      "HeaderFileName":"Header.html",
+      "TrailerFileName":"Trailer.html",
+      "FilesDirectory":"Website",
+      "Address":"http://168.235.90.109:80/",
+      "CSSPath":"Website/stylesheet.css/"
+   },
+   "ServerListHolder":{  
+      "ListConfigs":[  
+      ]
+   }
+}

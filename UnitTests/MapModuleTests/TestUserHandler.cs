@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SteamBotLite
 {
-    class TestUserHandler : UserHandler, ModuleHandler
+    class TestUserHandler : UserHandler, ModuleHandler, HTMLFileFromArrayListiners
     {
         public override void ChatMemberInfo(object sender, Tuple<ChatroomEntity, bool> e)
         {
@@ -61,6 +61,10 @@ namespace SteamBotLite
 
         List<BaseModule> ModuleHandler.GetAllModules() {
             return new List<BaseModule>();
+        }
+
+        void HTMLFileFromArrayListiners.HTMLFileFromArray(string[] Headernames, List<string[]> Data, string TableKey)
+        {
         }
 
         void ModuleHandler.HTMLFileFromArray(string[] headerNames, List<string[]> dataEntries, string v)

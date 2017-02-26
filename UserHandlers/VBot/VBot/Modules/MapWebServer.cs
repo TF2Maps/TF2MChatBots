@@ -40,7 +40,31 @@ namespace SteamBotLite
                 Console.WriteLine(exception);
                 Console.WriteLine("Files not found, webserver load failed");
             }
+
+            adminCommands.Add(new RebootModule(bot, this));
         }
+
+        private class RebootModule : BaseCommand
+        {
+            // Command to query if a server is active
+            MapWebServer module;
+            ModuleHandler ModuleHandler;
+            string address;
+
+            public RebootModule(ModuleHandler bot, MapWebServer module) : base(bot, "!WebsiteReboot")
+            {
+                this.module = module;
+                this.address = (module.config["Address"].ToString());
+            }
+            protected override string exec(MessageEventArgs Msg, string param)
+            {
+                module.CloseWebServer();
+                module.StartWebServer(address);
+                return "Rebooting Serer";
+            }
+
+        }
+
 
         public override void OnAllModulesLoaded()
         {

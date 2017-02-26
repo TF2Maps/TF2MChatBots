@@ -3,6 +3,7 @@
 [Dd]ebug
 packages
 *.exe
+!*.json-example
 *.dll
 *.user
 *.suo

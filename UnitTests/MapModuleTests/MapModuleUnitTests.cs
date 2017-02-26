@@ -144,6 +144,7 @@ namespace MapModuleTests
             MessageEventArgs Message = new MessageEventArgs(null);
             Message.ReceivedMessage = DeleteCommand + " " + Mapname;
             Message.Sender = TestUser;
+            Message.Sender.Rank = ChatroomEntity.AdminStatus.False;
 
             RegularSyntax();
             
