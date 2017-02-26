@@ -1,6 +1,8 @@
 # SteamBotLite
 Needs a name-change, it does bot stuff for TF2Maps. Easily configurable. 
 
+#USE AT YOUR OWN RISK
+
 #General code structure
 
 A general idea of the code is: 
