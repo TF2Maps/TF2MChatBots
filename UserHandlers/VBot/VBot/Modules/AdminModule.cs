@@ -24,6 +24,7 @@ namespace SteamBotLite
             savePersistentData();
 
             handler.AddLoginEventListiner(this);
+            commands.Add(new CommandListRetrieve(handler, this));
 
             adminCommands.Add(new RemoveModule(handler, this));
             adminCommands.Add(new AddModule(handler, this));
@@ -41,10 +42,13 @@ namespace SteamBotLite
         public override void loadPersistentData()
         {
         }
+        Dictionary<string, List<string[]>> CommandListHeld;
+        List<string[]> CommandList;
 
         public override void OnAllModulesLoaded()
         {
-            foreach(BaseModule module in modulehandler.GetAllModules())
+            CommandListHeld = new Dictionary<string, List<string[]>>();
+            foreach (BaseModule module in modulehandler.GetAllModules())
             {
                 
                 string[] HeaderNames = { "Command Type", "Command Name" };
@@ -59,6 +63,7 @@ namespace SteamBotLite
                     }
 
                 }
+                
 
                 foreach (BaseCommand command in module.adminCommands)
                 {
@@ -68,6 +73,7 @@ namespace SteamBotLite
                     }
                     
                 }
+                CommandListHeld.Add(module.GetType().ToString()  , CommandList);
 
                 modulehandler.HTMLFileFromArray(HeaderNames, CommandList, module.GetType().ToString());
             }
@@ -78,7 +84,35 @@ namespace SteamBotLite
         {
         }
 
-       
+        private class CommandListRetrieve : BaseCommand
+        {
+            // Command to query if a server is active
+            AdminModule module;
+
+            public CommandListRetrieve(ModuleHandler bot, AdminModule module) : base(bot, "!CommandList")
+            {
+                this.module = module;
+            }
+            protected override string exec(MessageEventArgs Msg, string param)
+            {
+                string buildresponse = "";
+
+
+                foreach(KeyValuePair<string,List<string[]>> item in module.CommandListHeld)
+                {
+                    buildresponse += System.Environment.NewLine;
+                    buildresponse += item.Key;
+                    buildresponse += System.Environment.NewLine;
+                    foreach (string[] entry in item.Value)
+                    {
+                        
+                        buildresponse += "    " + entry[1] + " (" + entry[0] + " )" + System.Environment.NewLine; ; 
+                    }
+                }
+                userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = Msg.Sender, ReplyMessage = buildresponse });
+                return "Sent command list as private message!";
+            }
+        }
         private class Reboot : BaseCommand
         {
             // Command to query if a server is active
