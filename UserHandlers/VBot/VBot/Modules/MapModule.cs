@@ -266,12 +266,19 @@ namespace SteamBotLite
             {
                 string[] parameters = param.Split(new char[] { ' ' }, 2);
                 bool AllowOnlyUploadedMaps = bool.Parse(parameters[0]);
-                string RejectUnUploadedMapsReply = parameters[1];
-                mapmodule.mapList.RestrictMapsToBeUploaded(AllowOnlyUploadedMaps, RejectUnUploadedMapsReply);
-
+                if (parameters.Count() != 2 && AllowOnlyUploadedMaps)   {
+                    return "The syntax is: !forceuploaded true/false <reason>";
+                }
+                if (AllowOnlyUploadedMaps == false) {
+                    mapmodule.mapList.RestrictMapsToBeUploaded(AllowOnlyUploadedMaps, "");
+                }
+                else {
+                    string RejectUnUploadedMapsReply = parameters[1];
+                    mapmodule.mapList.RestrictMapsToBeUploaded(AllowOnlyUploadedMaps, RejectUnUploadedMapsReply);
+                }
                 mapmodule.savePersistentData();
 
-                return string.Format("Config has been updated, forcing maps to be uploaded has been set to: {0} with an error msg {1}",mapmodule.mapList.AllowOnlyUploadedMaps.ToString(), mapmodule.mapList.ForceMapsToBeUploadedErrorResponse);
+                return string.Format("Config has been updated, forcing maps to be uploaded has been set to: {0} with an error msg: {1}",mapmodule.mapList.AllowOnlyUploadedMaps.ToString(), mapmodule.mapList.ForceMapsToBeUploadedErrorResponse);
             }
         }
 
