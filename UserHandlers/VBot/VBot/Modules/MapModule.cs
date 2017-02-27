@@ -228,6 +228,9 @@ namespace SteamBotLite
                     if (TrailerSplitByFirstWord.Length > 1) {
                         trailer = TrailerSplitByFirstWord[1];
                     }
+                    else {
+                        trailer = "";
+                    }
                 }
 
                 map.Notes = trailer;

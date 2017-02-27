@@ -377,6 +377,26 @@ namespace MapModuleTests
             Assert.AreNotEqual(TestMap.Filename, Mapname + 1); //Ensure that its a string check
         }
 
+        [TestMethod]
+        public void NonUploadedMapAndNoNote()
+        {
+
+            MessageEventArgs Message = new MessageEventArgs(null);
+            Message.ReceivedMessage = AddCommand + " " + Mapname + " " + url;
+            Message.Sender = TestUser;
+
+            Console.WriteLine(FireCommand(Message, module));
+
+            Map TestMap = module.mapList.GetMap(0);
+
+            Assert.AreEqual(TestMap.Filename, Mapname);
+            Assert.AreEqual(TestMap.DownloadURL, url);
+            Assert.IsTrue(String.IsNullOrEmpty(TestMap.Notes));
+            Assert.AreEqual(TestMap.Submitter, identifier);
+
+            Assert.AreNotEqual(TestMap.Filename, Mapname + 1); //Ensure that its a string check
+        }
+
         void AssertMaplistSize(int i)
         {
             Assert.IsTrue(module.mapList.GetSize() == i);
