@@ -173,6 +173,11 @@ namespace SteamBotLite
         public string Notes { get; set; }
         public bool Uploaded { get; set; }
         public string Filename { get; set; }
+
+        public bool IsOwner(Object other)
+        {
+            return other.ToString().Equals(Submitter.ToString());
+        }
     }
 
     public class MapValidityCheck

@@ -8,6 +8,7 @@ using System.IO;
 using System.Security.Cryptography;
 using Newtonsoft.Json;
 using SteamKit2.Internal;
+using System.Net;
 
 namespace SteamBotLite
 {
@@ -263,6 +264,7 @@ namespace SteamBotLite
         void OnDisconnected(SteamClient.DisconnectedCallback callback)
         {
             Console.WriteLine("Disconnected from , UserSetup: {0}", callback.UserInitiated);
+            
             Reconnect();
         }
 
@@ -272,6 +274,8 @@ namespace SteamBotLite
         void Reconnect()
         {
             SteamDirectory.Initialize().Wait(15); //Update internal list that is heavily used before attempting login. And wait 2 Seconds to avoid Spam
+            //IPEndPoint Address = new IPEndPoint(IPAddress.Parse("72.165.61.187"), 27017); //IF you ever need a sample address, use this
+           // Console.WriteLine("CONNECTING:");
             steamClient.Connect(); //Lets try and log back in
         }
         /// <summary>
@@ -480,8 +484,12 @@ namespace SteamBotLite
         {
             foreach (ChatroomEntity Chatroom in GetMainChatroomsCollection())
             {
-                SteamID user = ConvertEntityToSteamID(Chatroom);
-                SteamFriends.SendChatRoomMessage(user , EChatEntryType.ChatMsg, message);
+                try
+                {
+                    SteamID user = ConvertEntityToSteamID(Chatroom);
+                    SteamFriends.SendChatRoomMessage(user, EChatEntryType.ChatMsg, message);
+                }
+                catch { }
             }
         }
 

@@ -545,7 +545,8 @@ namespace SteamBotLite
                     }
                     else
                     {
-                        if ((deletedMap.Submitter.Equals(Msg.Sender.identifier.ToString())) || (userhandler.admincheck(Msg.Sender)))
+                        
+                        if ((deletedMap.IsOwner(Msg.Sender.identifier)) || (userhandler.admincheck(Msg.Sender)))
                         {
                             module.mapList.RemoveMap(deletedMap);
                             module.savePersistentData();
@@ -563,6 +564,33 @@ namespace SteamBotLite
 
         }
 
+        private class GetOwner : BaseCommand
+        {
+            MapModule module;
+            public GetOwner(ModuleHandler bot, MapModule mapMod) : base(bot, "!GetOwner")
+            {
+                module = mapMod;
+            }
+            protected override string exec(MessageEventArgs Msg, string param)
+            {
+                string[] parameters = param.Split(' ');
+
+                if (parameters.Length > 0)
+                {
+                    Map GetMap = module.mapList.GetMapByFilename(parameters[0]);
+
+                    if (GetMap == null)
+                    {
+                        return string.Format("Map '{0}' was not found.", parameters[0]);
+                    }
+                    else
+                    {
+                    }
+                }
+                return "Invalid parameters for !GetOwner. Syntax: !GetOwner <filename>";
+            }
+
+        }
         private class Wipe : MapCommand
         {
             MapModule module;

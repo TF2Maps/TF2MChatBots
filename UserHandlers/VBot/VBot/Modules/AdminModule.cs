@@ -25,6 +25,7 @@ namespace SteamBotLite
 
             handler.AddLoginEventListiner(this);
             commands.Add(new CommandListRetrieve(handler, this));
+            commands.Add(new UserInfo(handler, this));
 
             adminCommands.Add(new RemoveModule(handler, this));
             adminCommands.Add(new AddModule(handler, this));
@@ -113,6 +114,21 @@ namespace SteamBotLite
                 return "Sent command list as private message!";
             }
         }
+        private class UserInfo : BaseCommand
+        {
+            // Command to query if a server is active
+            AdminModule module;
+
+            public UserInfo(ModuleHandler bot, AdminModule module) : base(bot, "!UserInfo")
+            {
+                this.module = module;
+            }
+            protected override string exec(MessageEventArgs Msg, string param)
+            {
+                return string.Format("Your ID is: {0} | {1} | {2}" ,Msg.Sender.identifier, Msg.Sender.identifier.ToString(),Msg.Sender.DisplayName );
+            }
+        }
+
         private class Reboot : BaseCommand
         {
             // Command to query if a server is active

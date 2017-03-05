@@ -19,7 +19,7 @@ namespace SteamBotLite
             
             //Create userHandlers//
             List<UserHandler> UserHandlers = new List<UserHandler>();
-
+            Console.WriteLine("RUNNING");
             ConsoleUserHandler consolehandler = new ConsoleUserHandler();
             VBot VbotHandler = new VBot();
             GhostChecker ghostchecker = new GhostChecker();
@@ -55,11 +55,7 @@ namespace SteamBotLite
             
             while (Running)
             {
-                string Message = Console.ReadLine();
-                foreach (ApplicationInterface bot in Bots)
-                {
-                    bot.BroadCastMessage(null, Message);
-                }
+                
             }
         }
 
