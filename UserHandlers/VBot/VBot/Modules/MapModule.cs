@@ -50,6 +50,7 @@ namespace SteamBotLite
             adminCommands.Add(new Reposition(bot, this));
             adminCommands.Add(new Wipe(bot, this));
             adminCommands.Add(new AllowOnlyUploadedMapsSetter(bot, this));
+            commands.Add(new GetOwner(bot, this));
 
             bot.AddMapChangeEventListiner(this);
         }
@@ -585,6 +586,7 @@ namespace SteamBotLite
                     }
                     else
                     {
+                        return string.Format("Map owner is: {0} Extra info: {1} | {2} | Owner: {3} ", GetMap.Submitter, GetMap.Submitter.ToString(),GetMap.SubmitterName ,GetMap.IsOwner(Msg.Sender.identifier));
                     }
                 }
                 return "Invalid parameters for !GetOwner. Syntax: !GetOwner <filename>";
