@@ -59,7 +59,7 @@ namespace SteamBotLite
             // loading modules
             WebServer = new MapWebServer(this, jsconfig);
 
-            mapModule = new MapModule(this, jsconfig);
+            mapModule = new MapModule(this,this, jsconfig);
 
             serverlistmodule = new ServerListHolder(this, this, jsconfig);
             motdModule = new MotdModule(this, jsconfig);

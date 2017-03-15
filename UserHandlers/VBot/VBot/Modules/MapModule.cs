@@ -17,14 +17,19 @@ namespace SteamBotLite
         int MaxMapNumber = 10;
         string ServerMapListUrl;
         
-        public MapModule(VBot bot, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
+        public MapModule(VBot bot, HTMLFileFromArrayListiners HtmlListiner, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
+            this.HTMLlistiner = HtmlListiner;
             LoadModule(bot);
 
         }
-        public MapModule(ModuleHandler bot, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
+        HTMLFileFromArrayListiners HTMLlistiner;
+
+        public MapModule(ModuleHandler bot,HTMLFileFromArrayListiners HtmlListiner, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
+            this.HTMLlistiner = HtmlListiner;
             LoadModule(bot);
+            
         }
 
         void LoadModule (ModuleHandler bot)
@@ -94,15 +99,43 @@ namespace SteamBotLite
 
         void ConvertMaplistToTable ()
         {
-            string[] HeaderNames = new string[] { "Filename", "Url", "Notes", "Submitter" };
-            List<string[]> DataEntries = new List<string[]>();
+            string TableName = "Current Maps";
+           
+            TableDataValue[] HeaderName = new TableDataValue[4];
+            HeaderName[0] = new TableDataValue(); //There's gotta be a way to fix this
+            HeaderName[1] = new TableDataValue(); //Too long, too useless
+            HeaderName[2] = new TableDataValue();
+            HeaderName[3] = new TableDataValue();
 
-            foreach(Map entry in mapList)
+            HeaderName[0].VisibleValue = "Filename";
+            HeaderName[1].VisibleValue = "Url";
+            HeaderName[2].VisibleValue = "Notes";
+            HeaderName[3].VisibleValue = "Submitter";
+
+
+            HTMLlistiner.SetTableHeader(TableName, HeaderName);
+
+            foreach (Map entry in mapList.GetAllMaps())
             {
-                string[] Data = new string[] { entry.Filename, entry.DownloadURL, entry.Notes, entry.SubmitterName };
-                DataEntries.Add(Data);
+                TableDataValue[] Values = new TableDataValue[4];
+                Values[0] = new TableDataValue();
+                Values[1] = new TableDataValue();
+                Values[2] = new TableDataValue();
+                Values[3] = new TableDataValue();
+
+                Values[0].VisibleValue = entry.Filename;
+
+                Values[1].VisibleValue = entry.DownloadURL;
+                Values[1].Link = entry.DownloadURL;
+
+                Values[2].VisibleValue = entry.Notes;
+
+                Values[3].VisibleValue = entry.SubmitterName;
+                Values[3].HoverText = entry.Submitter.ToString();
+
+                HTMLlistiner.AddEntryWithoutLimit(TableName, Values);
             }
-            userhandler.HTMLFileFromArray(HeaderNames, DataEntries, "CurrentMaps");
+
         }
 
         public override string getPersistentData()

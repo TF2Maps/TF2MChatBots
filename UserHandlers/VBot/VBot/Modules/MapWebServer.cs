@@ -134,34 +134,6 @@ namespace SteamBotLite
             listener.BeginGetContext(new AsyncCallback(ResponseMethod), listener);
 
         }
-        //TODO Maybe we could keep this? 
-
-        /*
-        public void MapListUpdate(ObservableCollection<MapModule.Map> maplist)
-        {
-            MapDataCache = "";
-
-            foreach (MapModule.Map map in maplist)
-            {
-                MapDataCache += "<tr>";
-                MapDataCache += "<td>" + WebUtility.HtmlEncode(map.Filename) + "</td>";
-                MapDataCache += "<td> <a href=\"" + WebUtility.HtmlEncode(map.DownloadURL) + "\">" + WebUtility.HtmlEncode(map.DownloadURL) + "</a></td>";
-                MapDataCache += "<td>" + WebUtility.HtmlEncode(map.Notes) + "</td>";
-                MapDataCache += "<td> <span title = \"" + WebUtility.HtmlEncode(map.Submitter.ToString()) + "\">" + WebUtility.HtmlEncode(map.SubmitterName) + "</span> </td>";
-                MapDataCache += "</tr>";
-            }
-
-            //string Form = "<form action=\"demo_form.asp\"method=\"get\">filename: <input type =\"text\" name=\"fname\"><br> Map Url: <input type =\"text\" name=\"lname\"><br><button type =\"submit\">Submit</button><button type =\"submit\" formmethod=\"POST\" formaction=\"index\">Submit using POST</button></ form > ";
-
-        }
-        */
-        /*
-        void HTMLFileFromArrayListiners.AddHTMLTable(string TableKey, string Tabledata)
-        {
-            throw new NotImplementedException();
-        }
-        */
-
         void AddHTMLTable(string TableKey, string Tabledata)
         {
             if (WebsiteTables.ContainsKey(TableKey))
@@ -286,7 +258,7 @@ namespace SteamBotLite
             {
                 foreach (TableDataValue value in TableData.Header)
                 {
-                    Table += "<th>" + WebUtility.HtmlEncode(value.VisibleValue) + "</th>";
+                    Table += "<th>" + value.GetEncodedValue() + "</th>";
                 }
             }
 
@@ -298,7 +270,7 @@ namespace SteamBotLite
 
                 foreach (TableDataValue row in value)
                 {
-                    Table += "<td>" + WebUtility.HtmlEncode(row.VisibleValue) + "</td>";
+                    Table += "<td>" + row.GetEncodedValue() + "</td>";
                 }
             }
 
