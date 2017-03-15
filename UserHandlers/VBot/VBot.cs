@@ -47,6 +47,7 @@ namespace SteamBotLite
         /// <param name="SteamConnectionHandler"></param>
         public VBot() 
         {
+
            // base.SetUsernameEvent += UpdateUsernameEvent;
             Console.WriteLine("VBot Initialised");
             Console.WriteLine("Loading modules and stuff");
@@ -62,14 +63,14 @@ namespace SteamBotLite
 
             serverlistmodule = new ServerListHolder(this, this, jsconfig);
             motdModule = new MotdModule(this, jsconfig);
-            serverModule = new ServerModule(this, jsconfig);
+            serverModule = new ServerModule(this, this, jsconfig);
             usersModule = new UsersModule(this, jsconfig);
             replyModule = new RepliesModule(this, jsconfig);
             searchModule = new SearchModule(this, jsconfig);
             adminmodule = new AdminModule(this,this, jsconfig);
             identitymodule = new IdentityModule(this, this, jsconfig);
             countdownmodule = new CountDownModule(this, jsconfig);
-            ListModule = new ListHolder(this, jsconfig);
+            ListModule = new ListHolder(this, this, jsconfig);
 
             ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,identitymodule , usersModule,replyModule,adminmodule,searchModule, WebServer, serverlistmodule , countdownmodule , ListModule };
 
@@ -98,6 +99,8 @@ namespace SteamBotLite
             {
                 listiner.MaplistChange(maplist);
             }
+           
+
         }
 
         public void AddListChangeEventListiner(MapListChangeListiner listiner)
@@ -273,6 +276,38 @@ namespace SteamBotLite
             foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)
             {
                 Listiner.AddHTMLTable(TableKey,Tabledata);
+            }
+        }
+
+        public void MakeTableFromEntry(string TableKey, TableData TableData)
+        {
+            foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)
+            {
+                Listiner.MakeTableFromEntry(TableKey, TableData);
+            }
+        }
+
+        public void AddEntryWithoutLimit(string identifier, TableDataValue[] data)
+        {
+            foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)
+            {
+                Listiner.AddEntryWithoutLimit(identifier, data);
+            }
+        }
+
+        public void AddEntryWithLimit(string identifier, TableDataValue[] data, int limit)
+        {
+            foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)
+            {
+                Listiner.AddEntryWithLimit(identifier, data , limit);
+            }
+        }
+
+        public void SetTableHeader(string TableIdentifier, TableDataValue[] Header)
+        {
+            foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)
+            {
+                Listiner.SetTableHeader(TableIdentifier, Header);
             }
         }
     }

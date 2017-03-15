@@ -22,14 +22,14 @@ namespace SteamBotLite
 
         public ModuleHandler Bot;
 
-        
+        HTMLFileFromArrayListiners WebServer;
 
         public override void OnAllModulesLoaded() { }
 
 
-        public ServerModule(ModuleHandler bot, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
+        public ServerModule(ModuleHandler bot, HTMLFileFromArrayListiners WebServer, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
-
+            this.WebServer = WebServer;
             Bot = bot;
             List<ServerInfo> ServerList = new List<ServerInfo>();
 
@@ -74,6 +74,31 @@ namespace SteamBotLite
             {
                 userhandler.BroadcastMessageProcessEvent(e.ToString());
             }
+
+            TableDataValue HeaderName = new TableDataValue();
+            HeaderName.VisibleValue = "Map Name";
+
+            TableDataValue HeaderNamePlayerCount = new TableDataValue();
+            HeaderNamePlayerCount.VisibleValue = "PlayerCount";
+
+            TableDataValue HeaderTime = new TableDataValue();
+            HeaderTime.VisibleValue = "Time (UTC)";
+
+            WebServer.SetTableHeader(e.tag, new TableDataValue[] { HeaderName, HeaderNamePlayerCount, HeaderTime });
+
+            //Add Entry
+
+            TableDataValue MapName = new TableDataValue();
+            MapName.VisibleValue = e.currentMap;
+
+            TableDataValue PlayerCount = new TableDataValue();
+            PlayerCount.VisibleValue = e.playerCount.ToString();
+
+            TableDataValue Time = new TableDataValue();
+            Time.VisibleValue = DateTime.UtcNow.ToShortDateString();
+
+            WebServer.AddEntryWithLimit(e.tag, new TableDataValue[] { MapName, PlayerCount, Time }, 5);
+
         }
 
         

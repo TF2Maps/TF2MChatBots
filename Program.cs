@@ -28,6 +28,29 @@ namespace SteamBotLite
             // Create Interfaces//
             List<ApplicationInterface> Bots = new List<ApplicationInterface>();
 
+            ConsoleInterface DebugInterface = new ConsoleInterface();
+
+            Console.WriteLine("Would you like to run the console? Y/N");
+
+            if (Console.ReadLine().Equals("Y"))
+            {
+                bool RunConsole = true;
+
+                while (RunConsole)
+                {
+                    MessageEventArgs Msg = new MessageEventArgs(DebugInterface);
+                    Msg.Sender = new ChatroomEntity("Console", DebugInterface);
+                    Msg.ReceivedMessage = Console.ReadLine();
+                    VbotHandler.ProcessPrivateMessage(DebugInterface, Msg);
+                    Msg.InterfaceHandlerDestination = DebugInterface;
+
+                    if (Msg.ReceivedMessage.Equals("Exit"))
+                    {
+                        RunConsole = false;
+                    }
+                }
+            }
+
             SteamAccountVBot SteamPlatformInterface = new SteamAccountVBot();
             DiscordAccountVBot DiscordPlatformInterfaceRelay = new DiscordAccountVBot();
 
@@ -44,6 +67,7 @@ namespace SteamBotLite
             
 
             Thread[] BotThreads = new Thread[Bots.Count];
+            
             //Start looping and iterating//
             for (int x = 0; x < Bots.Count; x++)
             {

@@ -88,6 +88,8 @@ namespace SteamBotLite
         {
             userhandler.OnMaplistchange(mapList.GetAllMaps(), sender, args);
             ConvertMaplistToTable();
+
+
         }
 
         void ConvertMaplistToTable ()
@@ -551,7 +553,9 @@ namespace SteamBotLite
                         {
                             module.mapList.RemoveMap(deletedMap);
                             module.savePersistentData();
-                            userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = new User(deletedMap.Submitter,null), ReplyMessage = string.Format("Your map {0} has been deleted from the map list", deletedMap.Filename) });
+                            string Reason = param.Substring(0,deletedMap.Filename.Length);
+                            
+                            userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = new User(deletedMap.Submitter,null), ReplyMessage = string.Format("Your map {0} has been deleted from the map list. Reason Given: {1}", deletedMap.Filename , Reason) });
                             return string.Format("Map '{0}' DELETED.", deletedMap.Filename);
                         }
                         else

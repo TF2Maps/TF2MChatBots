@@ -96,6 +96,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationInterfaces\ApplicationInterface.cs" />
+    <Compile Include="ApplicationInterfaces\ConsoleInterface.cs" />
     <Compile Include="ApplicationInterfaces\Steam\Accounts\VBot\SteamAccountVBot.cs" />
     <Compile Include="ApplicationInterfaces\Steam\ExtraData\BotSavedData.cs" />
     <Compile Include="MinimalServer.cs" />
@@ -114,6 +115,8 @@
     <Compile Include="UserHandlers\VBot\VBot\Interfaces\Interface1.cs" />
     <Compile Include="UserHandlers\VBot\VBot\ModuleHandler.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\CountDownModule.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\DataTypes\TableData.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\DataTypes\TableDataValue.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\IdentityModule.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\ListHolder.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\MapCollection.cs" />

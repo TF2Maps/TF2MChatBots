@@ -10,6 +10,16 @@ namespace SteamBotLite
 {
     class TestUserHandler : UserHandler, ModuleHandler, HTMLFileFromArrayListiners
     {
+        public void AddEntryWithLimit(string identifier, TableDataValue[] data, int limit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AddEntryWithoutLimit(string identifier, TableDataValue[] data)
+        {
+            throw new NotImplementedException();
+        }
+
         public void AddHTMLTable(string TableKey, string Tabledata)
         {
             throw new NotImplementedException();
@@ -17,6 +27,11 @@ namespace SteamBotLite
 
         public override void ChatMemberInfo(object sender, Tuple<ChatroomEntity, bool> e)
         {
+        }
+
+        public void MakeTableFromEntry(string TableKey, TableData TableData)
+        {
+            throw new NotImplementedException();
         }
 
         public override void OnLoginCompleted(object sender, EventArgs e)
@@ -29,6 +44,11 @@ namespace SteamBotLite
 
         public override void ProcessPrivateMessage(object sender, MessageEventArgs e)
         {
+        }
+
+        public void SetTableHeader(string TableIdentifier, TableDataValue[] Header)
+        {
+            throw new NotImplementedException();
         }
 
         void ModuleHandler.AddListChangeEventListiner(MapListChangeListiner listiner)

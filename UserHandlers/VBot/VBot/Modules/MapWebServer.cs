@@ -24,6 +24,7 @@ namespace SteamBotLite
         public MapWebServer(VBot bot, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
             WebsiteTables = new Dictionary<string, string>();
+            DataLists = new Dictionary<string, TableData>();
 
             try
             {
@@ -188,39 +189,93 @@ namespace SteamBotLite
             throw new NotImplementedException();
         }
 
+
+        //For legacy reasons
         void HTMLFileFromArrayListiners.HTMLFileFromArray(string[] Headernames, List<string[]> Data, string TableKey)
         {
-            string Table = string.Format("<table> <caption> <h1> {0} </h1> </caption> <tbody> <tr>",TableKey);
-            foreach (string value in Headernames)
+            TableData ThisTableData = new TableData();
+
+            TableDataValue[] Header = new TableDataValue[Headernames.Length];
+            for (int i = 0; i < Headernames.Length; i++)
             {
-                Table += "<th>" + WebUtility.HtmlEncode(value) + "</th>";
+                Header[i] = new TableDataValue();
+                Header[i].VisibleValue = Headernames[i];
             }
 
-            Table += "</tr>";
-
-            foreach (string[] Entry in Data)
-            {
-                Table += "<tr>";
-                foreach (string Entryvalue in Entry)
-                {
-                    Table += "<td>" + WebUtility.HtmlEncode(Entryvalue) + "</td>";
-                }
-                Table += "</tr>";
-            }
-            Table += "</tbody> </table>";
-
-            AddHTMLTable(TableKey, Table);
+            ThisTableData.Header = Header;
             
+
+            foreach (string[] Row in Data)
+            {
+                TableDataValue[] DataEntries = new TableDataValue[Row.Length];
+
+                for (int i = 0; i < Row.Length; i++)
+                {
+                    DataEntries[i] = new TableDataValue();
+                    DataEntries[i].VisibleValue = Row[i];
+                }
+
+                ThisTableData.TableValues.Add(DataEntries);
+            }
+
+            MakeTableFromEntry(TableKey, ThisTableData);
         }
 
+        
 
-        /*
-        //New Code
+        private void SetTableHeader(string tableKey, TableDataValue[] header)
+        {
+            SetTableHeader(tableKey, header);
+        }
 
-        void AddEntryWithoutLimit(string identifier, TableDataValue[] data)
+        Dictionary<string, TableData> DataLists;
+
+        void HTMLFileFromArrayListiners.SetTableHeader(string TableIdentifier, TableDataValue[] Header)
+        {
+            GetTableData(TableIdentifier).Header = Header;
+        }
+
+        //Does this pass by value or by reference? 
+
+        public TableData GetTableData(string identifier)
+        {
+            if (DataLists.ContainsKey(identifier))
+            {
+                return DataLists[identifier];
+            }
+            else
+            {
+                DataLists.Add(identifier, new TableData());
+                return DataLists[identifier];
+            }
+        }
+
+        void HTMLFileFromArrayListiners.AddEntryWithLimit(string identifier, TableDataValue[] data, int limit)
+        {
+            GetTableData(identifier).TableValues.Add(data);
+
+            int ExcessToRemove = GetTableData(identifier).TableValues.Count - limit;
+
+
+            int entriestoremove = limit;
+
+            if (GetTableData(identifier).TableValues.Count > entriestoremove)
+            {
+                GetTableData(identifier).TableValues.RemoveRange(0, ExcessToRemove);
+            }
+
+            MakeTableFromEntry(identifier, GetTableData(identifier));
+        }
+
+        void HTMLFileFromArrayListiners.AddEntryWithoutLimit(string identifier, TableDataValue[] data)
         {
             GetTableData(identifier).TableValues.Add(data);
             MakeTableFromEntry(identifier, GetTableData(identifier));
+        }
+
+        void HTMLFileFromArrayListiners.MakeTableFromEntry(string TableKey, TableData TableData)
+        {
+            MakeTableFromEntry(TableKey, TableData);
         }
 
         void MakeTableFromEntry(string TableKey, TableData TableData)
@@ -248,14 +303,9 @@ namespace SteamBotLite
             }
 
             Table += "</tbody> </table>";
-
-            HtmlParserThing.AddHTMLTable(TableKey, Table);
-
+            AddHTMLTable(TableKey, Table);
         }
-        */
 
-
-
-
+       
     }
 }
