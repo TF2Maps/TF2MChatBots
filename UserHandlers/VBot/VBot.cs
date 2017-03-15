@@ -24,6 +24,7 @@ namespace SteamBotLite
         CountDownModule countdownmodule;
         MapWebServer WebServer;
         IdentityModule identitymodule;
+        ListHolder ListModule;
 
         public UsersModule usersModule;
 
@@ -68,8 +69,9 @@ namespace SteamBotLite
             adminmodule = new AdminModule(this,this, jsconfig);
             identitymodule = new IdentityModule(this, this, jsconfig);
             countdownmodule = new CountDownModule(this, jsconfig);
+            ListModule = new ListHolder(this, jsconfig);
 
-            ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,identitymodule , usersModule,replyModule,adminmodule,searchModule, WebServer, serverlistmodule , countdownmodule };
+            ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,identitymodule , usersModule,replyModule,adminmodule,searchModule, WebServer, serverlistmodule , countdownmodule , ListModule };
 
             Console.WriteLine("Modules loaded and ModuleList intitialised");
 
@@ -266,5 +268,12 @@ namespace SteamBotLite
             return ModuleList;
         }
 
+        public void AddHTMLTable(string TableKey, string Tabledata)
+        {
+            foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)
+            {
+                Listiner.AddHTMLTable(TableKey,Tabledata);
+            }
+        }
     }
 }

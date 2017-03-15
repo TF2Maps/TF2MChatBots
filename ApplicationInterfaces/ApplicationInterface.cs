@@ -58,6 +58,11 @@ namespace SteamBotLite
         {
             InterfaceHandlerDestination = interfacehandlerdestination;
         }
+
+        public override string ToString()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public abstract class ApplicationInterface

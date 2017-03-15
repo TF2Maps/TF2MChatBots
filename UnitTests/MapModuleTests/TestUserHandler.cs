@@ -10,6 +10,11 @@ namespace SteamBotLite
 {
     class TestUserHandler : UserHandler, ModuleHandler, HTMLFileFromArrayListiners
     {
+        public void AddHTMLTable(string TableKey, string Tabledata)
+        {
+            throw new NotImplementedException();
+        }
+
         public override void ChatMemberInfo(object sender, Tuple<ChatroomEntity, bool> e)
         {
         }

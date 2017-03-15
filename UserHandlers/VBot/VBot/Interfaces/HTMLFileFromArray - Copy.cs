@@ -9,5 +9,7 @@ namespace SteamBotLite
     public interface HTMLFileFromArrayListiners
     {
         void HTMLFileFromArray(string[] Headernames, List<string[]> Data, string TableKey);
+
+        void AddHTMLTable(string TableKey, string Tabledata);
     }
 }

@@ -154,21 +154,29 @@ namespace SteamBotLite
 
         }
         */
+        /*
+        void HTMLFileFromArrayListiners.AddHTMLTable(string TableKey, string Tabledata)
+        {
+            throw new NotImplementedException();
+        }
+        */
 
-        
-
-        void AddTable (string TableKey, string Data)
+        void AddHTMLTable(string TableKey, string Tabledata)
         {
             if (WebsiteTables.ContainsKey(TableKey))
             {
-                WebsiteTables[TableKey] = Data;
+                WebsiteTables[TableKey] = Tabledata;
             }
             else
             {
-                WebsiteTables.Add(TableKey, Data);
+                WebsiteTables.Add(TableKey, Tabledata);
             }
         }
 
+        void HTMLFileFromArrayListiners.AddHTMLTable(string TableKey, string Tabledata)
+        {
+            AddHTMLTable(TableKey, Tabledata);
+        }
 
         public override string getPersistentData()
         {
@@ -201,7 +209,53 @@ namespace SteamBotLite
             }
             Table += "</tbody> </table>";
 
-            AddTable(TableKey, Table);
+            AddHTMLTable(TableKey, Table);
+            
         }
+
+
+        /*
+        //New Code
+
+        void AddEntryWithoutLimit(string identifier, TableDataValue[] data)
+        {
+            GetTableData(identifier).TableValues.Add(data);
+            MakeTableFromEntry(identifier, GetTableData(identifier));
+        }
+
+        void MakeTableFromEntry(string TableKey, TableData TableData)
+        {
+            string Table = string.Format("<table> <caption> <h1> {0} </h1> </caption> <tbody> <tr>", TableKey);
+
+            if (TableData.Header != null)
+            {
+                foreach (TableDataValue value in TableData.Header)
+                {
+                    Table += "<th>" + WebUtility.HtmlEncode(value.VisibleValue) + "</th>";
+                }
+            }
+
+            Table += "</tr>";
+
+            foreach (TableDataValue[] value in TableData.TableValues)
+            {
+                Table += "<tr>";
+
+                foreach (TableDataValue row in value)
+                {
+                    Table += "<td>" + WebUtility.HtmlEncode(row.VisibleValue) + "</td>";
+                }
+            }
+
+            Table += "</tbody> </table>";
+
+            HtmlParserThing.AddHTMLTable(TableKey, Table);
+
+        }
+        */
+
+
+
+
     }
 }

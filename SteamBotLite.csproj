@@ -115,6 +115,7 @@
     <Compile Include="UserHandlers\VBot\VBot\ModuleHandler.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\CountDownModule.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\IdentityModule.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\ListHolder.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\MapCollection.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\MapWebServer.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\SearchClass.cs" />
