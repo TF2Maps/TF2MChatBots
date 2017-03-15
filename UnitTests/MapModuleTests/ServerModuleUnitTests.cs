@@ -35,14 +35,14 @@ namespace UsersModuleTests
 
         [TestInitialize()]
         public void Initialize() {
-            module = new ServerModule(new TestUserHandler(), MakeConfig());
+            module = new ServerModule(new TestUserHandler(), new TestUserHandler() , MakeConfig());
             TestUser = new User(0, null);
             TestUser.Rank = ChatroomEntity.AdminStatus.True;
         }
 
         [TestCleanup()]
         public void Cleanup() {
-            module = new ServerModule(new TestUserHandler(), MakeConfig());
+            module = new ServerModule(new TestUserHandler(), new TestUserHandler(),  MakeConfig());
             module.serverList.Clear();
             Assert.IsTrue(module.serverList.Count() == 0);
         }
@@ -122,7 +122,7 @@ namespace UsersModuleTests
         [TestMethod()]
         public void Persistency() {
             AddServer();
-            module = new ServerModule(new TestUserHandler(), MakeConfig());
+            module = new ServerModule(new TestUserHandler(), new TestUserHandler(),  MakeConfig());
 
             Assert.IsTrue(module.serverList.Count() == 1);
 
@@ -151,7 +151,7 @@ namespace UsersModuleTests
         [TestMethod()]
         public void CheckPersistencyOfRemove() {
             RemoveServerAfterAdd();
-            module = new ServerModule(new TestUserHandler(), MakeConfig());
+            module = new ServerModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
             Assert.IsTrue(module.serverList.Count() == 0);
 
             Assert.IsFalse  (ContainsCommand(module.NameToserverCommand(TestName), module.commands));
@@ -161,7 +161,7 @@ namespace UsersModuleTests
         public void ClearPersistency() {
             AddServer();
             module.serverList.Clear();
-            module = new ServerModule(new TestUserHandler(), MakeConfig());
+            module = new ServerModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
             Assert.IsTrue(module.serverList.Count() == 0);
 
             Assert.IsFalse  (ContainsCommand(module.NameToserverCommand(TestName), module.commands));

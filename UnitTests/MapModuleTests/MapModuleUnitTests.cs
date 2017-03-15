@@ -34,7 +34,7 @@ namespace MapModuleTests
 
         public SyntaxUnitTests() {
             TestUser = new User(identifier, null);
-            module = new MapModule(new TestUserHandler(), MakeConfig());
+            module = new MapModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
             
         }
 
@@ -52,9 +52,9 @@ namespace MapModuleTests
         [TestInitialize()]
         public void Initialize()
         {
-            module = new MapModule(new TestUserHandler(), MakeConfig());
+            module = new MapModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
             TestUser = new User(identifier, null);
-            module = new MapModule(new TestUserHandler(), MakeConfig());
+            module = new MapModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
         }
 
         // Use TestCleanup to run code after each test has run
@@ -62,7 +62,7 @@ namespace MapModuleTests
         public void Cleanup()
         {
             module.ClearMapListWithMessage("Test Wipe");
-            module = new MapModule(new TestUserHandler(), MakeConfig());
+            module = new MapModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
             Assert.IsTrue(module.mapList.GetSize() == 0);
         }
 
@@ -91,7 +91,7 @@ namespace MapModuleTests
         public void CheckPersistance()
         {
             RegularSyntax();
-            module = module = new MapModule(new TestUserHandler(), MakeConfig());
+            module = module = new MapModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
 
             Map TestMap = module.mapList.GetMap(0);
 
@@ -121,7 +121,7 @@ namespace MapModuleTests
 
             AssertMaplistSize(0);
 
-            module = module = new MapModule(new TestUserHandler(), MakeConfig());
+            module = module = new MapModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
             
             
             command = "!forceuploaded" + " " + "false" + " " + "Map Not Uploaded";
@@ -129,7 +129,7 @@ namespace MapModuleTests
             FireAdminCommand(Message, module);
             Assert.IsFalse(module.mapList.AllowOnlyUploadedMaps);
             
-            module = module = new MapModule(new TestUserHandler(), MakeConfig());
+            module = module = new MapModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
 
             RegularSyntax();
 
