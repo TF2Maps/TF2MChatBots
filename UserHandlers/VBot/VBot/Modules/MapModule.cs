@@ -100,7 +100,9 @@ namespace SteamBotLite
         void ConvertMaplistToTable ()
         {
             string TableName = "Current Maps";
-           
+            
+
+
             TableDataValue[] HeaderName = new TableDataValue[4];
             HeaderName[0] = new TableDataValue(); //There's gotta be a way to fix this
             HeaderName[1] = new TableDataValue(); //Too long, too useless
@@ -114,6 +116,8 @@ namespace SteamBotLite
 
 
             HTMLlistiner.SetTableHeader(TableName, HeaderName);
+
+            List<TableDataValue[]> Entries = new List<TableDataValue[]>();
 
             foreach (Map entry in mapList.GetAllMaps())
             {
@@ -133,9 +137,16 @@ namespace SteamBotLite
                 Values[3].VisibleValue = entry.SubmitterName;
                 Values[3].HoverText = entry.Submitter.ToString();
 
+                Entries.Add(Values);
+
                 HTMLlistiner.AddEntryWithoutLimit(TableName, Values);
             }
 
+            TableData data = new TableData();
+            data.Header = HeaderName;
+            data.TableValues = Entries;
+
+            HTMLlistiner.MakeTableFromEntry(TableName, data);
         }
 
         public override string getPersistentData()
@@ -160,7 +171,7 @@ namespace SteamBotLite
                
 
                 Dictionary<string, string> PersistantData = JsonConvert.DeserializeObject<Dictionary<string, string>>(System.IO.File.ReadAllText(ModuleSavedDataFilePath()));
-                mapList = new MapCollection(JsonConvert.DeserializeObject<ObservableCollection<Map>>(PersistantData["Maplist"].ToString()));
+                mapList = new MapCollection(JsonConvert.DeserializeObject<ObservableCollection<Map>>(PersistantData["Maplist"].ToString()), HTMLlistiner);
 
                 Dictionary<string, object> MetaData = new Dictionary<string, object>(JsonConvert.DeserializeObject<Dictionary<string, object>>(PersistantData["Config"]));
                 bool AllowOnlyUploadedMaps = (bool.Parse(MetaData["AllowOnlyUploadedMaps"].ToString()));
@@ -171,7 +182,7 @@ namespace SteamBotLite
             }
             catch
             {
-                mapList = new MapCollection(new ObservableCollection<Map>());
+                mapList = new MapCollection(new ObservableCollection<Map>(), HTMLlistiner);
                 mapList.RestrictMapsToBeUploaded(false,"TESTING");
                 
                 savePersistentData();
@@ -191,8 +202,9 @@ namespace SteamBotLite
                 User Submitter = new User(map.Submitter,null);
 
                 Console.WriteLine("Found map, sending message to {0}", Submitter);
-                userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = Submitter, ReplyMessage = string.Format("Map {0} is being tested on the {1} server and has been DELETED.", map.Filename, args.tag) });
-                mapList.RemoveMap(map);
+                string ReasonForDeletion = string.Format("Map {0} is being tested on the {1} server and has been DELETED.", map.Filename, args.tag);
+                userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = Submitter, ReplyMessage = ReasonForDeletion });
+                mapList.RemoveMap(map , ReasonForDeletion);
                 Console.WriteLine("Map {0} is being tested on the {1} server and has been DELETED.", map.Filename, args.tag);
                 savePersistentData();
             }
@@ -527,7 +539,7 @@ namespace SteamBotLite
                     // Map editedMap = MapModule.mapList.Find(map => map.filename.Equals(parameters[0])); //OLD Map CODE
                     if (editedMap.Submitter.Equals(Msg.Sender.identifier.ToString()) | (userhandler.admincheck(Msg.Sender)))
                     {
-                        MapModule.mapList.RemoveMap(editedMap);
+                        MapModule.mapList.RemoveMap(editedMap , "Map Repositioned");
                         editedMap.Notes += string.Format("Map repositioned to {0} by {1} // ", index, Msg.Sender.identifier.ToString());
                         MapModule.mapList.InsertMap(index, editedMap);
                         MapModule.savePersistentData();
@@ -584,12 +596,25 @@ namespace SteamBotLite
                         
                         if ((deletedMap.IsOwner(Msg.Sender.identifier)) || (userhandler.admincheck(Msg.Sender)))
                         {
-                            module.mapList.RemoveMap(deletedMap);
-                            module.savePersistentData();
-                            string Reason = param.Substring(0,deletedMap.Filename.Length);
                             
-                            userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = new User(deletedMap.Submitter,null), ReplyMessage = string.Format("Your map {0} has been deleted from the map list. Reason Given: {1}", deletedMap.Filename , Reason) });
-                            return string.Format("Map '{0}' DELETED.", deletedMap.Filename);
+                            module.savePersistentData();
+                            string Reason = "Deleted by " + Msg.Sender.DisplayName + " (" + Msg.Sender.identifier + "). ";
+
+                            string ExplicitReason = param.Substring(deletedMap.Filename.Length, param.Length - deletedMap.Filename.Length); 
+                            if ( !string.IsNullOrWhiteSpace(ExplicitReason) )
+                            {
+                                Reason += "Reason given: " + ExplicitReason;
+                            }
+                            else
+                            {
+                                Reason += "No reason given";
+                            }
+                            
+                            userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = new User(deletedMap.Submitter,null), ReplyMessage = string.Format("Your map {0} has been deleted from the map list. {1}", deletedMap.Filename , Reason) });
+
+                            module.mapList.RemoveMap(deletedMap, Reason);
+
+                            return string.Format("Map '{0}' DELETED. Sending: {1}", deletedMap.Filename, Reason);
                         }
                         else
                         {

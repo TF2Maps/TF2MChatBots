@@ -15,11 +15,27 @@ namespace SteamBotLite
         /// </summary>
         /// 
         ObservableCollection<Map> mapList = new ObservableCollection<Map>();
+        string tablename = "Deleted Maps";
 
-        public MapCollection(ObservableCollection<Map> inputlist)
+        HTMLFileFromArrayListiners listiner;
+        public MapCollection(ObservableCollection<Map> inputlist , HTMLFileFromArrayListiners HtmlListiner)
         {
             this.mapList = inputlist;
+            this.listiner = HtmlListiner;
+
             mapList.CollectionChanged += MapList_CollectionChanged;
+
+            TableDataValue MapEntry = new TableDataValue();
+            MapEntry.VisibleValue = "Map Name";
+
+            TableDataValue ReasonEntry = new TableDataValue();
+            ReasonEntry.VisibleValue = "Extra info";
+
+            TableDataValue Owner = new TableDataValue();
+            Owner.VisibleValue = "Owner";
+
+            TableDataValue[] Data = new TableDataValue[] { MapEntry, ReasonEntry , Owner};
+            HtmlListiner.SetTableHeader(tablename, Data);
 
             AllowOnlyUploadedMaps = false;
         }
@@ -37,7 +53,24 @@ namespace SteamBotLite
 
         public Map GetMapByFilename(string filename) { return mapList.FirstOrDefault(x => x.Filename == filename); }
 
-        public void RemoveMap(Map map) { mapList.Remove(map); }
+        public void RemoveMap(Map map , string reason) {
+            TableDataValue Owner = new TableDataValue();
+            Owner.VisibleValue = map.SubmitterName;
+            Owner.HoverText = map.Submitter.ToString();
+
+            mapList.Remove(map);
+            TableDataValue MapEntry = new TableDataValue();
+            MapEntry.VisibleValue = map.Filename;
+
+            TableDataValue ReasonEntry = new TableDataValue();
+            ReasonEntry.VisibleValue = reason;
+
+            
+
+            TableDataValue[] Data = new TableDataValue[] { MapEntry, ReasonEntry , Owner };
+            
+            listiner.AddEntryWithLimit(tablename, Data, 3);
+        }
 
         public void RemoveMap(int position) { mapList.RemoveAt(position); }
 

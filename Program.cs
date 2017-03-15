@@ -41,6 +41,7 @@ namespace SteamBotLite
                     MessageEventArgs Msg = new MessageEventArgs(DebugInterface);
                     Msg.Sender = new ChatroomEntity("Console", DebugInterface);
                     Msg.ReceivedMessage = Console.ReadLine();
+                    Msg.Sender.Rank = ChatroomEntity.AdminStatus.True;
                     VbotHandler.ProcessPrivateMessage(DebugInterface, Msg);
                     Msg.InterfaceHandlerDestination = DebugInterface;
 

@@ -70,6 +70,7 @@ namespace SteamBotLite
 
         private void ServerModule_ServerMapChanged(object sender, ServerInfo e)
         {
+            string TableLabel = e.tag + " history";
             if (e.playerCount > 8)
             {
                 userhandler.BroadcastMessageProcessEvent(e.ToString());
@@ -84,7 +85,7 @@ namespace SteamBotLite
             TableDataValue HeaderTime = new TableDataValue();
             HeaderTime.VisibleValue = "Time (UTC)";
 
-            WebServer.SetTableHeader(e.tag, new TableDataValue[] { HeaderName, HeaderNamePlayerCount, HeaderTime });
+            WebServer.SetTableHeader(TableLabel, new TableDataValue[] { HeaderName, HeaderNamePlayerCount, HeaderTime });
 
             //Add Entry
 
@@ -97,7 +98,7 @@ namespace SteamBotLite
             TableDataValue Time = new TableDataValue();
             Time.VisibleValue = DateTime.UtcNow.ToShortDateString();
 
-            WebServer.AddEntryWithLimit(e.tag, new TableDataValue[] { MapName, PlayerCount, Time }, 5);
+            WebServer.AddEntryWithLimit(TableLabel, new TableDataValue[] { MapName, PlayerCount, Time }, 5);
 
         }
 
