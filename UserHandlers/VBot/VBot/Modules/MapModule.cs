@@ -34,6 +34,8 @@ namespace SteamBotLite
 
         void LoadModule (ModuleHandler bot)
         {
+            HTMLlistiner.SetTableHeader(TableName, GetMapListTableHeader()); //Ensures the maplist is shown before deleted maps
+
             loadPersistentData();
 
             ServerMapListUrl = config["ServerMapListUrl"].ToString();
@@ -97,12 +99,10 @@ namespace SteamBotLite
 
         }
 
-        void ConvertMaplistToTable ()
+        string TableName = "Current Maps";
+
+        TableDataValue[] GetMapListTableHeader ()
         {
-            string TableName = "Current Maps";
-            
-
-
             TableDataValue[] HeaderName = new TableDataValue[4];
             HeaderName[0] = new TableDataValue(); //There's gotta be a way to fix this
             HeaderName[1] = new TableDataValue(); //Too long, too useless
@@ -115,8 +115,11 @@ namespace SteamBotLite
             HeaderName[3].VisibleValue = "Submitter";
 
 
-            HTMLlistiner.SetTableHeader(TableName, HeaderName);
+            return HeaderName;
+        }
 
+        void ConvertMaplistToTable ()
+        {
             List<TableDataValue[]> Entries = new List<TableDataValue[]>();
 
             foreach (Map entry in mapList.GetAllMaps())
@@ -143,7 +146,7 @@ namespace SteamBotLite
             }
 
             TableData data = new TableData();
-            data.Header = HeaderName;
+            data.Header = GetMapListTableHeader();
             data.TableValues = Entries;
 
             HTMLlistiner.MakeTableFromEntry(TableName, data);

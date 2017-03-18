@@ -269,14 +269,6 @@ namespace SteamBotLite
             return ModuleList;
         }
 
-        public void AddHTMLTable(string TableKey, string Tabledata)
-        {
-            foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)
-            {
-                Listiner.AddHTMLTable(TableKey,Tabledata);
-            }
-        }
-
         public void MakeTableFromEntry(string TableKey, TableData TableData)
         {
             foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)

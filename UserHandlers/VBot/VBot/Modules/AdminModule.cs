@@ -74,9 +74,9 @@ namespace SteamBotLite
                     }
                     
                 }
-                CommandListHeld.Add(module.GetType().ToString()  , CommandList);
+                CommandListHeld.Add(module.GetType().Name.ToString()  , CommandList);
 
-                modulehandler.HTMLFileFromArray(HeaderNames, CommandList, module.GetType().ToString());
+                modulehandler.HTMLFileFromArray(HeaderNames, CommandList, module.GetType().Name.ToString());
             }
            
         }

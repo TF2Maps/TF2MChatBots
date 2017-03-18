@@ -10,7 +10,6 @@ namespace SteamBotLite
     {
         void HTMLFileFromArray(string[] Headernames, List<string[]> Data, string TableKey);
 
-        void AddHTMLTable(string TableKey, string Tabledata);
 
         void MakeTableFromEntry(string TableKey, TableData TableData);
 

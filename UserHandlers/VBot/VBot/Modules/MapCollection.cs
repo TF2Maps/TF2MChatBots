@@ -64,12 +64,10 @@ namespace SteamBotLite
 
             TableDataValue ReasonEntry = new TableDataValue();
             ReasonEntry.VisibleValue = reason;
-
             
-
             TableDataValue[] Data = new TableDataValue[] { MapEntry, ReasonEntry , Owner };
             
-            listiner.AddEntryWithLimit(tablename, Data, 3);
+            listiner.AddEntryWithLimit(tablename, Data, 10);
         }
 
         public void RemoveMap(int position) { mapList.RemoveAt(position); }

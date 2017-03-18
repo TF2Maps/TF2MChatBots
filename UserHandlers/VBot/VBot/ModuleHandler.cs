@@ -8,8 +8,7 @@ namespace SteamBotLite
     {
         void OnMaplistchange(IReadOnlyList<Map> mapList, object sender, NotifyCollectionChangedEventArgs args);
         void HTMLFileFromArray(string[] headerNames, List<string[]> dataEntries, string v);
-        void AddHTMLTable(string TableKey, string Tabledata);
-
+       
         void SendPrivateMessageProcessEvent(MessageEventArgs messageEventArgs);
         void SetStatusmessageEvent( string statusMessage);
         void UpdateUsernameEvent(object sender , string Username);
