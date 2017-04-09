@@ -112,7 +112,7 @@ namespace SteamBotLite
         {
             if (Autojoin)
                 {
-                   // base.FireMainChatRoomEvent(ChatroomEventEnum.EnterChat);
+                    base.FireMainChatRoomEvent(ChatroomEventEnum.EnterChat);
                 }
             foreach (OnLoginCompletedListiners listiner in OnLoginlistiners) {
                 listiner.OnLoginCompleted();

@@ -229,7 +229,7 @@ namespace SteamBotLite
             foreach (ChatroomEntity Chatroom in GetMainChatroomsCollection())
             {
                 SteamID ChatroomToJoin = ConvertEntityToSteamID(Chatroom);
-               // SteamFriends.JoinChat(ChatroomToJoin);
+                SteamFriends.JoinChat(ChatroomToJoin);
             }
 
         }
@@ -502,7 +502,7 @@ namespace SteamBotLite
         public override void EnterChatRoom(object sender, ChatroomEntity ChatroomEntity)
         {
             SteamID Chatroom = ConvertEntityToSteamID(ChatroomEntity);
-            //SteamFriends.JoinChat(Chatroom);
+            SteamFriends.JoinChat(Chatroom);
         }
 
         public override void ReceiveChatMemberInfo(ChatroomEntity ChatroomEntity, bool AdminStatus)
