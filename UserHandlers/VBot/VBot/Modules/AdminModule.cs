@@ -164,12 +164,13 @@ namespace SteamBotLite
                     }
                 };
                 proc.Start();
-                
-                
+
+                proc.Kill();
                 return "Script should've ran";
             }
         }
 
+       
         private class Rejoin : BaseCommand
         {
             // Command to query if a server is active
