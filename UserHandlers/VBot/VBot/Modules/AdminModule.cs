@@ -160,7 +160,7 @@ namespace SteamBotLite
                 {
                     StartInfo = new ProcessStartInfo
                     {
-                        FileName = "../update.sh"
+                        FileName = "../../update.sh"
                     }
                 };
                 proc.Start();
