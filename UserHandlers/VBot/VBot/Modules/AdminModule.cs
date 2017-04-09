@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-
+using System.Diagnostics;
 
 namespace SteamBotLite
 {
@@ -32,6 +32,7 @@ namespace SteamBotLite
             adminCommands.Add(new GetAllModules(handler, this));
 
             adminCommands.Add(new Reboot(handler, this));
+            adminCommands.Add(new RunScript(handler, this));
             adminCommands.Add(new Rejoin(userhandler, modulehandler, this));
         }
 
@@ -140,6 +141,32 @@ namespace SteamBotLite
             protected override string exec(MessageEventArgs Msg, string param)  {
                 module.userhandler.Reboot();
                 return "Rebooted";
+            }
+        }
+
+        private class RunScript : BaseCommand
+        {
+            // Command to query if a server is active
+            AdminModule module;
+
+            public RunScript(ModuleHandler bot, AdminModule module) : base(bot, "!RunUpdateScript")
+            {
+                this.module = module;
+            }
+            protected override string exec(MessageEventArgs Msg, string param)
+            {
+
+                Process proc = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "../update.sh"
+                    }
+                };
+                proc.Start();
+                
+                
+                return "Script should've ran";
             }
         }
 
