@@ -32,6 +32,7 @@ namespace SteamBotLite
 
             Console.WriteLine("Would you like to run the console? Y/N");
 
+            /*
             if (Console.ReadLine().Equals("Y"))
             {
                 bool RunConsole = true;
@@ -51,6 +52,7 @@ namespace SteamBotLite
                     }
                 }
             }
+            */
 
             SteamAccountVBot SteamPlatformInterface = new SteamAccountVBot();
             DiscordAccountVBot DiscordPlatformInterfaceRelay = new DiscordAccountVBot();
