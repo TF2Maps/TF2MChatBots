@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System;
 using System.IO;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace SteamBotLite
 {
@@ -17,14 +18,12 @@ namespace SteamBotLite
         readonly protected string trailer;
         readonly protected string WebsiteFilesDirectory;
         
-        Dictionary<string, string> WebsiteTables;
 
         //string prefix, ObservableCollection<MapModule.Map> Maplist)
 
         public MapWebServer(VBot bot, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
-            WebsiteTables = new Dictionary<string, string>();
-            DataLists = new Dictionary<string, TableData>();
+            loadPersistentData();
 
             try
             {
@@ -68,16 +67,15 @@ namespace SteamBotLite
 
 
         public override void OnAllModulesLoaded()
-        {
-
-        }
+        {   }
 
         string GetAlltables ()
         {
             string value = "";
-            foreach (KeyValuePair<string,string> table in WebsiteTables)
+
+            foreach (KeyValuePair<string, TableData> table in DataLists)
             {
-                value += table.Value;
+                value += table.Value.HtmlTable(table.Key);
             }
             return value;
         }
@@ -115,50 +113,56 @@ namespace SteamBotLite
 
             HttpListenerContext context = listener.EndGetContext(result);
             HttpListenerResponse response = context.Response;
-            string path = (WebsiteFilesDirectory + context.Request.RawUrl);
+            byte[] buff = System.Text.Encoding.UTF8.GetBytes("Sorry an Error Has occured");
 
-            byte[] buff;
-
-            if (File.Exists(path))
+            try
             {
-                buff = System.Text.Encoding.UTF8.GetBytes(System.IO.File.ReadAllText(path).ToString());
+                string path = (WebsiteFilesDirectory + context.Request.RawUrl);
+
+                if (File.Exists(path))
+                {
+                    buff = System.Text.Encoding.UTF8.GetBytes(System.IO.File.ReadAllText(path).ToString());
+                }
+                else
+                {
+                    buff = System.Text.Encoding.UTF8.GetBytes(header + GetAlltables() + trailer);
+                }
             }
-            else
+
+            finally
             {
-                buff = System.Text.Encoding.UTF8.GetBytes(header + GetAlltables() + trailer);
+                response.ContentLength64 = buff.Length;
+                response.Close(buff, true);
+                listener.BeginGetContext(new AsyncCallback(ResponseMethod), listener);
             }
 
-            response.ContentLength64 = buff.Length;
-
-            response.Close(buff, true);
-            listener.BeginGetContext(new AsyncCallback(ResponseMethod), listener);
+            
 
         }
-        void AddHTMLTable(string TableKey, string Tabledata)
-        {
-            if (WebsiteTables.ContainsKey(TableKey))
-            {
-                WebsiteTables[TableKey] = Tabledata;
-            }
-            else
-            {
-                WebsiteTables.Add(TableKey, Tabledata);
-            }
-        }
-
-        void HTMLFileFromArrayListiners.AddHTMLTable(string TableKey, string Tabledata)
-        {
-            AddHTMLTable(TableKey, Tabledata);
-        }
-
+        
         public override string getPersistentData()
         {
-            throw new NotImplementedException();
+            return JsonConvert.SerializeObject(DataLists);
         }
 
         public override void loadPersistentData()
         {
-            throw new NotImplementedException();
+            {
+                try
+                {
+                    Console.WriteLine("Loading Website");
+
+                    DataLists = JsonConvert.DeserializeObject<Dictionary<string, TableData>>(System.IO.File.ReadAllText(ModuleSavedDataFilePath()));
+                    
+                    Console.WriteLine("Loaded saved file");
+                }
+                catch
+                {
+                    DataLists = new Dictionary<string, TableData>();
+                    savePersistentData();
+                    Console.WriteLine("Error Loading Website Table List, creating a new one and wiping the old");
+                }
+            }
         }
 
 
@@ -190,7 +194,7 @@ namespace SteamBotLite
                 ThisTableData.TableValues.Add(DataEntries);
             }
 
-            MakeTableFromEntry(TableKey, ThisTableData);
+            AddTableFromEntry(TableKey, ThisTableData);
         }
 
         
@@ -236,48 +240,29 @@ namespace SteamBotLite
                 GetTableData(identifier).TableValues.RemoveRange(0, ExcessToRemove);
             }
 
-            MakeTableFromEntry(identifier, GetTableData(identifier));
+            AddTableFromEntry(identifier, GetTableData(identifier));
         }
 
         void HTMLFileFromArrayListiners.AddEntryWithoutLimit(string identifier, TableDataValue[] data)
         {
             GetTableData(identifier).TableValues.Add(data);
-            MakeTableFromEntry(identifier, GetTableData(identifier));
+            AddTableFromEntry(identifier, GetTableData(identifier));
         }
 
         void HTMLFileFromArrayListiners.MakeTableFromEntry(string TableKey, TableData TableData)
         {
-            MakeTableFromEntry(TableKey, TableData);
+            AddTableFromEntry(TableKey, TableData);
         }
 
-        void MakeTableFromEntry(string TableKey, TableData TableData)
+        void AddTableFromEntry(string TableKey, TableData TableData)
         {
-            string Table = string.Format("<table> <caption> <h1> {0} </h1> </caption> <tbody> <tr>", TableKey);
-
-            if (TableData.Header != null)
-            {
-                foreach (TableDataValue value in TableData.Header)
-                {
-                    Table += "<th>" + value.GetEncodedValue() + "</th>";
-                }
+            if (DataLists.ContainsKey(TableKey)) {
+                DataLists[TableKey] = TableData;
             }
-
-            Table += "</tr>";
-
-            foreach (TableDataValue[] value in TableData.TableValues)
-            {
-                Table += "<tr>";
-
-                foreach (TableDataValue row in value)
-                {
-                    Table += "<td>" + row.GetEncodedValue() + "</td>";
-                }
+            else {
+                DataLists.Add(TableKey, TableData);
             }
-
-            Table += "</tbody> </table>";
-            AddHTMLTable(TableKey, Table);
+            savePersistentData();
         }
-
-       
     }
 }

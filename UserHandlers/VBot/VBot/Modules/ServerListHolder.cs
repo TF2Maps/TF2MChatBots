@@ -38,6 +38,7 @@ namespace SteamBotLite
             UpdateList();
 
             bot.AddMapChangeEventListiner(this);
+            Export();
         }
 
         public override void OnAllModulesLoaded()
@@ -73,11 +74,28 @@ namespace SteamBotLite
 
         void UpdateList ()
         {
+            
             foreach (Maplist entry in Maplists)
             {
                 listiner.HTMLFileFromArray(Header, ParseSummarisedListToHTMLTable(SummariseEntries(MapTests, entry.Maps, entry.ListKind)), entry.ListName);
             }
             
+        }
+
+        void Export ()
+        {
+            List<string[]> Data = new List<string[]>();
+            string[] header =  { "MapName", "IP", "Playercount", "TimeEntered" };
+            foreach (KeyValuePair<string, List<PlayEntry>> Item in MapTests)
+            {
+                foreach (PlayEntry PlayCache in Item.Value)
+                {
+                    string[] DataEntry = { Item.Key, PlayCache.ServerIP, PlayCache.PlayerCount, PlayCache.TimeEntered };
+                    Data.Add(DataEntry);
+                }
+
+                listiner.HTMLFileFromArray(header, Data, "ExportedData");
+            }
         }
 
         public void AddEntry(string MapName, PlayEntry Entry)
