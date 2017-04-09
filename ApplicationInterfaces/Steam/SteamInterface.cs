@@ -229,7 +229,7 @@ namespace SteamBotLite
             foreach (ChatroomEntity Chatroom in GetMainChatroomsCollection())
             {
                 SteamID ChatroomToJoin = ConvertEntityToSteamID(Chatroom);
-                SteamFriends.JoinChat(ChatroomToJoin);
+               // SteamFriends.JoinChat(ChatroomToJoin);
             }
 
         }
