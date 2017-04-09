@@ -165,7 +165,10 @@ namespace SteamBotLite
                 };
                 proc.Start();
 
-                proc.Kill();
+                
+
+                
+
                 return "Script should've ran";
             }
         }
@@ -182,7 +185,6 @@ namespace SteamBotLite
             }
             protected override string exec(MessageEventArgs Msg, string param)
             {
-
                 module.userhandler.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.LeaveChat);
                 module.userhandler.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.EnterChat);
                 return "Rejoined!";
