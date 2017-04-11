@@ -126,7 +126,7 @@ namespace SteamBotLite
             }
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                return string.Format("Your ID is::::: {0} | {1} | {2}" ,Msg.Sender.identifier, Msg.Sender.identifier.ToString(),Msg.Sender.DisplayName );
+                return string.Format("Your ID is {0} | {1} | {2}" ,Msg.Sender.identifier, Msg.Sender.identifier.ToString(),Msg.Sender.DisplayName );
             }
         }
 
