@@ -166,9 +166,6 @@ namespace SteamBotLite
 
                 proc.Start();
 
-                proc.WaitForExit();
-
-                Process.GetCurrentProcess().Kill();
                 return "Script should've ran";
             }
         }
