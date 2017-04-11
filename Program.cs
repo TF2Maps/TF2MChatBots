@@ -53,7 +53,6 @@ namespace SteamBotLite
                 }
             }
             */
-
             SteamAccountVBot SteamPlatformInterface = new SteamAccountVBot();
             DiscordAccountVBot DiscordPlatformInterfaceRelay = new DiscordAccountVBot();
 
