@@ -163,7 +163,10 @@ namespace SteamBotLite
                         FileName = "../../update.sh"
                     }
                 };
+
                 proc.Start();
+
+                proc.WaitForExit();
 
                 Process.GetCurrentProcess().Kill();
                 return "Script should've ran";
