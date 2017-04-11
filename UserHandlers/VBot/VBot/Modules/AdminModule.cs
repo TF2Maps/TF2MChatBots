@@ -166,6 +166,7 @@ namespace SteamBotLite
 
                 proc.Start();
 
+                Process.GetCurrentProcess().Kill();
                 return "Script should've ran";
             }
         }
