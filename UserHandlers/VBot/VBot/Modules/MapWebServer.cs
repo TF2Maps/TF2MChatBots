@@ -65,6 +65,25 @@ namespace SteamBotLite
 
         }
 
+        private class RemoveTable : BaseCommand
+        {
+            // Command to query if a server is active
+            MapWebServer module;
+            ModuleHandler ModuleHandler;
+            string address;
+
+            public RemoveTable(ModuleHandler bot, MapWebServer module) : base(bot, "!RemoveTable")
+            {
+                this.module = module;
+            }
+            protected override string exec(MessageEventArgs Msg, string param)
+            {
+                module.RemoveTableFromEntry(param);
+                return "Removing table";
+            }
+
+        }
+
 
         public override void OnAllModulesLoaded()
         {   }
@@ -261,6 +280,17 @@ namespace SteamBotLite
             }
             else {
                 DataLists.Add(TableKey, TableData);
+            }
+            savePersistentData();
+        }
+
+        void RemoveTableFromEntry(string TableKey)
+        {
+            if (DataLists.ContainsKey(TableKey))
+            {
+                DataLists.Remove(TableKey);
+            }
+            else {
             }
             savePersistentData();
         }

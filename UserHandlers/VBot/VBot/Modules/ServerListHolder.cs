@@ -38,7 +38,7 @@ namespace SteamBotLite
             UpdateList();
 
             bot.AddMapChangeEventListiner(this);
-            Export();
+            
         }
 
         public override void OnAllModulesLoaded()

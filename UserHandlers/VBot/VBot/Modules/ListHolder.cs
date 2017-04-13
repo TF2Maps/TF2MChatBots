@@ -24,10 +24,6 @@ namespace SteamBotLite
             {
 
                 this.module = module;
-
-               
-
-                
             }
             protected override string exec(MessageEventArgs Msg, string param)
             {
