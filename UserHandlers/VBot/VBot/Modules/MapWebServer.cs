@@ -42,6 +42,7 @@ namespace SteamBotLite
             }
 
             adminCommands.Add(new RebootModule(bot, this));
+            adminCommands.Add(new RemoveTable(bot, this));
         }
 
         private class RebootModule : BaseCommand
