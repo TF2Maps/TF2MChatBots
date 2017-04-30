@@ -206,7 +206,7 @@ namespace SteamBotLite
         public abstract void EnterChatRoom (object sender, ChatroomEntity ChatroomEntity);
         public abstract void LeaveChatroom (object sender, ChatroomEntity ChatroomEntity);
 
-        
+
         public void JoinAllChatrooms(object sender, EventArgs e) {
             foreach(ChatroomEntity entry in GetMainChatroomsCollection()) {
                 EnterChatRoom(sender, entry);
