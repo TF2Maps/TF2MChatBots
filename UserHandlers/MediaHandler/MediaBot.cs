@@ -68,16 +68,13 @@ namespace SteamBotLite
                     
                     dynamic red = JsonConvert.DeserializeObject(item);
                     RootObject data = JsonConvert.DeserializeObject<RootObject>(item);
-                   string time = data.items[0].contentDetails.duration.replace("H",""); 
-                   time = time.replace("M","");
-                    time = time.replace("S","");
-                    time = time.replace("P","");
-
-
-
-
                     
-                    e.ReplyMessage = data["Title"] + "[" + Time + "]";
+                    string time = data.items[0].contentDetails.duration;
+                    time = time.Replace("P", "");
+                    time = time.Replace("T", "");
+                    time = Regex.Replace(time, "[^0-9.]", ":");
+                    time = time.Substring(0, time.Length - 1);
+                    e.ReplyMessage = data.items[0].snippet.title + " [" + time + "]";
                     e.InterfaceHandlerDestination.SendChatRoomMessage(this, e);
                 }
                Console.WriteLine(GetVideoData(VideoID));
