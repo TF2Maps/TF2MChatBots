@@ -135,6 +135,9 @@ namespace SteamBotLite
 
                 string Key = e.ReceivedMessage.Substring(StartIndex, CharactersRemaining);
                 SetApiKey(Key);
+                e.ReplyMessage = "Retrieved Key";
+                e.InterfaceHandlerDestination.SendPrivateMessage(this, e);
+
             }
         }
         string TrimOpening (string MainString, int Trimmer)
