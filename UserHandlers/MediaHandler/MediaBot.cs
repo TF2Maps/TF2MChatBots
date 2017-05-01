@@ -72,8 +72,11 @@ namespace SteamBotLite
                     string time = data.items[0].contentDetails.duration;
                     time = time.Replace("P", "");
                     time = time.Replace("T", "");
-                    time = Regex.Replace(time, "[^0-9.]", ":");
-                    time = time.Substring(0, time.Length - 1);
+                    time = time.Replace("S", " Seconds ");
+                    time = time.Replace("H", " Hours ");
+                    time = time.Replace("M", " Minutes ");
+                    time = time.Replace("W", " Weeks ");
+                   
                     e.ReplyMessage = data.items[0].snippet.title + " [" + time + "]";
                     e.InterfaceHandlerDestination.SendChatRoomMessage(this, e);
                 }
