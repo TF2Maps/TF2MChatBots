@@ -76,6 +76,7 @@ namespace SteamBotLite
                     time = time.Replace("H", " Hours ");
                     time = time.Replace("M", " Minutes ");
                     time = time.Replace("W", " Weeks ");
+                    time = time.Substring(0, time.Length - 1);
                    
                     e.ReplyMessage = data.items[0].snippet.title + " [" + time + "]";
                     e.InterfaceHandlerDestination.SendChatRoomMessage(this, e);
