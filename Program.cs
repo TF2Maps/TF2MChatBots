@@ -21,6 +21,7 @@ namespace SteamBotLite
             List<UserHandler> UserHandlers = new List<UserHandler>();
             Console.WriteLine("RUNNING");
             ConsoleUserHandler consolehandler = new ConsoleUserHandler();
+            MediaBot MediaHandler = new MediaBot();
             VBot VbotHandler = new VBot();
             GhostChecker ghostchecker = new GhostChecker();
             
@@ -60,6 +61,9 @@ namespace SteamBotLite
             Bots.Add(DiscordPlatformInterfaceRelay);
 
             //Link userhandlers and classes that are two way//
+            AssignConnection(MediaHandler, DiscordPlatformInterfaceRelay);
+            AssignConnection(MediaHandler, SteamPlatformInterface);
+
             AssignConnection(VbotHandler, DiscordPlatformInterfaceRelay);
             AssignConnection(VbotHandler, SteamPlatformInterface);
             AssignConnection(consolehandler, DiscordPlatformInterfaceRelay);
