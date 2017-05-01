@@ -68,19 +68,25 @@ namespace SteamBotLite
                     
                     dynamic red = JsonConvert.DeserializeObject(item);
                     RootObject data = JsonConvert.DeserializeObject<RootObject>(item);
-                    dynamic blue = JsonConvert.DeserializeObject(item);
-                   
-            
-                 
-                   
-                    string Duration = "0" ;
-                    //e.ReplyMessage = data["Title"] + "[" + Duration + "]";
+                    TimeSpan youTubeDuration = TimeSpan.Parse(data.items[0].contentDetails.duration); 
+
+
+
+
+                    
+                    e.ReplyMessage = data["Title"] + "[" + Duration + "]";
                     e.InterfaceHandlerDestination.SendChatRoomMessage(this, e);
                 }
                Console.WriteLine(GetVideoData(VideoID));
             }
                 
         }
+
+        public class Snippet
+        {
+            public string title { get; set; }
+        }
+
         public class RegionRestriction
         {
             public List<string> allowed { get; set; }
@@ -89,16 +95,12 @@ namespace SteamBotLite
         public class ContentDetails
         {
             public string duration { get; set; }
-            public string dimension { get; set; }
-            public string definition { get; set; }
-            public string caption { get; set; }
-            public bool licensedContent { get; set; }
-            public RegionRestriction regionRestriction { get; set; }
-            public string projection { get; set; }
+           
         }
 
         public class Item
         {
+            public Snippet snippet { get; set; }
             public ContentDetails contentDetails { get; set; }
         }
 
