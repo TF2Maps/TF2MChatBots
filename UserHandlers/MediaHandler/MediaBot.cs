@@ -128,7 +128,6 @@ namespace SteamBotLite
         }
 
         public override void ProcessPrivateMessage(object sender, MessageEventArgs e) {
-            e.ReplyMessage = "Retrieved Message";
             e.InterfaceHandlerDestination.SendPrivateMessage(this, e);
             if (e.ReceivedMessage.StartsWith(APICommand, StringComparison.OrdinalIgnoreCase))
             {
