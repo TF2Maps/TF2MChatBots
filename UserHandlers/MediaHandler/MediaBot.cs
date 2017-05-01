@@ -73,6 +73,7 @@ namespace SteamBotLite
                     time = time.Replace("P", "");
                     time = time.Replace("T", "");
                     time = time.Replace("S", " Seconds ");
+                    time = time.Replace("D", " Days ");
                     time = time.Replace("H", " Hours ");
                     time = time.Replace("M", " Minutes ");
                     time = time.Replace("W", " Weeks ");
