@@ -94,6 +94,10 @@ namespace SteamBotLite
                         {
                             TimeString = TimeString.Substring(Hoursheader.Length, TimeString.Length - Hoursheader.Length);
                         }
+                        if (TimeString.Equals("00:00"))
+                        {
+                            TimeString = "Stream";
+                        }
                         e.ReplyMessage = data.items[0].snippet.title + " [" + TimeString + "]";
                         e.InterfaceHandlerDestination.SendChatRoomMessage(this, e);
                     }
