@@ -244,6 +244,7 @@ namespace SteamBotLite
                 DataLists.Add(identifier, new TableData());
                 return DataLists[identifier];
             }
+           
         }
 
         void HTMLFileFromArrayListiners.AddEntryWithLimit(string identifier, TableDataValue[] data, int limit)

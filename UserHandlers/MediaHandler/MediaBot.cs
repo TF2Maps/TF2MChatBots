@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
 using System.Net;
+using System.Xml;
 
 namespace SteamBotLite
 {
@@ -52,32 +53,51 @@ namespace SteamBotLite
         }
         
         public override void ProcessChatRoomMessage(object sender, MessageEventArgs e) {
-            string VideoID = ExtractID(e.ReceivedMessage);
-            
-            if (string.IsNullOrEmpty(VideoID)) {
-                //Do Nothing
-            } else {
-                string VideoData = GetVideoData(VideoID);
-                if (string.IsNullOrEmpty(VideoData)) {
+            string[] SplitMessage = e.ReceivedMessage.Split(null);
+            foreach (string Word in SplitMessage) //We do this to handle multiple videos
+            {
+                string VideoID = ExtractID(Word);
+
+                if (string.IsNullOrEmpty(VideoID))
+                {
                     //Do Nothing
-                } else {
-
-                    string item = VideoData;//.Replace("\n", string.Empty);
-
-                    Console.WriteLine(item);
-                    
-                    dynamic red = JsonConvert.DeserializeObject(item);
-                    RootObject data = JsonConvert.DeserializeObject<RootObject>(item);
-                    
-                    string time = data.items[0].contentDetails.duration;
-                    time = time.Replace("P", "");
-                    time = time.Replace("T", "");
-                    time = Regex.Replace(time, "[^0-9.]", ":");
-                    time = time.Substring(0, time.Length - 1);
-                    e.ReplyMessage = data.items[0].snippet.title + " [" + time + "]";
-                    e.InterfaceHandlerDestination.SendChatRoomMessage(this, e);
                 }
-               Console.WriteLine(GetVideoData(VideoID));
+                else {
+                    string VideoData = GetVideoData(VideoID);
+                    if (string.IsNullOrEmpty(VideoData))
+                    {
+                        //Do Nothing
+                    }
+                    else {
+
+                        string item = VideoData;//.Replace("\n", string.Empty);
+                        string TimeString;
+
+                        Console.WriteLine(item);
+
+                        dynamic red = JsonConvert.DeserializeObject(item);
+                        RootObject data = JsonConvert.DeserializeObject<RootObject>(item);
+
+                        string time = data.items[0].contentDetails.duration;
+
+                        if (time.Contains("D"))
+                        {
+                            TimeString = "Over 24 Hours long";
+                        }
+                        else {
+                            TimeString = XmlConvert.ToTimeSpan(time).ToString();
+                        }
+
+                        string Hoursheader = "00:";
+                        if (TimeString.StartsWith(Hoursheader))
+                        {
+                            TimeString = TimeString.Substring(Hoursheader.Length, TimeString.Length - Hoursheader.Length);
+                        }
+                        e.ReplyMessage = data.items[0].snippet.title + " [" + TimeString + "]";
+                        e.InterfaceHandlerDestination.SendChatRoomMessage(this, e);
+                    }
+                    Console.WriteLine(GetVideoData(VideoID));
+                }
             }
                 
         }
@@ -141,11 +161,16 @@ namespace SteamBotLite
 
             }
         }
-        string TrimOpening (string MainString, int Trimmer)
+        string TrimOpeningForURL (string MainString, int Trimmer)
         {
             int StartIndex = Trimmer;
             int CharactersRemaining = MainString.Length - Trimmer;
             return MainString.Substring(StartIndex, CharactersRemaining);
+        }
+        string TrimEnding (string Message)
+        {
+            
+            return Message.Split(null)[0];
         }
 
         string ExtractID (string Message) {
@@ -158,10 +183,18 @@ namespace SteamBotLite
             for (int i = 0 ; i < YoutubeRepresentations.Length;i++)
             {
                 if (Message.ToLower().Contains(YoutubeRepresentations[i])) {
-                    string Value = TrimOpening(Message , YoutubeRepresentations[i].Length);
+                    
+                    string Value = TrimOpeningForURL(Message, YoutubeRepresentations[i].Length);
+
+                    Value = TrimEnding(Value);
 
                     if (Value.EndsWith("/")) {
                         Value = Value.Substring(0, Value.Length - 1);
+                    }
+                    if (Value.Contains("?t="))
+                    {
+                        Value = Value.Split(new string[] { "?t=" },StringSplitOptions.RemoveEmptyEntries)[0];
+                        
                     }
 
                     return Value;
