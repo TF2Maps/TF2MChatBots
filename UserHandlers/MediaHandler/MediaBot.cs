@@ -73,6 +73,7 @@ namespace SteamBotLite
                         string item = VideoData;//.Replace("\n", string.Empty);
                         string TimeString;
 
+
                         Console.WriteLine(item);
 
                         dynamic red = JsonConvert.DeserializeObject(item);
@@ -97,6 +98,7 @@ namespace SteamBotLite
                         e.InterfaceHandlerDestination.SendChatRoomMessage(this, e);
                     }
                     Console.WriteLine(GetVideoData(VideoID));
+
                 }
             }
                 
