@@ -21,14 +21,16 @@ namespace SteamBotLite
             
             if ( !string.IsNullOrEmpty(HoverText))
             {
-                header += "<span title = \"";
-                trailer = trailer + "\">" + WebUtility.HtmlEncode(VisibleValue) + "</span>" ;
-                ValueToDisplay = HoverText;
+                header += "<span title = \"" + WebUtility.HtmlEncode(HoverText) + "\">";
+
+                trailer = WebUtility.HtmlEncode(VisibleValue) + "</span>" ;
+                
             }
+
             if ( !string.IsNullOrEmpty(Link))
             {
-                header += "<a href=\"";
-                trailer = trailer + "\">" + WebUtility.HtmlEncode(VisibleValue ) + "</a>";
+                header += "<a href=\"" + WebUtility.HtmlEncode(Link) + "\">";
+                trailer = "</a>" + trailer;
             }
             return header + WebUtility.HtmlEncode(ValueToDisplay) + trailer;
         }
