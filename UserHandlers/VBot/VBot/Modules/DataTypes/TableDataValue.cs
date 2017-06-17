@@ -23,7 +23,7 @@ namespace SteamBotLite
             {
                 header += "<span title = \"" + WebUtility.HtmlEncode(HoverText) + "\">";
 
-                trailer = WebUtility.HtmlEncode(VisibleValue) + "</span>" ;
+                trailer = "</span>" ;
                 
             }
 
