@@ -79,7 +79,7 @@ namespace SteamBotLite
                 module.OnAllModulesLoaded();
             }
 
-          //  OnMaplistchange(mapModule.mapList);
+         
         }
 
         
@@ -88,17 +88,12 @@ namespace SteamBotLite
             base.SetUsernameEventProcess(e);
         }
 
-        
-        
-
         public void OnMaplistchange(IReadOnlyList<Map> maplist, object sender = null, NotifyCollectionChangedEventArgs args = null)
         {
             foreach (MapListChangeListiner listiner in ListChangeEventListiners)
             {
                 listiner.MaplistChange(maplist);
             }
-           
-
         }
 
         public void AddListChangeEventListiner(MapListChangeListiner listiner)

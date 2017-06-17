@@ -18,6 +18,8 @@ namespace SteamBotLite
         public string DisplayName = "";
         public object ExtraData;
         public object ParentIdentifier;
+        public string UserURL; 
+
         bool IsChild;
 
         public ChatroomEntity(object identifier, ApplicationInterface Application) {

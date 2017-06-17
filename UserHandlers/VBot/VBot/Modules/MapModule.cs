@@ -140,6 +140,11 @@ namespace SteamBotLite
                 Values[3].VisibleValue = entry.SubmitterName;
                 Values[3].HoverText = entry.Submitter.ToString();
 
+                if (string.IsNullOrEmpty(entry.SubmitterContact)) {
+                } else {
+                    Values[3].Link = entry.SubmitterName;
+                }
+                
                 Entries.Add(Values);
 
                 HTMLlistiner.AddEntryWithoutLimit(TableName, Values);
@@ -252,6 +257,7 @@ namespace SteamBotLite
                 Map map = ParseStringToMap(message);
                 map.Submitter = Msg.Sender.identifier;
                 map.SubmitterName = Msg.Sender.DisplayName;
+                map.SubmitterContact = Msg.Sender.UserURL;
 
                 return map;
             }
@@ -358,7 +364,7 @@ namespace SteamBotLite
             public override string runcommand(MessageEventArgs Msg, string param)
             {
                 Map UserMap = CleanupAndParseMsgToMap(Msg , param);
-                UserMap.Submitter = Msg.Sender.identifier;
+                
 
                 string Reply =  MapModule.mapList.AddMap(UserMap);
 

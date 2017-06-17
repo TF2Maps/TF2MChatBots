@@ -421,9 +421,10 @@ namespace SteamBotLite
             NewMessageData.Chatroom = new Chatroom(callback.ChatRoomID.ConvertToUInt64(), this);
             NewMessageData.Chatroom.DisplayName = (callback.ChatRoomID.ToString());
             
-     
+            
             NewMessageData.Sender = new User(callback.ChatterID.ConvertToUInt64(), this);
             NewMessageData.Sender.DisplayName = SteamFriends.GetFriendPersonaName(callback.ChatterID.ConvertToUInt64());
+            NewMessageData.Sender.UserURL = "http://steamcommunity.com/profiles/" + callback.ChatterID.ConvertToUInt64();
 
             NewMessageData.Destination = NewMessageData.Chatroom;
 

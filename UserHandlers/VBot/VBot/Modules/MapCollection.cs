@@ -204,6 +204,7 @@ namespace SteamBotLite
         public string Notes { get; set; }
         public bool Uploaded { get; set; }
         public string Filename { get; set; }
+        public string SubmitterContact { get; set; }
 
         public bool IsOwner(Object other)
         {
