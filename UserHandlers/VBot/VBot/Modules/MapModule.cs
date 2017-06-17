@@ -142,7 +142,7 @@ namespace SteamBotLite
 
                 if (string.IsNullOrEmpty(entry.SubmitterContact)) {
                 } else {
-                    Values[3].Link = entry.SubmitterName;
+                    Values[3].Link = entry.SubmitterContact;
                 }
                 
                 Entries.Add(Values);
