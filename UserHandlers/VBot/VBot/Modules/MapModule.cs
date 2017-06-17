@@ -636,6 +636,10 @@ namespace SteamBotLite
                 if (parameters.Length > 1)
                 {
                     Map NewMapdata = ParseStringToMap(parameters[1]);
+                    if (userhandler.admincheck(msg.Sender)) {
+                        msg.Sender.Rank = ChatroomEntity.AdminStatus.True;
+                    }
+                     
                     return MapModule.mapList.UpdateMap(parameters[0], NewMapdata, msg.Sender);
                 }
                 else
