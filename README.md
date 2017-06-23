@@ -10,7 +10,8 @@ The design of the bot allows for a single “UserHandler” to handle and proces
 
 # Maintananers
 This program is primarily written, maintained, deployed and updated by Ben "Fantasmos" Krajancic, all questions should be sent to him.
-Maxine Dupis https://github.com/maxdup was responsible for developing the initial modules and command system, however due to issues with github the initial commit was made under fantasmos' account. 
+
+Maxine Dupis https://github.com/maxdup was responsible for developing the initial modules and command system, however due to issues with github the initial commit was made under fantasmos' account at: https://github.com/TF2Maps/SteamBotLite/commit/fe204c423372e8038c1a77ded378a22630d8522a 
 
 # General code structure
 
