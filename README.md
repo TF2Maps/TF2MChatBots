@@ -1,7 +1,15 @@
-# SteamBotLite
-Needs a name-change, it does bot stuff for TF2Maps on the Steam and Discord platforms and is easily configurable and modifiable 
+# VBOT (A.k.a SteamBotLite)
+VBot is a program that is utilised by the TF2Maps community, accessible via the steam group chat and discord channel. 
+Its primary purpose is to improve the capability of the online chatroom as well as improve the development process for members. 
 
-#USE AT YOUR OWN RISK
+VBot allows users to actively add their Maps into the chat-bot’s list, and all maps in the list can be recited anytime through a command. Furthermore VBot will actively connect to TF2Map’s Game Servers and remove maps from the list when they are ran, and notify the user through a private message (as well as post in the chatroom on map-change to encourage users to join). 
+
+VBot’s module-based design allows for the easy integration and isolated development of numerous functions w/o causing disturbance to the primary features, the Bot has a MOTD module that broadcasts a message hourly to the chatroom, a Saved Replies Module (e.g: /maps replies http://vbot.site/) and an online search module for the Team Fortress 2 development reference site as well as TF2maps.net itself.
+
+The design of the bot allows for a single “UserHandler” to handle and process requests on multiple platforms simultaneously (and has been integrated to also work with Discord) as instead ‘InterfacePlatforms’ normalize the data across platforms and serve as a bridge. VBot also hosts a website at: http://vbot.site/ that allows users to view the maps currently in the queue. 
+
+#Maintanance
+This program is primarily written to and updated by Ben "Fantasmos" Krajancic, all questions should be sent to him
 
 #General code structure
 
