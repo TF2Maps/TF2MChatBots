@@ -8,10 +8,11 @@ VBot’s module-based design allows for the easy integration and isolated develo
 
 The design of the bot allows for a single “UserHandler” to handle and process requests on multiple platforms simultaneously (and has been integrated to also work with Discord) as instead ‘InterfacePlatforms’ normalize the data across platforms and serve as a bridge. VBot also hosts a website at: http://vbot.site/ that allows users to view the maps currently in the queue. 
 
-#Maintanance
-This program is primarily written to and updated by Ben "Fantasmos" Krajancic, all questions should be sent to him
+# Maintananers
+This program is primarily written, maintained, deployed and updated by Ben "Fantasmos" Krajancic, all questions should be sent to him.
+Maxine Dupis https://github.com/maxdup was responsible for developing the initial modules and command system, however due to issues with github the initial commit was made under fantasmos' account. 
 
-#General code structure
+# General code structure
 
 A general idea of the code is: 
 
@@ -21,7 +22,7 @@ There are "Chathandlers" which will respond to messages through events. (VBot be
 Interfaces can be linked to chathandlers. Interfaces will translate the data into an abstract form for the chathandlers to do work on, similarly chathandlers will fire events in response TO the interfaces, in a similarly abstract form.
 A cool thing is a single chathandler can be linked to many interfaces. 
 
-#Configuring:
+# Configuring:
 
 In bin/example there are several files. 
 
