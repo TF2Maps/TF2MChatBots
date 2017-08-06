@@ -475,7 +475,7 @@ namespace SteamBotLite
                 return true; //Why did we arrive here
             }
 
-            Tuple<string,string> GetMapsWithFilter (string Filter, MapSearchFilter FilterType)
+            Tuple<string,string> GetMapsWithFilter (string Filter, MapSearchFilter FilterType , bool OnlyReturnUploadedMaps)
             {
 
                 IReadOnlyList<Map> maps = module.mapList.GetAllMaps();
@@ -496,7 +496,11 @@ namespace SteamBotLite
                     //Build Chat Response
                     for (int i = 0; i < maps.Count; i++ )
                     {
-                        if (MapNamePassesFilter(maps[i].Filename, FilterType,Filter))
+                        if (OnlyReturnUploadedMaps && (module.CheckIfMapIsUploaded(maps[i].Filename) == false))
+                        {
+                            // do nothing
+                        }
+                        else if (MapNamePassesFilter(maps[i].Filename, FilterType,Filter))
                         {
                             if (MapsAddedToResponse < MapsInResponseLimit)
                             {
@@ -542,6 +546,7 @@ namespace SteamBotLite
                 string MapFilter = "";
                 //If the param actually has a mapname, and isn't empty, execute the filtering system
                 bool ValidData = (string.IsNullOrWhiteSpace(param) != true && param.StartsWith("!maps", StringComparison.OrdinalIgnoreCase) != true);
+                bool OnlyWantUploaded = command.StartsWith("!mapsuploaded", StringComparison.OrdinalIgnoreCase);
 
                 if (ValidData) {
 
@@ -571,7 +576,7 @@ namespace SteamBotLite
                     MapFilter = param;
                 }
 
-                Tuple<string, string>Responses = GetMapsWithFilter(MapFilter, Filter);
+                Tuple<string, string>Responses = GetMapsWithFilter(MapFilter, Filter, OnlyWantUploaded);
 
                 userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = Msg.Sender, ReplyMessage = Responses.Item2 });
                 return Responses.Item1;
