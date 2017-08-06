@@ -546,7 +546,7 @@ namespace SteamBotLite
                 string MapFilter = "";
                 //If the param actually has a mapname, and isn't empty, execute the filtering system
                 bool ValidData = (string.IsNullOrWhiteSpace(param) != true && param.StartsWith("!maps", StringComparison.OrdinalIgnoreCase) != true);
-                bool OnlyWantUploaded = command.StartsWith("!mapsuploaded", StringComparison.OrdinalIgnoreCase);
+                bool OnlyWantUploaded = Msg.ReceivedMessage.StartsWith("!mapsuploaded", StringComparison.OrdinalIgnoreCase);
 
                 if (ValidData) {
 
