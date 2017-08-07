@@ -455,6 +455,7 @@ namespace SteamBotLite
 
             public Maps(ModuleHandler bot, MapModule mapMod) : base(bot, "!maps") {
                 module = mapMod;
+                LastExecuted = DateTime.Now;
             }
             enum MapSearchFilter { StartsWith, EndsWith, NoFilter, Contains};
 
