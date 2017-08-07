@@ -100,10 +100,17 @@ namespace SteamBotLite
 
             if (e.playerCount > 8) {
                 userhandler.BroadcastMessageProcessEvent(e.ToString());
+
+                TableDataValue HeaderServer = new TableDataValue();
+                HeaderTime.VisibleValue = "Server";
+
                 TableDataValue ServerLabel = new TableDataValue();
                 ServerLabel.VisibleValue = e.tag;
                 ServerLabel.Link = "steam://connect/" + e.serverIP + ":" + e.port;
-                WebServer.AddEntryWithLimit("Recently Tested", new TableDataValue[] { ServerLabel, MapName, PlayerCount, Time }, 10);
+
+                string RecentlyTestedTableLabel = "Recently Tested";
+                WebServer.SetTableHeader(RecentlyTestedTableLabel, new TableDataValue[] { HeaderName, HeaderNamePlayerCount, HeaderTime,  HeaderServer });
+                WebServer.AddEntryWithLimit(RecentlyTestedTableLabel, new TableDataValue[] { MapName, PlayerCount, Time, ServerLabel}, 10);
             }
 
         }
