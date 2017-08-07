@@ -19,8 +19,6 @@ namespace SteamBotLite
 
         void AddLoginEventListiner(OnLoginCompletedListiners listiner);
         void AddListChangeEventListiner(MapListChangeListiner listiner);
-        void Disablemodule(string param);
-        void Enablemodule(string param);
         List<BaseModule> GetAllModules();
     }
 }

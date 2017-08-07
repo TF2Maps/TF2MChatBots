@@ -157,7 +157,7 @@
     <Compile Include="UserHandlers\VBot\VBot\Modules\IdentityModule.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\ListHolder.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\MapCollection.cs" />
-    <Compile Include="UserHandlers\VBot\VBot\Modules\MapWebServer.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\WebServerModule.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\SearchClass.cs" />
     <Compile Include="UserHandlers\VBot\VBot.cs" />
     <Compile Include="UserHandlers\VBot\VBot\BaseCommand.cs" />

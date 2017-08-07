@@ -22,7 +22,7 @@ namespace SteamBotLite
         ImpNaoModule impnaomodule;
         ServerListHolder serverlistmodule;
         CountDownModule countdownmodule;
-        MapWebServer WebServer;
+        WebServerModule WebServer;
         IdentityModule identitymodule;
 
         public UsersModule usersModule;
@@ -56,7 +56,7 @@ namespace SteamBotLite
             OnLoginlistiners = new List<OnLoginCompletedListiners>();
             ListChangeEventListiners = new List<MapListChangeListiner>();
             // loading modules
-            WebServer = new MapWebServer(this, jsconfig);
+            WebServer = new WebServerModule(this, jsconfig);
 
             mapModule = new MapModule(this,this, jsconfig);
 
@@ -135,49 +135,7 @@ namespace SteamBotLite
             }
         }
 
-        public void Disablemodule(string ModuleToRemove)
-        {
-            int x = 0;
-            int EntryToRemove = 0;
-            bool RemoveModule = false;
-            foreach (BaseModule Module in ModuleList)
-            {
-                Console.WriteLine(Module.GetType().ToString());
-                if (Module.GetType().Name.ToString().Equals(ModuleToRemove))
-                {
-                    EntryToRemove = x;
-                    RemoveModule = true;
-                }
-                x++;
-            }
-            if (RemoveModule && ModuleList[EntryToRemove].DeletableModule)
-            {
-                ModuleList[EntryToRemove] = null;
-                ModuleList.RemoveAt(EntryToRemove);
-            }
-        }
-
-        public void Enablemodule(string ModuleToAdd)
-        {
-            Type T = Type.GetType("SteamBotLite." + ModuleToAdd); //We attempt to translate the string to an existing type
-            if ((T.GetType() != null) & (T.BaseType.ToString().Equals("SteamBotLite.BaseModule"))) //Then we check its valid AND if its a base of userhandler
-            {                
-                BaseModule module =  (BaseModule)Activator.CreateInstance(T, new object[] { this, jsconfig });
-                bool AlreadyExists = false;
-
-                foreach (BaseModule ExistingModule in ModuleList)
-                {
-                    if (ExistingModule.GetType() == module.GetType())
-                    {
-                        AlreadyExists = true;
-                    }
-                }
-                if (!AlreadyExists)
-                {
-                    ModuleList.Add(module);
-                }
-            }
-        }
+       
 
 
         public string ChatMessageHandler(MessageEventArgs Msg , string Message)

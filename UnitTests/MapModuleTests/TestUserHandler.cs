@@ -72,12 +72,7 @@ namespace SteamBotLite
         {
         }
 
-        void ModuleHandler.Disablemodule(string param) {
-        }
-
-        void ModuleHandler.Enablemodule(string param)
-        {
-        }
+        
 
         List<BaseModule> ModuleHandler.GetAllModules() {
             return new List<BaseModule>();

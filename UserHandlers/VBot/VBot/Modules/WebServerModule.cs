@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace SteamBotLite
 {
-    class MapWebServer : BaseModule , HTMLFileFromArrayListiners
+    class WebServerModule : BaseModule , HTMLFileFromArrayListiners
     {
         HttpListener listener;
 
@@ -21,7 +21,7 @@ namespace SteamBotLite
 
         //string prefix, ObservableCollection<MapModule.Map> Maplist)
 
-        public MapWebServer(VBot bot, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
+        public WebServerModule(VBot bot, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
             loadPersistentData();
 
@@ -48,11 +48,11 @@ namespace SteamBotLite
         private class RebootModule : BaseCommand
         {
             // Command to query if a server is active
-            MapWebServer module;
+            WebServerModule module;
             ModuleHandler ModuleHandler;
             string address;
 
-            public RebootModule(ModuleHandler bot, MapWebServer module) : base(bot, "!WebsiteReboot")
+            public RebootModule(ModuleHandler bot, WebServerModule module) : base(bot, "!WebsiteReboot")
             {
                 this.module = module;
                 this.address = (module.config["Address"].ToString());
@@ -69,11 +69,11 @@ namespace SteamBotLite
         private class RemoveTable : BaseCommand
         {
             // Command to query if a server is active
-            MapWebServer module;
+            WebServerModule module;
             ModuleHandler ModuleHandler;
             string address;
 
-            public RemoveTable(ModuleHandler bot, MapWebServer module) : base(bot, "!RemoveTable")
+            public RemoveTable(ModuleHandler bot, WebServerModule module) : base(bot, "!RemoveTable")
             {
                 this.module = module;
             }
@@ -101,7 +101,7 @@ namespace SteamBotLite
         }
 
         //When this class is turned off, we close the server properly
-        ~MapWebServer()
+        ~WebServerModule()
         {
             CloseWebServer();
         }

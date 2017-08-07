@@ -27,8 +27,6 @@ namespace SteamBotLite
             commands.Add(new CommandListRetrieve(handler, this));
             commands.Add(new UserInfo(handler, this));
 
-            adminCommands.Add(new RemoveModule(handler, this));
-            adminCommands.Add(new AddModule(handler, this));
             adminCommands.Add(new GetAllModules(handler, this));
 
             adminCommands.Add(new Reboot(handler, this));
@@ -186,44 +184,6 @@ namespace SteamBotLite
                 module.userhandler.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.LeaveChat);
                 module.userhandler.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.EnterChat);
                 return "Rejoined!";
-            }
-
-        }
-
-        private class RemoveModule : BaseCommand
-        {
-            // Command to query if a server is active
-            AdminModule module;
-            ModuleHandler ModuleHandler;
-
-            public RemoveModule(ModuleHandler bot, AdminModule module) : base(bot, "!ModuleRemove")
-            {
-                this.module = module;
-                ModuleHandler = bot;
-            }
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                ModuleHandler.Disablemodule(param);
-                return "Removing Module...";
-            }
-
-        }
-
-        private class AddModule : BaseCommand
-        {
-            // Command to query if a server is active
-            AdminModule module;
-            ModuleHandler modulehandler;
-
-            public AddModule(ModuleHandler bot, AdminModule module) : base(bot, "!ModuleAdd")
-            {
-                this.module = module;
-                modulehandler = bot;
-            }
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                modulehandler.Enablemodule(param);
-                return "Adding Module...";
             }
 
         }
