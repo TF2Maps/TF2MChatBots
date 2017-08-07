@@ -102,7 +102,7 @@ namespace SteamBotLite
                 userhandler.BroadcastMessageProcessEvent(e.ToString());
 
                 TableDataValue HeaderServer = new TableDataValue();
-                HeaderTime.VisibleValue = "Server";
+                HeaderServer.VisibleValue = "Server";
 
                 TableDataValue ServerLabel = new TableDataValue();
                 ServerLabel.VisibleValue = e.tag;
