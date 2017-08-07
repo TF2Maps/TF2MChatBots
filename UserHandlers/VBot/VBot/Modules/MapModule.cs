@@ -585,8 +585,10 @@ namespace SteamBotLite
                 
                 if (DateTime.Now > LastExecuted.AddMinutes(1)) {
                     userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = Msg.Sender, ReplyMessage = Responses.Item1 });
+                    
                     return null;
                 } else {
+                    LastExecuted = DateTime.Now;
                     return Responses.Item1;
                 }
 
