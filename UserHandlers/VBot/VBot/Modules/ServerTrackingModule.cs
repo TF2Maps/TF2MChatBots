@@ -94,7 +94,7 @@ namespace SteamBotLite
             PlayerCount.VisibleValue = e.playerCount.ToString();
 
             TableDataValue Time = new TableDataValue();
-            Time.VisibleValue = DateTime.UtcNow.ToShortTimeString();
+            Time.VisibleValue = DateTime.UtcNow.ToLongTimeString();
 
             WebServer.AddEntryWithLimit(TableLabel, new TableDataValue[] { MapName, PlayerCount, Time }, 10);
 
