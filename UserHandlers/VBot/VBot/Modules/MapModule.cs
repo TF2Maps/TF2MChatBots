@@ -455,7 +455,6 @@ namespace SteamBotLite
 
             public Maps(ModuleHandler bot, MapModule mapMod) : base(bot, "!maps") {
                 module = mapMod;
-                LastExecuted = DateTime.Now;
             }
             enum MapSearchFilter { StartsWith, EndsWith, NoFilter, Contains};
 
@@ -584,7 +583,7 @@ namespace SteamBotLite
 
                 userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = Msg.Sender, ReplyMessage = Responses.Item2 });
                 
-                if (DateTime.Now > LastExecuted.AddMinutes(1)) {
+                if (DateTime.Now < LastExecuted.AddMinutes(1)) {
                     userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = Msg.Sender, ReplyMessage = Responses.Item1 });
                     
                     return null;
