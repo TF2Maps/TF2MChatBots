@@ -55,11 +55,11 @@ namespace SteamBotLite
             HTMLParsers = new List<HTMLFileFromArrayListiners>();
             OnLoginlistiners = new List<OnLoginCompletedListiners>();
             ListChangeEventListiners = new List<MapListChangeListiner>();
+            
+
             // loading modules
             WebServer = new WebServerModule(this, jsconfig);
-
             mapModule = new MapModule(this,this, jsconfig);
-
             serverlistmodule = new ServerListHolder(this, this, jsconfig);
             motdModule = new MotdModule(this, jsconfig);
             serverModule = new ServerModule(this, this, jsconfig);
@@ -101,6 +101,7 @@ namespace SteamBotLite
             ListChangeEventListiners.Add(listiner);
         }
 
+
         public List<OnLoginCompletedListiners> OnLoginlistiners;
 
         public override void OnLoginCompleted(object sender, EventArgs e)
@@ -136,11 +137,10 @@ namespace SteamBotLite
         }
 
        
-
-
         public string ChatMessageHandler(MessageEventArgs Msg , string Message)
         {
             string response = null;
+
             foreach (BaseModule module in ModuleList)
             {
                 if (module != null)
@@ -157,7 +157,7 @@ namespace SteamBotLite
                 }
             }
 
-            if (usersModule.admincheck(Msg.Sender)) //Verifies that it is a moderator, Can you please check if the "ISAdmin" is being used correctly? 
+            if (usersModule.admincheck(Msg.Sender))
             {
                 foreach (BaseModule module in ModuleList)
                 {
@@ -214,8 +214,6 @@ namespace SteamBotLite
         {
             OnLoginlistiners.Add(listiner);
         }
-
-        
 
         public List<BaseModule> GetAllModules()
         {

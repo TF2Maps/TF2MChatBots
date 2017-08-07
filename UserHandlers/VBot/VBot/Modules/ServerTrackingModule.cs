@@ -11,7 +11,7 @@ using System.IO;
 
 namespace SteamBotLite
 {
-    public class ServerModule : BaseModule
+    public class ServerTrackingModule : BaseModule
     {
         public event EventHandler<ServerInfo> ServerMapChanged;
 
@@ -27,7 +27,7 @@ namespace SteamBotLite
         public override void OnAllModulesLoaded() { }
 
 
-        public ServerModule(ModuleHandler bot, HTMLFileFromArrayListiners WebServer, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
+        public ServerTrackingModule(ModuleHandler bot, HTMLFileFromArrayListiners WebServer, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
             this.WebServer = WebServer;
             Bot = bot;
@@ -60,7 +60,7 @@ namespace SteamBotLite
             serverUpdate = new BaseTask(updateInterval, new System.Timers.ElapsedEventHandler(SyncServerInfo));
 
             ServerMapChanged += bot.ServerUpdated;
-            ServerMapChanged += ServerModule_ServerMapChanged;
+            ServerMapChanged += ServerTrackingModule_ServerMapChanged;
         }
 
         public string NameToserverCommand (string servername)
@@ -68,13 +68,11 @@ namespace SteamBotLite
             return "!" + servername.ToLower() + "server";
         }
 
-        private void ServerModule_ServerMapChanged(object sender, ServerInfo e)
+        private void ServerTrackingModule_ServerMapChanged(object sender, ServerInfo e)
         {
+
             string TableLabel = e.tag + " History";
-            if (e.playerCount > 8)
-            {
-                userhandler.BroadcastMessageProcessEvent(e.ToString());
-            }
+            
 
             TableDataValue HeaderName = new TableDataValue();
             HeaderName.VisibleValue = "Map Name";
@@ -99,6 +97,14 @@ namespace SteamBotLite
             Time.VisibleValue = DateTime.UtcNow.ToShortTimeString();
 
             WebServer.AddEntryWithLimit(TableLabel, new TableDataValue[] { MapName, PlayerCount, Time }, 10);
+
+            if (e.playerCount > 8) {
+                userhandler.BroadcastMessageProcessEvent(e.ToString());
+                TableDataValue ServerLabel = new TableDataValue();
+                ServerLabel.VisibleValue = e.tag;
+                ServerLabel.Link = "steam://connect/" + e.serverIP + ":" + e.port;
+                WebServer.AddEntryWithLimit("Recently Tested", new TableDataValue[] { ServerLabel, MapName, PlayerCount, Time }, 10);
+            }
 
         }
 
@@ -214,17 +220,17 @@ namespace SteamBotLite
         {
             // Automaticaly generated status command for each server under the config
             ServerInfo server;
-            ServerModule servermodule;
+            ServerTrackingModule ServerTrackingModule;
 
-            public Status(ModuleHandler bot, ServerInfo server, ServerModule module) : base(bot, module.NameToserverCommand(server.tag))
+            public Status(ModuleHandler bot, ServerInfo server, ServerTrackingModule module) : base(bot, module.NameToserverCommand(server.tag))
             {
                 this.server = server;
-                servermodule = module;
+                ServerTrackingModule = module;
 
             }
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                ServerInfo status = servermodule.ServerQuery(server);
+                ServerInfo status = ServerTrackingModule.ServerQuery(server);
                 if (status != null)
                 {
                     server.update(status);
@@ -238,20 +244,20 @@ namespace SteamBotLite
         private sealed class SpecificServerStatus : BaseCommand
         {
             // Automaticaly generated status command for each server under the config
-            ServerModule servermodule;
+            ServerTrackingModule ServerTrackingModule;
 
-            public SpecificServerStatus(ModuleHandler bot, ServerModule module) : base(bot, "")
+            public SpecificServerStatus(ModuleHandler bot, ServerTrackingModule module) : base(bot, "")
             {
-                servermodule = module;
+                ServerTrackingModule = module;
 
             }
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                foreach (ServerInfo server in servermodule.serverList)
+                foreach (ServerInfo server in ServerTrackingModule.serverList)
                 {
                     if (server.tag.Equals(param))
                     {
-                        return servermodule.ServerQuery(server).ToString();
+                        return ServerTrackingModule.ServerQuery(server).ToString();
                     }
                 }
                 return "An error occured when querying the server!";
@@ -259,9 +265,9 @@ namespace SteamBotLite
 
             public override bool CheckCommandExists(MessageEventArgs Msg, string Message)
             {
-                foreach (ServerInfo server in servermodule.serverList)
+                foreach (ServerInfo server in ServerTrackingModule.serverList)
                 {
-                    if (Message.StartsWith(servermodule.NameToserverCommand(server.tag), StringComparison.OrdinalIgnoreCase))
+                    if (Message.StartsWith(ServerTrackingModule.NameToserverCommand(server.tag), StringComparison.OrdinalIgnoreCase))
                     {
                         return true;
                     }
@@ -272,12 +278,12 @@ namespace SteamBotLite
             
             public override string[] GetCommmand()
             {
-                int AmountOfServers = servermodule.serverList.Count();
+                int AmountOfServers = ServerTrackingModule.serverList.Count();
                 string[] ServerList = new string[AmountOfServers];
 
                 for (int x = 0; x < AmountOfServers; x++ )
                 {
-                    ServerList[x] = servermodule.NameToserverCommand(servermodule.serverList.Servers[x].tag);
+                    ServerList[x] = ServerTrackingModule.NameToserverCommand(ServerTrackingModule.serverList.Servers[x].tag);
                 }
 
                 return ServerList;
@@ -286,8 +292,8 @@ namespace SteamBotLite
 
         private class ServerAdd : BaseCommand
         {
-            ServerModule module;
-            public ServerAdd(ModuleHandler bot, ServerModule module) : base(bot, "!serveradd")
+            ServerTrackingModule module;
+            public ServerAdd(ModuleHandler bot, ServerTrackingModule module) : base(bot, "!serveradd")
             {
                 this.module = module;
             }
@@ -320,9 +326,9 @@ namespace SteamBotLite
         }
         private class ServerRemove : BaseCommand
         {
-            ServerModule module;
+            ServerTrackingModule module;
 
-            public ServerRemove(ModuleHandler bot, ServerModule module) : base(bot, "!serverremove")
+            public ServerRemove(ModuleHandler bot, ServerTrackingModule module) : base(bot, "!serverremove")
             {
                 this.module = module;
             }
@@ -345,8 +351,8 @@ namespace SteamBotLite
         private class Active : BaseCommand
         {
             // Command to query if a server is active
-            ServerModule module;
-            public Active(ModuleHandler bot, ServerModule module) : base(bot, "!Active")
+            ServerTrackingModule module;
+            public Active(ModuleHandler bot, ServerTrackingModule module) : base(bot, "!Active")
             {
                 this.module = module;
             }
@@ -368,8 +374,8 @@ namespace SteamBotLite
         private class FullServerQuery : BaseCommand
         {
             // Command to query if a server is active
-            ServerModule module;
-            public FullServerQuery(ModuleHandler bot, ServerModule module) : base(bot, "!Serverquery")
+            ServerTrackingModule module;
+            public FullServerQuery(ModuleHandler bot, ServerTrackingModule module) : base(bot, "!Serverquery")
             {
                 this.module = module;
             }
