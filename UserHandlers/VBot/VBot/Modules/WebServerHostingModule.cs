@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace SteamBotLite
 {
-    class WebServerModule : BaseModule , HTMLFileFromArrayListiners
+    class WebServerHostingModule : BaseModule , HTMLFileFromArrayListiners
     {
         HttpListener listener;
 
@@ -21,7 +21,7 @@ namespace SteamBotLite
 
         //string prefix, ObservableCollection<MapModule.Map> Maplist)
 
-        public WebServerModule(VBot bot, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
+        public WebServerHostingModule(VBot bot, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
             loadPersistentData();
 
@@ -48,11 +48,11 @@ namespace SteamBotLite
         private class RebootModule : BaseCommand
         {
             // Command to query if a server is active
-            WebServerModule module;
+            WebServerHostingModule module;
             ModuleHandler ModuleHandler;
             string address;
 
-            public RebootModule(ModuleHandler bot, WebServerModule module) : base(bot, "!WebsiteReboot")
+            public RebootModule(ModuleHandler bot, WebServerHostingModule module) : base(bot, "!WebsiteReboot")
             {
                 this.module = module;
                 this.address = (module.config["Address"].ToString());
@@ -69,11 +69,11 @@ namespace SteamBotLite
         private class RemoveTable : BaseCommand
         {
             // Command to query if a server is active
-            WebServerModule module;
+            WebServerHostingModule module;
             ModuleHandler ModuleHandler;
             string address;
 
-            public RemoveTable(ModuleHandler bot, WebServerModule module) : base(bot, "!RemoveTable")
+            public RemoveTable(ModuleHandler bot, WebServerHostingModule module) : base(bot, "!RemoveTable")
             {
                 this.module = module;
             }
@@ -101,7 +101,7 @@ namespace SteamBotLite
         }
 
         //When this class is turned off, we close the server properly
-        ~WebServerModule()
+        ~WebServerHostingModule()
         {
             CloseWebServer();
         }

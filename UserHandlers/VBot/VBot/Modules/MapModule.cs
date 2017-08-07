@@ -450,6 +450,9 @@ namespace SteamBotLite
         private class Maps : BaseCommand
         {
             MapModule module;
+
+            DateTime LastExecuted;
+
             public Maps(ModuleHandler bot, MapModule mapMod) : base(bot, "!maps") {
                 module = mapMod;
             }
@@ -579,7 +582,13 @@ namespace SteamBotLite
                 Tuple<string, string>Responses = GetMapsWithFilter(MapFilter, Filter, OnlyWantUploaded);
 
                 userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = Msg.Sender, ReplyMessage = Responses.Item2 });
-                return Responses.Item1;
+                
+                if (DateTime.Now > LastExecuted.AddMinutes(1)) {
+                    userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = Msg.Sender, ReplyMessage = Responses.Item1 });
+                    return null;
+                } else {
+                    return Responses.Item1;
+                }
 
             }
         }

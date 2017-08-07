@@ -10,11 +10,11 @@ using SteamBotLite;
 namespace UsersModuleTests
 {
     [TestClass()]
-    public class ServerModuleUnitTests
+    public class ServerTrackingModuleUnitTests
     {
 
 
-        ServerModule module;
+        ServerTrackingModule module;
         string ServerAddCommand = "!ServerAdd";
         string TestIP = "192.168.0.1";
         string TestPort = "27015";
@@ -25,9 +25,9 @@ namespace UsersModuleTests
 
         Dictionary<string, Dictionary<string, object>> MakeConfig() {
             Dictionary<string, Dictionary<string, object>> ModuleHolder = new Dictionary<string, Dictionary<string, object>>();
-            Dictionary<string, object> ServerModuleData = new Dictionary<string, object>();
-            ServerModuleData.Add("updateInterval", "999999");
-            ModuleHolder.Add("ServerModule", ServerModuleData);
+            Dictionary<string, object> ServerTrackingModuleData = new Dictionary<string, object>();
+            ServerTrackingModuleData.Add("updateInterval", "999999");
+            ModuleHolder.Add("ServerTrackingModule", ServerTrackingModuleData);
 
             return ModuleHolder;
         }
@@ -35,14 +35,14 @@ namespace UsersModuleTests
 
         [TestInitialize()]
         public void Initialize() {
-            module = new ServerModule(new TestUserHandler(), new TestUserHandler() , MakeConfig());
+            module = new ServerTrackingModule(new TestUserHandler(), new TestUserHandler() , MakeConfig());
             TestUser = new User(0, null);
             TestUser.Rank = ChatroomEntity.AdminStatus.True;
         }
 
         [TestCleanup()]
         public void Cleanup() {
-            module = new ServerModule(new TestUserHandler(), new TestUserHandler(),  MakeConfig());
+            module = new ServerTrackingModule(new TestUserHandler(), new TestUserHandler(),  MakeConfig());
             module.serverList.Clear();
             Assert.IsTrue(module.serverList.Count() == 0);
         }
@@ -122,7 +122,7 @@ namespace UsersModuleTests
         [TestMethod()]
         public void Persistency() {
             AddServer();
-            module = new ServerModule(new TestUserHandler(), new TestUserHandler(),  MakeConfig());
+            module = new ServerTrackingModule(new TestUserHandler(), new TestUserHandler(),  MakeConfig());
 
             Assert.IsTrue(module.serverList.Count() == 1);
 
@@ -151,7 +151,7 @@ namespace UsersModuleTests
         [TestMethod()]
         public void CheckPersistencyOfRemove() {
             RemoveServerAfterAdd();
-            module = new ServerModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
+            module = new ServerTrackingModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
             Assert.IsTrue(module.serverList.Count() == 0);
 
             Assert.IsFalse  (ContainsCommand(module.NameToserverCommand(TestName), module.commands));
@@ -161,7 +161,7 @@ namespace UsersModuleTests
         public void ClearPersistency() {
             AddServer();
             module.serverList.Clear();
-            module = new ServerModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
+            module = new ServerTrackingModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
             Assert.IsTrue(module.serverList.Count() == 0);
 
             Assert.IsFalse  (ContainsCommand(module.NameToserverCommand(TestName), module.commands));

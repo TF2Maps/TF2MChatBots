@@ -157,7 +157,7 @@
     <Compile Include="UserHandlers\VBot\VBot\Modules\IdentityModule.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\ListHolder.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\MapCollection.cs" />
-    <Compile Include="UserHandlers\VBot\VBot\Modules\WebServerModule.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\WebServerHostingModule.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\SearchClass.cs" />
     <Compile Include="UserHandlers\VBot\VBot.cs" />
     <Compile Include="UserHandlers\VBot\VBot\BaseCommand.cs" />
@@ -170,7 +170,7 @@
     <Compile Include="UserHandlers\VBot\VBot\Modules\Replies.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\SearchModule.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\ServerList.cs" />
-    <Compile Include="UserHandlers\VBot\VBot\Modules\ServerModule.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\ServerTrackingModule.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\ServerListHolder.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\UsersModule.cs" />
   </ItemGroup>

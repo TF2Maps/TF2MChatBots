@@ -8,29 +8,29 @@ namespace SteamBotLite
 {
     public class ServerList
     {
-        ServerModule Servermodule;
+        ServerTrackingModule ServerTrackingModule;
         List<ServerInfo> ServerListObject { get; }
 
-        public ServerList(ServerModule module, List<ServerInfo> serverlist)
+        public ServerList(ServerTrackingModule module, List<ServerInfo> serverlist)
         {
-            Servermodule = module;
+            ServerTrackingModule = module;
             ServerListObject = serverlist;
         }
         public void Add(ServerInfo server)
         {
             ServerListObject.Add(server);
-            Servermodule.savePersistentData();
+            ServerTrackingModule.savePersistentData();
         }
 
         public void Remove(ServerInfo server)
         {
             ServerListObject.Remove(server);
-            Servermodule.savePersistentData();
+            ServerTrackingModule.savePersistentData();
         }
         public void Clear()
         {
             ServerListObject.Clear();
-            Servermodule.savePersistentData();
+            ServerTrackingModule.savePersistentData();
         }
 
         public IReadOnlyList<ServerInfo> Servers

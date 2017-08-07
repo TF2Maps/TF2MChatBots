@@ -15,14 +15,14 @@ namespace SteamBotLite
         // Class members
         MotdModule motdModule;
         public MapModule mapModule;
-        ServerModule serverModule;
+        ServerTrackingModule ServerTrackingModule;
         RepliesModule replyModule;
         AdminModule adminmodule;
         SearchModule searchModule;
         ImpNaoModule impnaomodule;
         ServerListHolder serverlistmodule;
         CountDownModule countdownmodule;
-        WebServerModule WebServer;
+        WebServerHostingModule WebServer;
         IdentityModule identitymodule;
 
         public UsersModule usersModule;
@@ -58,11 +58,11 @@ namespace SteamBotLite
             
 
             // loading modules
-            WebServer = new WebServerModule(this, jsconfig);
+            WebServer = new WebServerHostingModule(this, jsconfig);
             mapModule = new MapModule(this,this, jsconfig);
             serverlistmodule = new ServerListHolder(this, this, jsconfig);
             motdModule = new MotdModule(this, jsconfig);
-            serverModule = new ServerModule(this, this, jsconfig);
+            ServerTrackingModule = new ServerTrackingModule(this, this, jsconfig);
             usersModule = new UsersModule(this, jsconfig);
             replyModule = new RepliesModule(this, jsconfig);
             searchModule = new SearchModule(this, jsconfig);
@@ -70,7 +70,7 @@ namespace SteamBotLite
             identitymodule = new IdentityModule(this, this, jsconfig);
             countdownmodule = new CountDownModule(this, jsconfig);
 
-            ModuleList = new List<BaseModule> { motdModule,mapModule,serverModule,identitymodule , usersModule,replyModule,adminmodule,searchModule, WebServer, serverlistmodule , countdownmodule };
+            ModuleList = new List<BaseModule> { motdModule,mapModule,ServerTrackingModule,identitymodule , usersModule,replyModule,adminmodule,searchModule, WebServer, serverlistmodule , countdownmodule };
 
             Console.WriteLine("Modules loaded and ModuleList intitialised");
 
