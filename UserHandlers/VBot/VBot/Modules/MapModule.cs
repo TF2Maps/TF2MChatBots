@@ -514,8 +514,8 @@ namespace SteamBotLite
                                 chatResponse += maps[i].Filename;
                                 MapsAddedToResponse++;
                             }
-
-                            string mapLine = string.Format("{0} // {1} // {2} ({3})", maps[i].Filename, maps[i].DownloadURL, maps[i].SubmitterName, maps[i].Submitter.ToString());
+                            int Nextnum = i + 1;
+                            string mapLine = string.Format(Nextnum + ") {0} // {1} // {2} ({3})", maps[i].Filename, maps[i].DownloadURL, maps[i].SubmitterName, maps[i].Submitter.ToString());
 
                             if (!string.IsNullOrEmpty(maps[i].Notes))
                                 mapLine += "\nNotes: " + maps[i].Notes;
@@ -673,7 +673,7 @@ namespace SteamBotLite
 
         private class Delete : MapCommand
         {
-            public Delete(ModuleHandler bot, MapModule mapMod) : base(bot, "!delete", mapMod, "Invalid parameters for !delete.Syntax: !delete <filename> OR !delete <position> ") {
+            public Delete(ModuleHandler bot, MapModule mapMod) : base(bot, "!delete", mapMod, "!delete <filename> OR !delete <position> ") {
              
             }
 
@@ -685,8 +685,16 @@ namespace SteamBotLite
 
 
                 if (int.TryParse(parameters[0], out MapPositionInList)) {
-                    MapPositionInList++;
-                    deletedMap = MapModule.mapList.GetMap(MapPositionInList);
+                    
+                    if (MapPositionInList > MapModule.mapList.GetSize())
+                    {
+                        return "That index does not exist!";
+                    }
+                    else
+                    {
+                        MapPositionInList--;
+                        deletedMap = MapModule.mapList.GetMap(MapPositionInList);
+                    }
                   
                 }
                 else {
