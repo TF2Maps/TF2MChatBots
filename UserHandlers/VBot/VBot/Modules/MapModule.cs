@@ -680,7 +680,7 @@ namespace SteamBotLite
             public override string runcommand(MessageEventArgs Msg, string param)
             {
                 string[] parameters = param.Split(new char[] { ' ' }, 2);
-                int MapPositionInList;
+                int MapPositionInList = 0;
                 Map deletedMap = new Map() ;
 
                 
