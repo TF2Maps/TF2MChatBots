@@ -493,7 +493,7 @@ namespace MapModuleTests
 
             string NewURL = url + 2;
 
-            Message.ReceivedMessage = UpdateCommand + " " + Mapname + " " + NewMapName;
+            Message.ReceivedMessage = UpdateCommand + " " + Mapname + " " + NewMapName + NewURL;
 
             Console.WriteLine(FireCommand(Message, module));
 

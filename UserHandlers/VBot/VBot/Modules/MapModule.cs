@@ -683,12 +683,14 @@ namespace SteamBotLite
                 int MapPositionInList = 0;
                 Map deletedMap = new Map() ;
 
-                
+
                 if (int.TryParse(parameters[0], out MapPositionInList)) {
                     deletedMap = MapModule.mapList.GetMap(MapPositionInList);
+                  
                 }
                 else {
                     deletedMap = MapModule.mapList.GetMapByFilename(parameters[0]);
+                    
                 }
 
                 if (deletedMap == null)
@@ -703,8 +705,7 @@ namespace SteamBotLite
 
                         MapModule.savePersistentData();
                         string Reason = "Deleted by " + Msg.Sender.DisplayName + " (" + Msg.Sender.identifier + "). ";
-                        
-                        string ExplicitReason = Msg.ReceivedMessage.Substring(deletedMap.Filename.Length, param.Length - parameters[0].Length);
+                        string ExplicitReason = param.Substring(parameters[0].Length, param.Length - parameters[0].Length);
 
                         if (!string.IsNullOrWhiteSpace(ExplicitReason))
                         {
