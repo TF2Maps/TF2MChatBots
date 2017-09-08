@@ -671,59 +671,64 @@ namespace SteamBotLite
             }
         }
 
-        private class Delete : BaseCommand
+        private class Delete : MapCommand
         {
-            MapModule module;
-            public Delete(ModuleHandler bot, MapModule mapMod) : base(bot, "!delete") {
-                module = mapMod;
+            public Delete(ModuleHandler bot, MapModule mapMod) : base(bot, "!delete", mapMod, "Invalid parameters for !delete.Syntax: !delete <filename> OR !delete <position> ") {
+             
             }
-            protected override string exec(MessageEventArgs Msg, string param)
+
+            public override string runcommand(MessageEventArgs Msg, string param)
             {
-                string[] parameters = param.Split(' ');
+                string[] parameters = param.Split(new char[] { ' ' }, 2);
+                int MapPositionInList;
+                Map deletedMap = new Map() ;
 
-                if (parameters.Length > 0)
+                
+                if (int.TryParse(parameters[0], out MapPositionInList)) {
+                    deletedMap = MapModule.mapList.GetMap(MapPositionInList);
+                }
+                else {
+                    deletedMap = MapModule.mapList.GetMapByFilename(parameters[0]);
+                }
+
+                if (deletedMap == null)
                 {
-                    Map deletedMap = module.mapList.GetMapByFilename(parameters[0]);
+                    return string.Format("Map '{0}' was not found.", parameters[0]);
+                }
+                else
+                {
 
-                    if (deletedMap == null)
+                    if ((deletedMap.IsOwner(Msg.Sender.identifier)) || (userhandler.admincheck(Msg.Sender)))
                     {
-                        return string.Format("Map '{0}' was not found.", parameters[0]);
-                    }
-                    else
-                    {
+
+                        MapModule.savePersistentData();
+                        string Reason = "Deleted by " + Msg.Sender.DisplayName + " (" + Msg.Sender.identifier + "). ";
                         
-                        if ((deletedMap.IsOwner(Msg.Sender.identifier)) || (userhandler.admincheck(Msg.Sender)))
+                        string ExplicitReason = Msg.ReceivedMessage.Substring(deletedMap.Filename.Length, param.Length - parameters[0].Length);
+
+                        if (!string.IsNullOrWhiteSpace(ExplicitReason))
                         {
-                            
-                            module.savePersistentData();
-                            string Reason = "Deleted by " + Msg.Sender.DisplayName + " (" + Msg.Sender.identifier + "). ";
-
-                            string ExplicitReason = param.Substring(deletedMap.Filename.Length, param.Length - deletedMap.Filename.Length); 
-                            if ( !string.IsNullOrWhiteSpace(ExplicitReason) )
-                            {
-                                Reason += "Reason given: " + ExplicitReason;
-                            }
-                            else
-                            {
-                                Reason += "No reason given";
-                            }
-                            
-                            userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = new User(deletedMap.Submitter,null), ReplyMessage = string.Format("Your map {0} has been deleted from the map list. {1}", deletedMap.Filename , Reason) });
-
-                            module.mapList.RemoveMap(deletedMap, Reason);
-
-                            return string.Format("Map '{0}' DELETED. Sending: {1}", deletedMap.Filename, Reason);
+                            Reason += "Reason given: " + ExplicitReason;
                         }
                         else
                         {
-                            return string.Format("You do not have permission to edit map '{0}'.", deletedMap.Filename);
+                            Reason += "No reason given";
                         }
+
+                        userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = new User(deletedMap.Submitter, null), ReplyMessage = string.Format("Your map {0} has been deleted from the map list. {1}", deletedMap.Filename, Reason) });
+
+                        MapModule.mapList.RemoveMap(deletedMap, Reason);
+
+                        return string.Format("Map '{0}' DELETED. Sending: {1}", deletedMap.Filename, Reason);
+                    }
+                    else
+                    {
+                        return string.Format("You do not have permission to edit map '{0}'.", deletedMap.Filename);
                     }
                 }
-                return "Invalid parameters for !delete. Syntax: !delete <filename>";
             }
 
-        }
+       }
 
         private class GetOwner : BaseCommand
         {

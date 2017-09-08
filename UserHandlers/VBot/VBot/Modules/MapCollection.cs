@@ -155,6 +155,12 @@ namespace SteamBotLite
             return ReturnData;
         }
 
+        private bool CheckIfStringIsNumbers (string input)
+        {
+            int x;
+            return int.TryParse(input, out x);
+
+        }
         private MapValidityCheck CheckIfValid(Map map)
         {
             MapValidityCheck ValidityCheck = new MapValidityCheck();
@@ -172,6 +178,15 @@ namespace SteamBotLite
                     }
                 }
 
+                if (string.IsNullOrWhiteSpace(map.Filename))
+                {
+                    throw new ArgumentException("You must include a filename!");
+                }
+
+                if (CheckIfStringIsNumbers(map.Filename))
+                {
+                    throw new ArgumentException("You must include numbers!");
+                }
                 if (map.Filename.Any(c => char.IsUpper(c))) {
                     throw new ArgumentException("It includes an uppercase letter");
                 }

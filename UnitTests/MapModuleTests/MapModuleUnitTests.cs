@@ -153,6 +153,20 @@ namespace MapModuleTests
         }
 
         [TestMethod]
+        public void DeleteFirstMap()
+        {
+            MessageEventArgs Message = new MessageEventArgs(null);
+            Message.ReceivedMessage = DeleteCommand + " " + "0" ;
+
+            Message.Sender = new User(TestUser.identifier.ToString() + 1, null);
+            Message.Sender.Rank = ChatroomEntity.AdminStatus.True;
+
+            RegularSyntax();
+
+            Console.WriteLine(FireCommand(Message, module));
+            AssertMaplistSize(0);
+        }
+        [TestMethod]
         public void AdminDeleteMap()
         {
             MessageEventArgs Message = new MessageEventArgs(null);
@@ -447,6 +461,51 @@ namespace MapModuleTests
         public void Update_RejectNoURL()
         {
             string NewMapName = "foo";
+
+            module.SubstituteWebPageWithString(Mapname);
+            MessageEventArgs Message = new MessageEventArgs(null);
+            Message.ReceivedMessage = AddCommand + " " + Mapname + " " + url + " " + notes;
+            Message.Sender = TestUser;
+
+            FireCommand(Message, module);
+
+            string NewURL = url + 2;
+
+            Message.ReceivedMessage = UpdateCommand + " " + Mapname + " " + NewMapName;
+
+            Console.WriteLine(FireCommand(Message, module));
+
+            Map TestMap = module.mapList.GetMap(0);
+
+            Assert.AreEqual(TestMap.Filename, Mapname);
+        }
+        [TestMethod]
+        public void Update_RejectSpace()
+        {
+            string NewMapName = " ";
+
+            module.SubstituteWebPageWithString(Mapname);
+            MessageEventArgs Message = new MessageEventArgs(null);
+            Message.ReceivedMessage = AddCommand + " " + Mapname + " " + url + " " + notes;
+            Message.Sender = TestUser;
+
+            FireCommand(Message, module);
+
+            string NewURL = url + 2;
+
+            Message.ReceivedMessage = UpdateCommand + " " + Mapname + " " + NewMapName;
+
+            Console.WriteLine(FireCommand(Message, module));
+
+            Map TestMap = module.mapList.GetMap(0);
+
+            Assert.AreEqual(TestMap.Filename, Mapname);
+        }
+
+        [TestMethod]
+        public void Update_RejectNoName()
+        {
+            string NewMapName = "";
 
             module.SubstituteWebPageWithString(Mapname);
             MessageEventArgs Message = new MessageEventArgs(null);
