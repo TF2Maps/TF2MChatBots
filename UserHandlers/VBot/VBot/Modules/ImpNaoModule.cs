@@ -194,7 +194,7 @@ namespace SteamBotLite
                     string mapLine = string.Format("{0} // {1} // {2} ({3})", mapList[i].name, mapList[i].link, mapList[i].Submitter, "Unknown");
 
                     if (!string.IsNullOrEmpty(mapList[i].Notes))
-                        mapLine += "\n\tNotes: " + mapList[i].Notes;
+                        mapLine += "\n    Notes: " + mapList[i].Notes;
 
                     if (i < mapList.Count - 1)
                         mapLine += "\n";
