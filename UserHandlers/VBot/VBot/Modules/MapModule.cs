@@ -685,6 +685,7 @@ namespace SteamBotLite
 
 
                 if (int.TryParse(parameters[0], out MapPositionInList)) {
+                    MapPositionInList++;
                     deletedMap = MapModule.mapList.GetMap(MapPositionInList);
                   
                 }
