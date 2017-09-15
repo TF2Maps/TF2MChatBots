@@ -142,15 +142,13 @@ namespace SteamBotLite
 
                 string[] PathsToLookIn = { WebsitePath, InternalFilesPath };
 
+                buff = System.Text.Encoding.UTF8.GetBytes(header + GetAlltables() + trailer);
+
                 foreach (string path in PathsToLookIn)
                 {
                     if (File.Exists(path))
                     {
                         buff = System.Text.Encoding.UTF8.GetBytes(System.IO.File.ReadAllText(path).ToString());
-                    }
-                    else
-                    {
-                        buff = System.Text.Encoding.UTF8.GetBytes(header + GetAlltables() + trailer);
                     }
                 }
                 
