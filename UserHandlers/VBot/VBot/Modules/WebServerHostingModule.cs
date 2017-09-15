@@ -137,16 +137,23 @@ namespace SteamBotLite
 
             try
             {
-                string path = (WebsiteFilesDirectory + context.Request.RawUrl);
+                string WebsitePath = (WebsiteFilesDirectory + context.Request.RawUrl);
+                string InternalFilesPath = userhandler.GetType().Name + context.Request.RawUrl;
 
-                if (File.Exists(path))
+                string[] PathsToLookIn = { WebsitePath, InternalFilesPath };
+
+                foreach (string path in PathsToLookIn)
                 {
-                    buff = System.Text.Encoding.UTF8.GetBytes(System.IO.File.ReadAllText(path).ToString());
+                    if (File.Exists(path))
+                    {
+                        buff = System.Text.Encoding.UTF8.GetBytes(System.IO.File.ReadAllText(path).ToString());
+                    }
+                    else
+                    {
+                        buff = System.Text.Encoding.UTF8.GetBytes(header + GetAlltables() + trailer);
+                    }
                 }
-                else
-                {
-                    buff = System.Text.Encoding.UTF8.GetBytes(header + GetAlltables() + trailer);
-                }
+                
             }
 
             finally
