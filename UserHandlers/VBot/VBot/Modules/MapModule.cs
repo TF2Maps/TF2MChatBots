@@ -159,14 +159,14 @@ namespace SteamBotLite
 
         public override string getPersistentData()
         {
-            Dictionary<string, string> PersistantData = new Dictionary<string, string>();
-            PersistantData.Add("Maplist", JsonConvert.SerializeObject(mapList.GetAllMaps()));
+            Dictionary<string, object> PersistantData = new Dictionary<string, object>();
+            PersistantData.Add("Maplist", mapList.GetAllMaps() );
 
             Dictionary<string, object> ConfigData = new Dictionary<string, object>();
             ConfigData.Add("AllowOnlyUploadedMaps", mapList.AllowOnlyUploadedMaps.ToString());
             ConfigData.Add("AllowOnlyUploadedMapsErrMsg",mapList.ForceMapsToBeUploadedErrorResponse);
 
-            PersistantData.Add("Config", JsonConvert.SerializeObject(ConfigData));
+            PersistantData.Add("Config", ConfigData);
 
             return JsonConvert.SerializeObject(PersistantData);
         }
