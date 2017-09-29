@@ -46,15 +46,22 @@ namespace SteamBotLite
                 SteamBotLite.User user = new SteamBotLite.User(e.User.Id, this);
                 user.DisplayName = e.User.Name;
                 user.ExtraData = e.User;
-                
-               
-                if (e.User.ServerPermissions.Administrator)
+
+
+                try
                 {
-                    user.Rank = ChatroomEntity.AdminStatus.True;
+                    if (e.User.ServerPermissions.Administrator)
+                    {
+                        user.Rank = ChatroomEntity.AdminStatus.True;
+                    }
+                    else
+                    {
+                        user.Rank = ChatroomEntity.AdminStatus.False;
+                    }
                 }
-                else
+                catch
                 {
-                    user.Rank = ChatroomEntity.AdminStatus.False;
+
                 }
 
                 MessageEventArgs Msg = new MessageEventArgs(this);
@@ -135,7 +142,9 @@ namespace SteamBotLite
         {
             try
             {
-                Discord.User user = (Discord.User)messagedata.Sender.ExtraData;
+                
+                
+                Discord.User user = (Discord.User)messagedata.Destination.ExtraData;
                 
                 Console.WriteLine("Casted Fine To Discord");
                 SendLargeMessage(user, messagedata.ReplyMessage);
@@ -161,7 +170,6 @@ namespace SteamBotLite
         public override void SetUsername(object sender, string Username)
         {
             _client.CurrentUser.Edit(username: Username);
-           
         }
         
         public override void tick()
