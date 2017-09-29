@@ -156,9 +156,12 @@ namespace SteamBotLite
             }
             user.SendMessage(message);
         }
+        
+
         public override void SetUsername(object sender, string Username)
         {
-          //  _client.SetGame(Username);
+            
+            
         }
         
         public override void tick()
@@ -183,9 +186,11 @@ namespace SteamBotLite
             }
         }
 
+        Game StatusName;
         public override void SetStatusMessage(object sender, string message)
         {
-         //   _client.SetGame(message);
+            StatusName = new Game(message, GameType.Default, "http://vbot.site/");
+            _client.SetGame(StatusName);
         }
     }
 }
