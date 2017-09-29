@@ -99,7 +99,7 @@ namespace SteamBotLite
 
         public override string GetUsername()
         {
-            return _client.CurrentUser.Name;
+            return _client.CurrentUser.Name.ToString();
         }
 
         public override void LeaveChatroom(object sender, ChatroomEntity ChatroomEntity)
@@ -160,7 +160,7 @@ namespace SteamBotLite
 
         public override void SetUsername(object sender, string Username)
         {
-            _client.CurrentUser.Edit(username: Username);
+             _client.CurrentUser.Edit(username: Username);
         }
         
         public override void tick()

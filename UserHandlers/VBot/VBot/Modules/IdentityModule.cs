@@ -81,8 +81,7 @@ namespace SteamBotLite
 
         public void MaplistChange(IReadOnlyList<Map> maplist)
         {
-            string param = "[" + maplist.Count + "]";
-            UsernamePrefix = param;
+            UsernamePrefix = "[" + maplist.Count + "]";
             userhandler.SetUsernameEventProcess(getusername());
         }
 
