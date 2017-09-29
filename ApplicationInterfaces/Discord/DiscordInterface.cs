@@ -160,7 +160,11 @@ namespace SteamBotLite
 
         public override void SetUsername(object sender, string Username)
         {
-             _client.CurrentUser.Edit(username: Username);
+            _client.CurrentUser.Edit(username: Username);
+            StatusName = new Game(Username, GameType.Default, "http://vbot.site/");
+            _client.SetGame(StatusName);
+
+            //_client.CurrentUser.Edit(username: Username);
         }
         
         public override void tick()

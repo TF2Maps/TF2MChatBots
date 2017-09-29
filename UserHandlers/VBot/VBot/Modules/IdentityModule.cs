@@ -12,7 +12,7 @@ namespace SteamBotLite
     {
         UserHandler userhandler;
         ModuleHandler modulehandler;
-        string UsernamePrefix = "";
+        string StatusPrefix = "";
         string username;
         string status;
         bool UseStatus;
@@ -40,7 +40,8 @@ namespace SteamBotLite
         }
 
         public override void OnAllModulesLoaded() {
-            userhandler.SetUsernameEventProcess(UsernamePrefix + username);
+            userhandler.SetUsernameEventProcess(username);
+            userhandler.SetStatusmessageEvent(StatusPrefix + status);
         }
 
 
@@ -69,7 +70,7 @@ namespace SteamBotLite
 
         string getusername ()
         {
-            return UsernamePrefix + username;
+            return username;
         }
         public void OnLoginCompleted()
         {
@@ -81,8 +82,9 @@ namespace SteamBotLite
 
         public void MaplistChange(IReadOnlyList<Map> maplist)
         {
-            UsernamePrefix = "[" + maplist.Count + "]";
-            userhandler.SetUsernameEventProcess(getusername());
+            StatusPrefix = "[" + maplist.Count + "] ";
+            userhandler.SetUsernameEventProcess(username);
+            userhandler.SetStatusmessageEvent(StatusPrefix + status);
         }
 
         private class SetStatusMessage : BaseCommand
