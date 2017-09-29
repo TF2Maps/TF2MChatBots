@@ -367,7 +367,6 @@ namespace SteamBotLite
                 
 
                 string Reply =  MapModule.mapList.AddMap(UserMap);
-
                 MapModule.savePersistentData();
 
                 return Reply;
