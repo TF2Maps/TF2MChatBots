@@ -447,11 +447,15 @@ namespace SteamBotLite
             {
                 if (callback.StateChangeInfo.MemberInfo.Permissions.HasFlag(EChatPermission.MemberDefault))
                 {
-                    ChatMemberInfoProcessEvent(new ChatroomEntity(callback.StateChangeInfo.ChatterActedOn.ConvertToUInt64(), this), true);
+                    ChatroomEntity user = new ChatroomEntity(callback.StateChangeInfo.ChatterActedOn.ConvertToUInt64(), this);
+                    user.ParentIdentifier = callback.ChatRoomID.ConvertToUInt64();
+                    ChatMemberInfoProcessEvent(user, true);
                 }
                 else
                 {
-                    ChatMemberInfoProcessEvent(new ChatroomEntity(callback.StateChangeInfo.ChatterActedOn.ConvertToUInt64(), this), false);
+                    ChatroomEntity user = new ChatroomEntity(callback.StateChangeInfo.ChatterActedOn.ConvertToUInt64(), this);
+                    user.ParentIdentifier = callback.ChatRoomID.ConvertToUInt64();
+                    ChatMemberInfoProcessEvent(user, false);
                 }
             }
         }
