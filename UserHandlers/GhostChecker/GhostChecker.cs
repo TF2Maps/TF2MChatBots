@@ -70,7 +70,6 @@ namespace SteamBotLite
             MessageEventArgs msg = new MessageEventArgs(e.Item1.Application);
             msg.Destination = new ChatroomEntity(e.Item1.ParentIdentifier, e.Item1.Application);
             msg.ReplyMessage = "Hi, the TF2Maps community has made the change over to a much more active Discord server. The Steam group will still be used for announcements and events, but you can find help, advice, and a thriving and friendly community over on our Discord at https://discord.gg/D5dMfb7 We hope to see you there!";
-
             SendChatRoomMessageProcessEvent(msg);
             CrashCheck = 0;
             Tick.Stop();
