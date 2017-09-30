@@ -36,6 +36,8 @@ namespace SteamBotLite
             _client = new DiscordClient();
             ConnectionProcess(Token, _client);
             _client.MessageReceived += _client_MessageReceived;
+            AnnounceLoginCompleted();
+            Console.WriteLine("Connected to discord!");
         }
 
         private void _client_MessageReceived(object sender, Discord.MessageEventArgs e)

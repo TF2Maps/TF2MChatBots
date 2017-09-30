@@ -113,6 +113,7 @@ namespace SteamBotLite
             foreach (OnLoginCompletedListiners listiner in OnLoginlistiners) {
                 listiner.OnLoginCompleted();
             }
+
             Console.WriteLine("UserHandler: {0} Has Loaded", this.GetType());
         }
 

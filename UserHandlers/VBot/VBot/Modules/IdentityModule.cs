@@ -75,9 +75,10 @@ namespace SteamBotLite
         public void OnLoginCompleted()
         {
             if (UseStatus) {
-                userhandler.SetStatusmessageEvent(status);
+                userhandler.SetStatusmessageEvent(StatusPrefix + status);
             }
             modulehandler.UpdateUsernameEvent(this, getusername());
+            //userhandler.SetStatusmessageEvent(StatusPrefix + status);
         }
 
         public void MaplistChange(IReadOnlyList<Map> maplist)
@@ -85,6 +86,7 @@ namespace SteamBotLite
             StatusPrefix = "[" + maplist.Count + "] ";
             userhandler.SetUsernameEventProcess(username);
             userhandler.SetStatusmessageEvent(StatusPrefix + status);
+
         }
 
         private class SetStatusMessage : BaseCommand

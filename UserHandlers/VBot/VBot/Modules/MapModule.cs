@@ -90,13 +90,11 @@ namespace SteamBotLite
         {
             userhandler.OnMaplistchange(mapList.GetAllMaps(), null, null); 
         }
-
+       
         void MapChange(object sender, NotifyCollectionChangedEventArgs args)
         {
             userhandler.OnMaplistchange(mapList.GetAllMaps(), sender, args);
             ConvertMaplistToTable();
-
-
         }
 
         string TableName = "Current Maps";
