@@ -1,4 +1,4 @@
-# VBOT (A.k.a SteamBotLite)
+# VBOT
 VBot is a program that is utilised by the TF2Maps community, accessible via the steam group chat and discord channel. 
 Its primary purpose is to improve the capability of the online chatroom as well as improve the development process for members. 
 
