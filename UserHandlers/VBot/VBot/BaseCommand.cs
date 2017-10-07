@@ -4,8 +4,6 @@ namespace SteamBotLite
 {
     public abstract class BaseCommand
     {
-        public String command { get; protected set; }
-
         protected ModuleHandler userhandler;
 
         public BaseCommand(ModuleHandler bot, string command)
@@ -14,19 +12,25 @@ namespace SteamBotLite
             this.command = command;
         }
 
-        public string run(MessageEventArgs Msg, string message = "")
+        public String command { get; protected set; }
+
+        public static string RemoveWhiteSpacesFromString(string param)
         {
-            string param = "";
-            string[] command = message.Split(new char[] { ' ' }, 2);
+            string[] command = param.Split(new char[] { ' ' });
 
-            param = command[0].Trim();
+            string returnstring = "";
 
-            if (command.Length > 1)
+            for (int i = 0; i < command.Length; i++)
             {
-                param = command[1].Trim();
+                returnstring += command[i].Trim();
+
+                if (command[i].Length > 0 & i + 1 != command.Length) //We add an extra space if the string isn't empty and not the last string
+                {
+                    returnstring += " ";
+                }
             }
 
-            return exec(Msg, param);
+            return returnstring;
         }
 
         public virtual bool CheckCommandExists(MessageEventArgs Msg, string Message)
@@ -46,28 +50,24 @@ namespace SteamBotLite
             return new string[] { command };
         }
 
+        public string run(MessageEventArgs Msg, string message = "")
+        {
+            string param = "";
+            string[] command = message.Split(new char[] { ' ' }, 2);
+
+            param = command[0].Trim();
+
+            if (command.Length > 1)
+            {
+                param = command[1].Trim();
+            }
+
+            return exec(Msg, param);
+        }
+
         protected virtual string exec(MessageEventArgs Msg, string param)
         {
             return null;
-        }
-
-        public static string RemoveWhiteSpacesFromString(string param)
-        {
-            string[] command = param.Split(new char[] { ' ' });
-
-            string returnstring = "";
-
-            for (int i = 0; i < command.Length; i++)
-            {
-                returnstring += command[i].Trim();
-
-                if (command[i].Length > 0 & i + 1 != command.Length) //We add an extra space if the string isn't empty and not the last string
-                {
-                    returnstring += " ";
-                }
-            }
-
-            return returnstring;
         }
     }
 }

@@ -6,6 +6,21 @@ namespace SteamBotLite
 {
     internal class Program
     {
+        public static void AssignConnection(UserHandler userhandler, ApplicationInterface applicationinterface)
+        {
+            userhandler.AssignAppInterface(applicationinterface);
+            applicationinterface.AssignUserHandler(userhandler);
+        }
+
+        public void DoWork(ApplicationInterface Bot)
+        {
+            bool Running = true;
+            while (Running)
+            {
+                Bot.tick();
+            }
+        }
+
         private static void Main(string[] args)
         {
             //Create userHandlers//
@@ -73,21 +88,6 @@ namespace SteamBotLite
 
             while (Running)
             {
-            }
-        }
-
-        public static void AssignConnection(UserHandler userhandler, ApplicationInterface applicationinterface)
-        {
-            userhandler.AssignAppInterface(applicationinterface);
-            applicationinterface.AssignUserHandler(userhandler);
-        }
-
-        public void DoWork(ApplicationInterface Bot)
-        {
-            bool Running = true;
-            while (Running)
-            {
-                Bot.tick();
             }
         }
     }

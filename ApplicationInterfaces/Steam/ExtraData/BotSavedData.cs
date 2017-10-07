@@ -4,18 +4,6 @@ namespace SteamBotLite
 {
     public struct SteamBotData
     {
-        public SteamBotData(string user, string pass, bool shouldrememberpass)
-        {
-            LoginData = new SteamUser.LogOnDetails();
-            LoginData.Password = pass;
-            LoginData.Username = user;
-
-            LoginData.ShouldRememberPassword = shouldrememberpass;
-
-            SavedUsername = user;
-            SavedPassword = pass;
-        }
-
         /// <summary>
         /// The LoginData that is sent to steam when we attempt to login
         /// </summary>
@@ -27,6 +15,18 @@ namespace SteamBotLite
         public string SavedPassword;
 
         public string SavedUsername;
+
+        public SteamBotData(string user, string pass, bool shouldrememberpass)
+        {
+            LoginData = new SteamUser.LogOnDetails();
+            LoginData.Password = pass;
+            LoginData.Username = user;
+
+            LoginData.ShouldRememberPassword = shouldrememberpass;
+
+            SavedUsername = user;
+            SavedPassword = pass;
+        }
 
         /// <summary>
         /// The login key allows us to login without SteamAuth
@@ -46,17 +46,19 @@ namespace SteamBotLite
         }
 
         /// <summary>
-        /// The username used to log onto steam with
+        /// The password that is sent to Steam. It is set both in the LoginData object and SavedPassword fields,
+        /// however upon receiving a login key it is deleted from the Login Data object to allow the loginkey's usage
         /// </summary>
-        public string username
+        public string password
         {
             get
             {
-                return LoginData.Username;
+                return LoginData.Password; //We get the Password that is sent to steam
             }
             set
             {
-                LoginData.Username = value;
+                LoginData.Password = value;  //We set the password used to login with
+                SavedPassword = value; //We keep a back up of the password in case the login key we receive later fails
             }
         }
 
@@ -76,19 +78,17 @@ namespace SteamBotLite
         }
 
         /// <summary>
-        /// The password that is sent to Steam. It is set both in the LoginData object and SavedPassword fields,
-        /// however upon receiving a login key it is deleted from the Login Data object to allow the loginkey's usage
+        /// The username used to log onto steam with
         /// </summary>
-        public string password
+        public string username
         {
             get
             {
-                return LoginData.Password; //We get the Password that is sent to steam
+                return LoginData.Username;
             }
             set
             {
-                LoginData.Password = value;  //We set the password used to login with
-                SavedPassword = value; //We keep a back up of the password in case the login key we receive later fails
+                LoginData.Username = value;
             }
         }
 

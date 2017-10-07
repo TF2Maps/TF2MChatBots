@@ -9,14 +9,14 @@ namespace SteamBotLite
         {
         }
 
-        public override string GetName()
-        {
-            return "Countdown";
-        }
-
         public override int DefaultPostCountLimit()
         {
             return 24 * 60;
+        }
+
+        public override string GetName()
+        {
+            return "Countdown";
         }
 
         /// <summary>

@@ -6,11 +6,11 @@ namespace SteamBotLite
 {
     public class IdentityModule : BaseModule, OnLoginCompletedListiners, MapListChangeListiner
     {
-        private UserHandler userhandler;
         private ModuleHandler modulehandler;
-        private string StatusPrefix = "";
-        private string username;
         private string status;
+        private string StatusPrefix = "";
+        private UserHandler userhandler;
+        private string username;
         private bool UseStatus;
 
         public IdentityModule(UserHandler bot, ModuleHandler handler, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(handler, Jsconfig)
@@ -32,12 +32,6 @@ namespace SteamBotLite
             adminCommands.Add(new Rename(handler, this));
             adminCommands.Add(new SetStatusMessage(userhandler, modulehandler, this));
             adminCommands.Add(new UnsetStatusMessage(userhandler, modulehandler, this));
-        }
-
-        public override void OnAllModulesLoaded()
-        {
-            userhandler.SetUsernameEventProcess(username);
-            userhandler.SetStatusmessageEvent(StatusPrefix + status);
         }
 
         public override string getPersistentData()
@@ -62,9 +56,17 @@ namespace SteamBotLite
             }
         }
 
-        private string getusername()
+        public void MaplistChange(IReadOnlyList<Map> maplist)
         {
-            return username;
+            StatusPrefix = "[" + maplist.Count + "] ";
+            userhandler.SetUsernameEventProcess(username);
+            userhandler.SetStatusmessageEvent(StatusPrefix + status);
+        }
+
+        public override void OnAllModulesLoaded()
+        {
+            userhandler.SetUsernameEventProcess(username);
+            userhandler.SetStatusmessageEvent(StatusPrefix + status);
         }
 
         public void OnLoginCompleted()
@@ -77,11 +79,51 @@ namespace SteamBotLite
             //userhandler.SetStatusmessageEvent(StatusPrefix + status);
         }
 
-        public void MaplistChange(IReadOnlyList<Map> maplist)
+        private string getusername()
         {
-            StatusPrefix = "[" + maplist.Count + "] ";
-            userhandler.SetUsernameEventProcess(username);
-            userhandler.SetStatusmessageEvent(StatusPrefix + status);
+            return username;
+        }
+
+        private class CheckStatus : BaseCommand
+        {
+            // Command to query if a server is active
+            private IdentityModule module;
+
+            public CheckStatus(ModuleHandler bot, IdentityModule module) : base(bot, "!CheckData")
+            {
+                this.module = module;
+            }
+
+            protected override string exec(MessageEventArgs Msg, string param)
+            {
+                return Msg.Sender.Rank.ToString();
+            }
+        }
+
+        private class Rename : BaseCommand
+        {
+            // Command to query if a server is active
+            private IdentityModule module;
+
+            public Rename(ModuleHandler bot, IdentityModule module) : base(bot, "!Rename")
+            {
+                this.module = module;
+            }
+
+            protected override string exec(MessageEventArgs Msg, string param)
+            {
+                if (param.Length > 0)
+                {
+                    module.userhandler.SetUsernameEventProcess(param);
+
+                    module.savePersistentData();
+                    return "Renamed";
+                }
+                else
+                {
+                    return "There was no name!";
+                }
+            }
         }
 
         private class SetStatusMessage : BaseCommand
@@ -138,48 +180,6 @@ namespace SteamBotLite
             private void Bot_SetStatusmessage(object sender, string e)
             {
                 throw new NotImplementedException();
-            }
-        }
-
-        private class CheckStatus : BaseCommand
-        {
-            // Command to query if a server is active
-            private IdentityModule module;
-
-            public CheckStatus(ModuleHandler bot, IdentityModule module) : base(bot, "!CheckData")
-            {
-                this.module = module;
-            }
-
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                return Msg.Sender.Rank.ToString();
-            }
-        }
-
-        private class Rename : BaseCommand
-        {
-            // Command to query if a server is active
-            private IdentityModule module;
-
-            public Rename(ModuleHandler bot, IdentityModule module) : base(bot, "!Rename")
-            {
-                this.module = module;
-            }
-
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                if (param.Length > 0)
-                {
-                    module.userhandler.SetUsernameEventProcess(param);
-
-                    module.savePersistentData();
-                    return "Renamed";
-                }
-                else
-                {
-                    return "There was no name!";
-                }
             }
         }
     }

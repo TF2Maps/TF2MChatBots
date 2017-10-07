@@ -6,12 +6,12 @@ namespace SteamBotLite
 {
     public class SearchClassEntry
     {
-        public string URLPrefix { get; set; }
-        public string URLSuffix { get; set; }
         public string Command { get; set; }
+        public bool IsCustomUrl { get; set; }
         public string SpiderPrefix { get; set; }
         public string SpiderSuffix { get; set; }
-        public bool IsCustomUrl { get; set; }
+        public string URLPrefix { get; set; }
+        public string URLSuffix { get; set; }
     }
 
     //TODO Better dumping and properly do it maybe static isn't best

@@ -7,9 +7,24 @@ namespace MapModuleTests
     [TestClass]
     public class AdminModuleUnitTests
     {
+        private int identifier = 0;
         private AdminModule module;
         private User TestUser;
-        private int identifier = 0;
+
+        // Use TestCleanup to run code after each test has run
+        [TestCleanup()]
+        public void Cleanup()
+        {
+            // module = new AdminModule(new TestUserHandler() , MakeConfig());
+        }
+
+        // Use TestInitialize to run code before running each test
+        [TestInitialize()]
+        public void Initialize()
+        {
+            //module = new AdminModule(new TestUserHandler(), MakeConfig());
+            TestUser = new User(identifier, null);
+        }
 
         private Dictionary<string, Dictionary<string, object>> MakeConfig()
         {
@@ -33,21 +48,6 @@ namespace MapModuleTests
             ModuleConfig.Add("UseStatus", "TRUE");
 
             return ModuleConfig;
-        }
-
-        // Use TestInitialize to run code before running each test
-        [TestInitialize()]
-        public void Initialize()
-        {
-            //module = new AdminModule(new TestUserHandler(), MakeConfig());
-            TestUser = new User(identifier, null);
-        }
-
-        // Use TestCleanup to run code after each test has run
-        [TestCleanup()]
-        public void Cleanup()
-        {
-            // module = new AdminModule(new TestUserHandler() , MakeConfig());
         }
     }
 }

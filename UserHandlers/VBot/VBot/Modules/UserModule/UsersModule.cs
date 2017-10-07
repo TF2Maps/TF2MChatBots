@@ -17,22 +17,17 @@ namespace SteamBotLite
             commands.Add(new CheckStatus(bot, this));
         }
 
-        public override void OnAllModulesLoaded()
+        public bool admincheck(ChatroomEntity UserToVerify)
         {
-        }
+            string data = UserToVerify.identifier.ToString();
 
-        private class CheckStatus : BaseCommand
-        {
-            private UsersModule module;
-
-            public CheckStatus(ModuleHandler bot, UsersModule module) : base(bot, "!CheckAdmin")
+            if (UserToVerify.Rank == ChatroomEntity.AdminStatus.True | (admins.Any(s => UserToVerify.UserEquals(s))))
             {
-                this.module = module;
+                return true;
             }
-
-            protected override string exec(MessageEventArgs Msg, string param)
+            else
             {
-                return module.admincheck(Msg.Sender).ToString();
+                return false;
             }
         }
 
@@ -56,6 +51,10 @@ namespace SteamBotLite
             catch { }
         }
 
+        public override void OnAllModulesLoaded()
+        {
+        }
+
         public void updateUserInfo(ChatroomEntity info, bool IsAdmin)
         {
             if (IsAdmin)
@@ -74,17 +73,18 @@ namespace SteamBotLite
             }
         }
 
-        public bool admincheck(ChatroomEntity UserToVerify)
+        private class CheckStatus : BaseCommand
         {
-            string data = UserToVerify.identifier.ToString();
+            private UsersModule module;
 
-            if (UserToVerify.Rank == ChatroomEntity.AdminStatus.True | (admins.Any(s => UserToVerify.UserEquals(s))))
+            public CheckStatus(ModuleHandler bot, UsersModule module) : base(bot, "!CheckAdmin")
             {
-                return true;
+                this.module = module;
             }
-            else
+
+            protected override string exec(MessageEventArgs Msg, string param)
             {
-                return false;
+                return module.admincheck(Msg.Sender).ToString();
             }
         }
     }

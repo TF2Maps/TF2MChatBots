@@ -9,15 +9,13 @@ namespace SteamBotLite
 {
     public class TrackingServerListHolder : BaseModule, ServerMapChangeListiner
     {
-        private class Maplist
-        {
-            public List<string> Maps;
-            public SummariseMethod ListKind;
-            public string ListName;
-        }
+        public Dictionary<string, List<PlayEntry>> MapTests;
 
         private string[] Header = new string[] { "Map", "Time Played" };
+
         private HTMLFileFromArrayListiners listiner;
+
+        private List<Maplist> Maplists;
 
         public TrackingServerListHolder(ModuleHandler bot, HTMLFileFromArrayListiners listiner, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
@@ -35,25 +33,80 @@ namespace SteamBotLite
             bot.AddMapChangeEventListiner(this);
         }
 
-        public override void OnAllModulesLoaded()
+        private enum SummariseMethod
+        { Blacklist, Whitelist }
+
+        public void AddEntry(string MapName, PlayEntry Entry)
         {
+            if (MapTests.ContainsKey(MapName))
+            {
+                MapTests[MapName].Add(Entry);
+            }
+            else
+            {
+                MapTests.Add(MapName, new List<PlayEntry>() { Entry });
+            }
+            savePersistentData();
         }
 
-        private List<Maplist> Maplists;
-        public Dictionary<string, List<PlayEntry>> MapTests;
-
-        public class PlayEntry
+        public string Decompress(string data)
         {
-            public string PlayerCount { get; set; }
-            public string ServerIP { get; set; }
-            public string TimeEntered { get; set; }
-
-            public PlayEntry(string playercount, string serverip, string timeentered)
+            if (string.IsNullOrWhiteSpace(data))
             {
-                this.PlayerCount = playercount;
-                this.ServerIP = serverip;
-                this.TimeEntered = timeentered;
+                return null;
             }
+
+            byte[] persistantdata = Convert.FromBase64String((data));
+
+            using (MemoryStream input = new MemoryStream(persistantdata))
+            using (MemoryStream output = new MemoryStream())
+            {
+                using (GZipStream dstream = new GZipStream(input, CompressionMode.Decompress))
+                {
+                    dstream.CopyTo(output);
+                }
+                return Encoding.Unicode.GetString(output.ToArray());
+            }
+        }
+
+        public override string getPersistentData()
+        {
+            byte[] persistantdata = Encoding.Unicode.GetBytes(JsonConvert.SerializeObject(MapTests));
+
+            using (MemoryStream mis = new MemoryStream(persistantdata))
+            using (MemoryStream output = new MemoryStream())
+            {
+                using (var dstream = new GZipStream(output, CompressionMode.Compress))
+                {
+                    mis.CopyTo(dstream);
+                }
+                return Convert.ToBase64String(output.ToArray());
+            }
+        }
+
+        public override void loadPersistentData()
+        {
+            if (File.Exists(ModuleSavedDataFilePath()))
+            {
+                string data = System.IO.File.ReadAllText(ModuleSavedDataFilePath());
+                string DataAsString = Decompress(data);
+                if (string.IsNullOrEmpty(DataAsString))
+                {
+                    MapTests = new Dictionary<string, List<PlayEntry>>();
+                }
+                else
+                {
+                    MapTests = JsonConvert.DeserializeObject<Dictionary<string, List<PlayEntry>>>(DataAsString);
+                }
+            }
+            else
+            {
+                MapTests = new Dictionary<string, List<PlayEntry>>();
+            }
+        }
+
+        public override void OnAllModulesLoaded()
+        {
         }
 
         public void OnMapChange(TrackingServerInfo args)
@@ -63,14 +116,6 @@ namespace SteamBotLite
             AddEntry(args.currentMap, entry);
             savePersistentData();
             UpdateList();
-        }
-
-        private void UpdateList()
-        {
-            foreach (Maplist entry in Maplists)
-            {
-                listiner.HTMLFileFromArray(Header, ParseSummarisedListToHTMLTable(SummariseEntries(MapTests, entry.Maps, entry.ListKind)), entry.ListName);
-            }
         }
 
         private void Export()
@@ -89,21 +134,15 @@ namespace SteamBotLite
             }
         }
 
-        public void AddEntry(string MapName, PlayEntry Entry)
+        private List<string[]> ParseSummarisedListToHTMLTable(Dictionary<string, int> Dictionary)
         {
-            if (MapTests.ContainsKey(MapName))
+            List<string[]> Array = new List<string[]>();
+            foreach (KeyValuePair<string, int> entry in Dictionary)
             {
-                MapTests[MapName].Add(Entry);
+                Array.Add(new string[] { entry.Key, entry.Value.ToString() });
             }
-            else
-            {
-                MapTests.Add(MapName, new List<PlayEntry>() { Entry });
-            }
-            savePersistentData();
+            return Array;
         }
-
-        private enum SummariseMethod
-        { Blacklist, Whitelist }
 
         /// <summary>
         /// Used to summarise the Dictionary but only return entries in the whitelist or not in the blacklist
@@ -137,70 +176,33 @@ namespace SteamBotLite
             return SumamrisedDictionary;
         }
 
-        private List<string[]> ParseSummarisedListToHTMLTable(Dictionary<string, int> Dictionary)
+        private void UpdateList()
         {
-            List<string[]> Array = new List<string[]>();
-            foreach (KeyValuePair<string, int> entry in Dictionary)
+            foreach (Maplist entry in Maplists)
             {
-                Array.Add(new string[] { entry.Key, entry.Value.ToString() });
-            }
-            return Array;
-        }
-
-        public override string getPersistentData()
-        {
-            byte[] persistantdata = Encoding.Unicode.GetBytes(JsonConvert.SerializeObject(MapTests));
-
-            using (MemoryStream mis = new MemoryStream(persistantdata))
-            using (MemoryStream output = new MemoryStream())
-            {
-                using (var dstream = new GZipStream(output, CompressionMode.Compress))
-                {
-                    mis.CopyTo(dstream);
-                }
-                return Convert.ToBase64String(output.ToArray());
+                listiner.HTMLFileFromArray(Header, ParseSummarisedListToHTMLTable(SummariseEntries(MapTests, entry.Maps, entry.ListKind)), entry.ListName);
             }
         }
 
-        public string Decompress(string data)
+        public class PlayEntry
         {
-            if (string.IsNullOrWhiteSpace(data))
+            public PlayEntry(string playercount, string serverip, string timeentered)
             {
-                return null;
+                this.PlayerCount = playercount;
+                this.ServerIP = serverip;
+                this.TimeEntered = timeentered;
             }
 
-            byte[] persistantdata = Convert.FromBase64String((data));
-
-            using (MemoryStream input = new MemoryStream(persistantdata))
-            using (MemoryStream output = new MemoryStream())
-            {
-                using (GZipStream dstream = new GZipStream(input, CompressionMode.Decompress))
-                {
-                    dstream.CopyTo(output);
-                }
-                return Encoding.Unicode.GetString(output.ToArray());
-            }
+            public string PlayerCount { get; set; }
+            public string ServerIP { get; set; }
+            public string TimeEntered { get; set; }
         }
 
-        public override void loadPersistentData()
+        private class Maplist
         {
-            if (File.Exists(ModuleSavedDataFilePath()))
-            {
-                string data = System.IO.File.ReadAllText(ModuleSavedDataFilePath());
-                string DataAsString = Decompress(data);
-                if (string.IsNullOrEmpty(DataAsString))
-                {
-                    MapTests = new Dictionary<string, List<PlayEntry>>();
-                }
-                else
-                {
-                    MapTests = JsonConvert.DeserializeObject<Dictionary<string, List<PlayEntry>>>(DataAsString);
-                }
-            }
-            else
-            {
-                MapTests = new Dictionary<string, List<PlayEntry>>();
-            }
+            public SummariseMethod ListKind;
+            public string ListName;
+            public List<string> Maps;
         }
     }
 }

@@ -8,34 +8,15 @@ namespace SteamBotLite
 {
     public class MediaBot : UserHandler
     {
+        private string APICommand = "!YoutubeAPIKEY";
         private string ApiKey;
 
-        private void SetApiKey(string value)
-        {
-            System.IO.File.WriteAllText(ApiKeySaveFile, value);
-            ApiKey = value;
-        }
+        private string ApiKeySaveFile = "Media.txt";
 
         public MediaBot()
         {
             GetVideoData("xrbrQhpvn8E");
             ApiKey = GetConfig();
-        }
-
-        private string ApiKeySaveFile = "Media.txt";
-        private string APICommand = "!YoutubeAPIKEY";
-
-        private string GetConfig()
-        {
-            if (File.Exists(ApiKeySaveFile))
-            {
-                return System.IO.File.ReadAllText(@ApiKeySaveFile);
-            }
-            else
-            {
-                Console.WriteLine("API Functionality will be disabled until a user sends the command: " + APICommand + " <Key>");
-                return null;
-            }
         }
 
         public override void ChatMemberInfo(object sender, Tuple<ChatroomEntity, bool> e)
@@ -102,50 +83,6 @@ namespace SteamBotLite
             }
         }
 
-        public class Snippet
-        {
-            public string title { get; set; }
-        }
-
-        public class RegionRestriction
-        {
-            public List<string> allowed { get; set; }
-        }
-
-        public class ContentDetails
-        {
-            public string duration { get; set; }
-        }
-
-        public class Item
-        {
-            public Snippet snippet { get; set; }
-            public ContentDetails contentDetails { get; set; }
-        }
-
-        public class RootObject
-        {
-            public List<Item> items { get; set; }
-        }
-
-        private string GetVideoData(string ID)
-        {
-            try
-            {
-                string header = "https://www.googleapis.com/youtube/v3/videos?id=";
-
-                string Key = "&key=" + ApiKey + "";
-                string trailer = "&fields=items(contentDetails,snippet(title))&part=snippet,contentDetails";
-                string WebData = SearchClass.GetWebPageAsString(header + ID + Key + trailer);
-                Console.WriteLine(WebData);
-                return WebData;
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
         public override void ProcessPrivateMessage(object sender, MessageEventArgs e)
         {
             e.InterfaceHandlerDestination.SendPrivateMessage(this, e);
@@ -159,18 +96,6 @@ namespace SteamBotLite
                 e.ReplyMessage = "Retrieved Key";
                 e.InterfaceHandlerDestination.SendPrivateMessage(this, e);
             }
-        }
-
-        private string TrimOpeningForURL(string MainString, int Trimmer)
-        {
-            int StartIndex = Trimmer;
-            int CharactersRemaining = MainString.Length - Trimmer;
-            return MainString.Substring(StartIndex, CharactersRemaining);
-        }
-
-        private string TrimEnding(string Message)
-        {
-            return Message.Split(null)[0];
         }
 
         private string ExtractID(string Message)
@@ -207,6 +132,81 @@ namespace SteamBotLite
         private string ExtractURL(string Message)
         {
             return Message;
+        }
+
+        private string GetConfig()
+        {
+            if (File.Exists(ApiKeySaveFile))
+            {
+                return System.IO.File.ReadAllText(@ApiKeySaveFile);
+            }
+            else
+            {
+                Console.WriteLine("API Functionality will be disabled until a user sends the command: " + APICommand + " <Key>");
+                return null;
+            }
+        }
+
+        private string GetVideoData(string ID)
+        {
+            try
+            {
+                string header = "https://www.googleapis.com/youtube/v3/videos?id=";
+
+                string Key = "&key=" + ApiKey + "";
+                string trailer = "&fields=items(contentDetails,snippet(title))&part=snippet,contentDetails";
+                string WebData = SearchClass.GetWebPageAsString(header + ID + Key + trailer);
+                Console.WriteLine(WebData);
+                return WebData;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private void SetApiKey(string value)
+        {
+            System.IO.File.WriteAllText(ApiKeySaveFile, value);
+            ApiKey = value;
+        }
+
+        private string TrimEnding(string Message)
+        {
+            return Message.Split(null)[0];
+        }
+
+        private string TrimOpeningForURL(string MainString, int Trimmer)
+        {
+            int StartIndex = Trimmer;
+            int CharactersRemaining = MainString.Length - Trimmer;
+            return MainString.Substring(StartIndex, CharactersRemaining);
+        }
+
+        public class ContentDetails
+        {
+            public string duration { get; set; }
+        }
+
+        public class Item
+        {
+            public ContentDetails contentDetails { get; set; }
+            public Snippet snippet { get; set; }
+        }
+
+        public class RegionRestriction
+        {
+            public List<string> allowed { get; set; }
+        }
+
+        public class RootObject
+        {
+            public List<Item> items { get; set; }
+        }
+
+        public class Snippet
+        {
+            public string title { get; set; }
         }
     }
 }

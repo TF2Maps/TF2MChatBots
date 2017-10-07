@@ -18,30 +18,6 @@ namespace SteamBotLite
         {
         }
 
-        public override void ChatMemberInfo(object sender, Tuple<ChatroomEntity, bool> e)
-        {
-        }
-
-        public void MakeTableFromEntry(string TableKey, TableData TableData)
-        {
-        }
-
-        public override void OnLoginCompleted(object sender, EventArgs e)
-        {
-        }
-
-        public override void ProcessChatRoomMessage(object sender, MessageEventArgs e)
-        {
-        }
-
-        public override void ProcessPrivateMessage(object sender, MessageEventArgs e)
-        {
-        }
-
-        public void SetTableHeader(string TableIdentifier, TableDataValue[] Header)
-        {
-        }
-
         void ModuleHandler.AddListChangeEventListiner(MapListChangeListiner listiner)
         {
         }
@@ -70,6 +46,10 @@ namespace SteamBotLite
         {
         }
 
+        public override void ChatMemberInfo(object sender, Tuple<ChatroomEntity, bool> e)
+        {
+        }
+
         List<BaseModule> ModuleHandler.GetAllModules()
         {
             return new List<BaseModule>();
@@ -83,7 +63,23 @@ namespace SteamBotLite
         {
         }
 
+        public void MakeTableFromEntry(string TableKey, TableData TableData)
+        {
+        }
+
+        public override void OnLoginCompleted(object sender, EventArgs e)
+        {
+        }
+
         void ModuleHandler.OnMaplistchange(IReadOnlyList<Map> mapList, object sender, NotifyCollectionChangedEventArgs args)
+        {
+        }
+
+        public override void ProcessChatRoomMessage(object sender, MessageEventArgs e)
+        {
+        }
+
+        public override void ProcessPrivateMessage(object sender, MessageEventArgs e)
         {
         }
 
@@ -96,6 +92,10 @@ namespace SteamBotLite
         }
 
         void ModuleHandler.SetStatusmessageEvent(string statusMessage)
+        {
+        }
+
+        public void SetTableHeader(string TableIdentifier, TableDataValue[] Header)
         {
         }
 

@@ -8,6 +8,8 @@ namespace SteamBotLite
 {
     public class MapCollection
     {
+        private HTMLFileFromArrayListiners listiner;
+
         /// <summary>
         /// This class is a wrapper for an observerable collection, in order to ensure validity of inputs
         /// </summary>
@@ -15,8 +17,6 @@ namespace SteamBotLite
         private ObservableCollection<Map> mapList = new ObservableCollection<Map>();
 
         private string tablename = "Deleted Maps";
-
-        private HTMLFileFromArrayListiners listiner;
 
         public MapCollection(ObservableCollection<Map> inputlist, HTMLFileFromArrayListiners HtmlListiner)
         {
@@ -40,21 +40,25 @@ namespace SteamBotLite
             AllowOnlyUploadedMaps = false;
         }
 
-        private void MapList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            CollectionChanged(this, e);
-        }
-
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
-        private ObservableCollection<Map> GetMaplist()
-        {
-            return mapList;
-        }
+        public bool AllowOnlyUploadedMaps { get; private set; }
 
-        public Map GetMap(int position)
+        public string ForceMapsToBeUploadedErrorResponse { get; private set; }
+
+        public string AddMap(Map map)
         {
-            return mapList[position];
+            MapValidityCheck MapCheck = CheckIfValid(map);
+
+            if (MapCheck.IsValid)
+            {
+                mapList.Add(map);
+                return string.Format("{0} Has been added to the list!", map.Filename);
+            }
+            else
+            {
+                return MapCheck.ReturnMessage;
+            }
         }
 
         public IReadOnlyList<Map> GetAllMaps()
@@ -62,9 +66,29 @@ namespace SteamBotLite
             return mapList;
         }
 
+        public IEnumerator<Map> GetEnumerator()
+        {
+            return mapList.GetEnumerator();
+        }
+
+        public Map GetMap(int position)
+        {
+            return mapList[position];
+        }
+
         public Map GetMapByFilename(string filename)
         {
             return mapList.FirstOrDefault(x => x.Filename == filename);
+        }
+
+        public int GetSize()
+        {
+            return mapList.Count;
+        }
+
+        public void InsertMap(int position, Map map)
+        {
+            mapList.Insert(position, map);
         }
 
         public void RemoveMap(Map map, string reason)
@@ -90,43 +114,10 @@ namespace SteamBotLite
             mapList.RemoveAt(position);
         }
 
-        public void InsertMap(int position, Map map)
-        {
-            mapList.Insert(position, map);
-        }
-
-        public int GetSize()
-        {
-            return mapList.Count;
-        }
-
-        public bool AllowOnlyUploadedMaps { get; private set; }
-        public string ForceMapsToBeUploadedErrorResponse { get; private set; }
-
         public void RestrictMapsToBeUploaded(bool ForceMapsToBeUploaded, string ErrorMessage)
         {
             this.AllowOnlyUploadedMaps = ForceMapsToBeUploaded;
             ForceMapsToBeUploadedErrorResponse = ErrorMessage;
-        }
-
-        public IEnumerator<Map> GetEnumerator()
-        {
-            return mapList.GetEnumerator();
-        }
-
-        public string AddMap(Map map)
-        {
-            MapValidityCheck MapCheck = CheckIfValid(map);
-
-            if (MapCheck.IsValid)
-            {
-                mapList.Add(map);
-                return string.Format("{0} Has been added to the list!", map.Filename);
-            }
-            else
-            {
-                return MapCheck.ReturnMessage;
-            }
         }
 
         public string UpdateMap(string MapName, Map NewMapData, ChatroomEntity User)
@@ -159,26 +150,6 @@ namespace SteamBotLite
             }
 
             return ReturnMessage;
-        }
-
-        private UpdateMapValidityCheck GetMapPositionInList(string mapName)
-        {
-            UpdateMapValidityCheck ReturnData = new UpdateMapValidityCheck();
-
-            int index = 0;
-            foreach (Map Entry in mapList)
-            {
-                if (Entry.Filename.Equals(mapName))
-                {
-                    ReturnData.MapExistsInList = true;
-                    ReturnData.MapEntry = index;
-                }
-                else
-                {
-                    index++;
-                }
-            }
-            return ReturnData;
         }
 
         private bool CheckIfStringIsNumbers(string input)
@@ -235,6 +206,36 @@ namespace SteamBotLite
             catch (NullReferenceException ex) { throw new ArgumentException("Map isn't uploaded"); }
 
             return ValidityCheck;
+        }
+
+        private ObservableCollection<Map> GetMaplist()
+        {
+            return mapList;
+        }
+
+        private UpdateMapValidityCheck GetMapPositionInList(string mapName)
+        {
+            UpdateMapValidityCheck ReturnData = new UpdateMapValidityCheck();
+
+            int index = 0;
+            foreach (Map Entry in mapList)
+            {
+                if (Entry.Filename.Equals(mapName))
+                {
+                    ReturnData.MapExistsInList = true;
+                    ReturnData.MapEntry = index;
+                }
+                else
+                {
+                    index++;
+                }
+            }
+            return ReturnData;
+        }
+
+        private void MapList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            CollectionChanged(this, e);
         }
     }
 }

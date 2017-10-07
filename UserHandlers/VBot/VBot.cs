@@ -7,36 +7,35 @@ namespace SteamBotLite
 {
     public class VBot : UserHandler, HTMLFileFromArrayListiners, ModuleHandler
     {
+        public List<HTMLFileFromArrayListiners> HTMLParsers;
+        public List<MapListChangeListiner> ListChangeEventListiners = new List<MapListChangeListiner>();
+        public List<ServerMapChangeListiner> MapChangeEventListiners = new List<ServerMapChangeListiner>();
+        public MapModule mapModule;
+        public List<BaseModule> ModuleList;
+        public List<OnLoginCompletedListiners> OnLoginlistiners;
+        public UsersModule usersModule;
+        private AdminModule adminmodule;
         private bool Autojoin = true;
+
+        private List<BaseCommand> chatAdminCommands = new List<BaseCommand>();
+
+        private List<BaseCommand> chatCommands = new List<BaseCommand>();
+
+        private CountDownModule countdownmodule;
+
+        private IdentityModule identitymodule;
+
+        // Loading Config
+        private Dictionary<string, Dictionary<string, object>> jsconfig = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, object>>>(System.IO.File.ReadAllText(@"config.json"));
 
         // Class members
         private MotdModule motdModule;
 
-        public MapModule mapModule;
-        private ServerTrackingModule ServerTrackingModule;
         private RepliesModule replyModule;
-        private AdminModule adminmodule;
         private SearchModule searchModule;
+        private ServerTrackingModule ServerTrackingModule;
         private TrackingServerListHolder TrackingServerListmodule;
-        private CountDownModule countdownmodule;
         private WebServerHostingModule WebServer;
-        private IdentityModule identitymodule;
-
-        public UsersModule usersModule;
-
-        public List<BaseModule> ModuleList;
-
-        public List<HTMLFileFromArrayListiners> HTMLParsers;
-
-        private List<BaseCommand> chatCommands = new List<BaseCommand>();
-        private List<BaseCommand> chatAdminCommands = new List<BaseCommand>();
-
-        public List<MapListChangeListiner> ListChangeEventListiners = new List<MapListChangeListiner>();
-
-        public List<ServerMapChangeListiner> MapChangeEventListiners = new List<ServerMapChangeListiner>();
-
-        // Loading Config
-        private Dictionary<string, Dictionary<string, object>> jsconfig = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, object>>>(System.IO.File.ReadAllText(@"config.json"));
 
         /// <summary>
         /// Do not try using steamfriends, steamuser and all that since it'll be uninitialised at this point
@@ -76,16 +75,19 @@ namespace SteamBotLite
             }
         }
 
-        public void UpdateUsernameEvent(object sender, string e)
+        public void AddEntryWithLimit(string identifier, TableDataValue[] data, int limit)
         {
-            base.SetUsernameEventProcess(e);
+            foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)
+            {
+                Listiner.AddEntryWithLimit(identifier, data, limit);
+            }
         }
 
-        public void OnMaplistchange(IReadOnlyList<Map> maplist, object sender = null, NotifyCollectionChangedEventArgs args = null)
+        public void AddEntryWithoutLimit(string identifier, TableDataValue[] data)
         {
-            foreach (MapListChangeListiner listiner in ListChangeEventListiners)
+            foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)
             {
-                listiner.MaplistChange(maplist);
+                Listiner.AddEntryWithoutLimit(identifier, data);
             }
         }
 
@@ -94,40 +96,24 @@ namespace SteamBotLite
             ListChangeEventListiners.Add(listiner);
         }
 
-        public List<OnLoginCompletedListiners> OnLoginlistiners;
-
-        public override void OnLoginCompleted(object sender, EventArgs e)
+        public void AddLoginEventListiner(OnLoginCompletedListiners listiner)
         {
-            if (Autojoin)
-            {
-                base.FireMainChatRoomEvent(ChatroomEventEnum.EnterChat);
-            }
-            foreach (OnLoginCompletedListiners listiner in OnLoginlistiners)
-            {
-                listiner.OnLoginCompleted();
-            }
-
-            Console.WriteLine("UserHandler: {0} Has Loaded", this.GetType());
+            OnLoginlistiners.Add(listiner);
         }
 
-        public override void ProcessPrivateMessage(object sender, MessageEventArgs e)
+        public void AddMapChangeEventListiner(ServerMapChangeListiner listiner)
         {
-            ApplicationInterface AppInterface = (ApplicationInterface)sender;
-            e.InterfaceHandlerDestination = AppInterface;
-            e.ReplyMessage = ChatMessageHandler(e, e.ReceivedMessage);
-            if (e.ReplyMessage != null)
-            {
-                e.InterfaceHandlerDestination.SendPrivateMessage(this, e);
-            }
+            MapChangeEventListiners.Add(listiner);
         }
 
-        public override void ProcessChatRoomMessage(object sender, MessageEventArgs e)
+        public bool admincheck(ChatroomEntity user)
         {
-            e.ReplyMessage = ChatMessageHandler(e, e.ReceivedMessage);
-            if (e.ReplyMessage != null)
-            {
-                e.InterfaceHandlerDestination.SendChatRoomMessage(this, e);
-            }
+            return usersModule.admincheck(user);
+        }
+
+        public override void ChatMemberInfo(object sender, Tuple<ChatroomEntity, bool> e)
+        {
+            usersModule.updateUserInfo(e.Item1, e.Item2);
         }
 
         public string ChatMessageHandler(MessageEventArgs Msg, string Message)
@@ -167,6 +153,69 @@ namespace SteamBotLite
             return response;
         }
 
+        public List<BaseModule> GetAllModules()
+        {
+            return ModuleList;
+        }
+
+        public void HTMLFileFromArray(string[] Headernames, List<string[]> Data, string TableKey)
+        {
+            foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)
+            {
+                Listiner.HTMLFileFromArray(Headernames, Data, TableKey);
+            }
+        }
+
+        public void MakeTableFromEntry(string TableKey, TableData TableData)
+        {
+            foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)
+            {
+                Listiner.MakeTableFromEntry(TableKey, TableData);
+            }
+        }
+
+        public override void OnLoginCompleted(object sender, EventArgs e)
+        {
+            if (Autojoin)
+            {
+                base.FireMainChatRoomEvent(ChatroomEventEnum.EnterChat);
+            }
+            foreach (OnLoginCompletedListiners listiner in OnLoginlistiners)
+            {
+                listiner.OnLoginCompleted();
+            }
+
+            Console.WriteLine("UserHandler: {0} Has Loaded", this.GetType());
+        }
+
+        public void OnMaplistchange(IReadOnlyList<Map> maplist, object sender = null, NotifyCollectionChangedEventArgs args = null)
+        {
+            foreach (MapListChangeListiner listiner in ListChangeEventListiners)
+            {
+                listiner.MaplistChange(maplist);
+            }
+        }
+
+        public override void ProcessChatRoomMessage(object sender, MessageEventArgs e)
+        {
+            e.ReplyMessage = ChatMessageHandler(e, e.ReceivedMessage);
+            if (e.ReplyMessage != null)
+            {
+                e.InterfaceHandlerDestination.SendChatRoomMessage(this, e);
+            }
+        }
+
+        public override void ProcessPrivateMessage(object sender, MessageEventArgs e)
+        {
+            ApplicationInterface AppInterface = (ApplicationInterface)sender;
+            e.InterfaceHandlerDestination = AppInterface;
+            e.ReplyMessage = ChatMessageHandler(e, e.ReceivedMessage);
+            if (e.ReplyMessage != null)
+            {
+                e.InterfaceHandlerDestination.SendPrivateMessage(this, e);
+            }
+        }
+
         public void ServerUpdated(object sender, TrackingServerInfo args)
         {
             if (MapChangeEventListiners.Count > 0)
@@ -178,69 +227,17 @@ namespace SteamBotLite
             }
         }
 
-        public override void ChatMemberInfo(object sender, Tuple<ChatroomEntity, bool> e)
-        {
-            usersModule.updateUserInfo(e.Item1, e.Item2);
-        }
-
-        public void HTMLFileFromArray(string[] Headernames, List<string[]> Data, string TableKey)
-        {
-            foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)
-            {
-                Listiner.HTMLFileFromArray(Headernames, Data, TableKey);
-            }
-        }
-
-        public bool admincheck(ChatroomEntity user)
-        {
-            return usersModule.admincheck(user);
-        }
-
-        public void AddMapChangeEventListiner(ServerMapChangeListiner listiner)
-        {
-            MapChangeEventListiners.Add(listiner);
-        }
-
-        public void AddLoginEventListiner(OnLoginCompletedListiners listiner)
-        {
-            OnLoginlistiners.Add(listiner);
-        }
-
-        public List<BaseModule> GetAllModules()
-        {
-            return ModuleList;
-        }
-
-        public void MakeTableFromEntry(string TableKey, TableData TableData)
-        {
-            foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)
-            {
-                Listiner.MakeTableFromEntry(TableKey, TableData);
-            }
-        }
-
-        public void AddEntryWithoutLimit(string identifier, TableDataValue[] data)
-        {
-            foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)
-            {
-                Listiner.AddEntryWithoutLimit(identifier, data);
-            }
-        }
-
-        public void AddEntryWithLimit(string identifier, TableDataValue[] data, int limit)
-        {
-            foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)
-            {
-                Listiner.AddEntryWithLimit(identifier, data, limit);
-            }
-        }
-
         public void SetTableHeader(string TableIdentifier, TableDataValue[] Header)
         {
             foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)
             {
                 Listiner.SetTableHeader(TableIdentifier, Header);
             }
+        }
+
+        public void UpdateUsernameEvent(object sender, string e)
+        {
+            base.SetUsernameEventProcess(e);
         }
     }
 }

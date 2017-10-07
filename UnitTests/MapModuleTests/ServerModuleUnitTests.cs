@@ -8,65 +8,16 @@ namespace UsersModuleTests
     [TestClass()]
     public class ServerTrackingModuleUnitTests
     {
+        public string ServerRemoveCommand = "!serverremove";
         private ServerTrackingModule module;
         private string ServerAddCommand = "!ServerAdd";
+        private int testcapacity = 24;
         private string TestIP = "192.168.0.1";
-        private string TestPort = "27015";
+        private string testmap = "koth_badlands";
         private string TestName = "TestServer";
+        private int testplayercount = 10;
+        private string TestPort = "27015";
         private ChatroomEntity TestUser;
-
-        public string ServerRemoveCommand = "!serverremove";
-
-        private Dictionary<string, Dictionary<string, object>> MakeConfig()
-        {
-            Dictionary<string, Dictionary<string, object>> ModuleHolder = new Dictionary<string, Dictionary<string, object>>();
-            Dictionary<string, object> ServerTrackingModuleData = new Dictionary<string, object>();
-            ServerTrackingModuleData.Add("updateInterval", "999999");
-            ModuleHolder.Add("ServerTrackingModule", ServerTrackingModuleData);
-
-            return ModuleHolder;
-        }
-
-        [TestInitialize()]
-        public void Initialize()
-        {
-            module = new ServerTrackingModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
-            TestUser = new User(0, null);
-            TestUser.Rank = ChatroomEntity.AdminStatus.True;
-        }
-
-        [TestCleanup()]
-        public void Cleanup()
-        {
-            module = new ServerTrackingModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
-            module.TrackedServers.Clear();
-            Assert.IsTrue(module.TrackedServers.Count() == 0);
-        }
-
-        private string FireCommand(MessageEventArgs Message, BaseModule module)
-        {
-            string param = " ";
-
-            foreach (BaseCommand c in module.commands)
-            {
-                if (c.CheckCommandExists(Message, Message.ReceivedMessage))
-                {
-                    param = c.run(Message, Message.ReceivedMessage);
-                }
-            }
-            if (Message.Sender.Rank == ChatroomEntity.AdminStatus.True)
-            {
-                foreach (BaseCommand c in module.adminCommands)
-                {
-                    if (c.CheckCommandExists(Message, Message.ReceivedMessage))
-                    {
-                        param = c.run(Message, Message.ReceivedMessage);
-                    }
-                }
-            }
-
-            return param;
-        }
 
         [TestMethod()]
         public void AddServer()
@@ -89,63 +40,6 @@ namespace UsersModuleTests
         }
 
         [TestMethod()]
-        public void RejectMissingIP()
-        {
-            string message = ServerAddCommand + " " + TestName + " ";
-
-            MessageEventArgs Message = new MessageEventArgs(null);
-            Message.ReceivedMessage = message;
-            Message.Sender = TestUser;
-            Console.WriteLine(FireCommand(Message, module));
-
-            Assert.IsTrue(module.TrackedServers.Count() == 0);
-        }
-
-        [TestMethod()]
-        public void RejectMissingPort()
-        {
-            string message = ServerAddCommand + " " + TestName + " " + TestIP + " ";
-
-            MessageEventArgs Message = new MessageEventArgs(null);
-            Message.ReceivedMessage = message;
-            Message.Sender = TestUser;
-            Console.WriteLine(FireCommand(Message, module));
-
-            Assert.IsTrue(module.TrackedServers.Count() == 0);
-        }
-
-        [TestMethod()]
-        public void Persistency()
-        {
-            AddServer();
-            module = new ServerTrackingModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
-
-            Assert.IsTrue(module.TrackedServers.Count() == 1);
-
-            Assert.IsTrue(module.TrackedServers.Servers[0].tag.Equals(TestName));
-            Assert.IsTrue(module.TrackedServers.Servers[0].port.Equals(int.Parse(TestPort)));
-            Assert.IsTrue(module.TrackedServers.Servers[0].serverIP.Equals(TestIP));
-            Assert.IsTrue(ContainsCommand(module.NameToserverCommand(TestName), module.commands));
-        }
-
-        [TestMethod()]
-        public void RemoveServerAfterAdd()
-        {
-            AddServer();
-            string message = ServerRemoveCommand + " " + TestName;
-
-            MessageEventArgs Message = new MessageEventArgs(null);
-            Message.ReceivedMessage = message;
-            Message.Sender = TestUser;
-
-            Console.WriteLine(FireCommand(Message, module));
-
-            Assert.IsTrue(module.TrackedServers.Count() == 0);
-
-            Assert.IsFalse(ContainsCommand(module.NameToserverCommand(TestName), module.commands));
-        }
-
-        [TestMethod()]
         public void CheckPersistencyOfRemove()
         {
             RemoveServerAfterAdd();
@@ -154,27 +48,6 @@ namespace UsersModuleTests
 
             Assert.IsFalse(ContainsCommand(module.NameToserverCommand(TestName), module.commands));
         }
-
-        [TestMethod()]
-        public void ClearPersistency()
-        {
-            AddServer();
-            module.TrackedServers.Clear();
-            module = new ServerTrackingModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
-            Assert.IsTrue(module.TrackedServers.Count() == 0);
-
-            Assert.IsFalse(ContainsCommand(module.NameToserverCommand(TestName), module.commands));
-        }
-
-        private TrackingServerInfo TestTrackingServerInfo()
-        {
-            TrackingServerInfo TestTrackingServerInfo = new TrackingServerInfo(TestIP, int.Parse(TestPort), TestName);
-            return TestTrackingServerInfo;
-        }
-
-        private string testmap = "koth_badlands";
-        private int testcapacity = 24;
-        private int testplayercount = 10;
 
         [TestMethod()]
         public void CheckQueryUpdatesOnAllChange()
@@ -281,6 +154,90 @@ namespace UsersModuleTests
             Assert.IsTrue(module.TrackedServers.Servers[0].currentMap.Equals(NewMapName));
         }
 
+        [TestCleanup()]
+        public void Cleanup()
+        {
+            module = new ServerTrackingModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
+            module.TrackedServers.Clear();
+            Assert.IsTrue(module.TrackedServers.Count() == 0);
+        }
+
+        [TestMethod()]
+        public void ClearPersistency()
+        {
+            AddServer();
+            module.TrackedServers.Clear();
+            module = new ServerTrackingModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
+            Assert.IsTrue(module.TrackedServers.Count() == 0);
+
+            Assert.IsFalse(ContainsCommand(module.NameToserverCommand(TestName), module.commands));
+        }
+
+        [TestInitialize()]
+        public void Initialize()
+        {
+            module = new ServerTrackingModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
+            TestUser = new User(0, null);
+            TestUser.Rank = ChatroomEntity.AdminStatus.True;
+        }
+
+        [TestMethod()]
+        public void Persistency()
+        {
+            AddServer();
+            module = new ServerTrackingModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
+
+            Assert.IsTrue(module.TrackedServers.Count() == 1);
+
+            Assert.IsTrue(module.TrackedServers.Servers[0].tag.Equals(TestName));
+            Assert.IsTrue(module.TrackedServers.Servers[0].port.Equals(int.Parse(TestPort)));
+            Assert.IsTrue(module.TrackedServers.Servers[0].serverIP.Equals(TestIP));
+            Assert.IsTrue(ContainsCommand(module.NameToserverCommand(TestName), module.commands));
+        }
+
+        [TestMethod()]
+        public void RejectMissingIP()
+        {
+            string message = ServerAddCommand + " " + TestName + " ";
+
+            MessageEventArgs Message = new MessageEventArgs(null);
+            Message.ReceivedMessage = message;
+            Message.Sender = TestUser;
+            Console.WriteLine(FireCommand(Message, module));
+
+            Assert.IsTrue(module.TrackedServers.Count() == 0);
+        }
+
+        [TestMethod()]
+        public void RejectMissingPort()
+        {
+            string message = ServerAddCommand + " " + TestName + " " + TestIP + " ";
+
+            MessageEventArgs Message = new MessageEventArgs(null);
+            Message.ReceivedMessage = message;
+            Message.Sender = TestUser;
+            Console.WriteLine(FireCommand(Message, module));
+
+            Assert.IsTrue(module.TrackedServers.Count() == 0);
+        }
+
+        [TestMethod()]
+        public void RemoveServerAfterAdd()
+        {
+            AddServer();
+            string message = ServerRemoveCommand + " " + TestName;
+
+            MessageEventArgs Message = new MessageEventArgs(null);
+            Message.ReceivedMessage = message;
+            Message.Sender = TestUser;
+
+            Console.WriteLine(FireCommand(Message, module));
+
+            Assert.IsTrue(module.TrackedServers.Count() == 0);
+
+            Assert.IsFalse(ContainsCommand(module.NameToserverCommand(TestName), module.commands));
+        }
+
         private bool ContainsCommand(string commandname, List<BaseCommand> commands)
         {
             foreach (BaseCommand command in commands)
@@ -291,6 +248,47 @@ namespace UsersModuleTests
                 }
             }
             return false;
+        }
+
+        private string FireCommand(MessageEventArgs Message, BaseModule module)
+        {
+            string param = " ";
+
+            foreach (BaseCommand c in module.commands)
+            {
+                if (c.CheckCommandExists(Message, Message.ReceivedMessage))
+                {
+                    param = c.run(Message, Message.ReceivedMessage);
+                }
+            }
+            if (Message.Sender.Rank == ChatroomEntity.AdminStatus.True)
+            {
+                foreach (BaseCommand c in module.adminCommands)
+                {
+                    if (c.CheckCommandExists(Message, Message.ReceivedMessage))
+                    {
+                        param = c.run(Message, Message.ReceivedMessage);
+                    }
+                }
+            }
+
+            return param;
+        }
+
+        private Dictionary<string, Dictionary<string, object>> MakeConfig()
+        {
+            Dictionary<string, Dictionary<string, object>> ModuleHolder = new Dictionary<string, Dictionary<string, object>>();
+            Dictionary<string, object> ServerTrackingModuleData = new Dictionary<string, object>();
+            ServerTrackingModuleData.Add("updateInterval", "999999");
+            ModuleHolder.Add("ServerTrackingModule", ServerTrackingModuleData);
+
+            return ModuleHolder;
+        }
+
+        private TrackingServerInfo TestTrackingServerInfo()
+        {
+            TrackingServerInfo TestTrackingServerInfo = new TrackingServerInfo(TestIP, int.Parse(TestPort), TestName);
+            return TestTrackingServerInfo;
         }
     }
 }

@@ -9,33 +9,16 @@ namespace MapModuleTests
     [TestClass]
     public class TrackingServerListHolderTests
     {
-        private TrackingServerListHolder module;
-        private TrackingServerListHolder.PlayEntry TestPlayEntry;
         private int identifier = 0;
         private string MapName = "TESTMAP";
+        private TrackingServerListHolder module;
+        private TrackingServerListHolder.PlayEntry TestPlayEntry;
 
-        private Dictionary<string, Dictionary<string, object>> MakeConfig()
+        [TestMethod()]
+        public void AddEntry()
         {
-            Dictionary<string, Dictionary<string, object>> ModuleHolder = new Dictionary<string, Dictionary<string, object>>();
-            Dictionary<string, object> ModuleData = new Dictionary<string, object>();
-            ModuleData.Add("ListConfigs", "");
-            ModuleHolder.Add("TrackingServerListHolder", ModuleData);
-
-            return ModuleHolder;
-        }
-
-        private void MakeNewModule()
-        {
-            TestUserHandler tester = new TestUserHandler();
-            module = new TrackingServerListHolder(tester, tester, MakeConfig());
-        }
-
-        // Use TestInitialize to run code before running each test
-        [TestInitialize()]
-        public void Initialize()
-        {
-            MakeNewModule();
-            TestPlayEntry = new TrackingServerListHolder.PlayEntry("25", "128.0.0.0", "1:00pm");
+            module.AddEntry(MapName, TestPlayEntry);
+            Assert.IsTrue(module.MapTests[MapName].Contains(TestPlayEntry));
         }
 
         // Use TestCleanup to run code after each test has run
@@ -47,10 +30,18 @@ namespace MapModuleTests
         }
 
         [TestMethod()]
-        public void AddEntry()
+        public void DoublePersistancy()
         {
             module.AddEntry(MapName, TestPlayEntry);
+            module.AddEntry(MapName, TestPlayEntry);
             Assert.IsTrue(module.MapTests[MapName].Contains(TestPlayEntry));
+            Console.WriteLine("Making new entry");
+            MakeNewModule();
+            Assert.IsTrue(module.MapTests[MapName].Count > 0);
+            Assert.IsTrue(module.MapTests[MapName].First().PlayerCount == TestPlayEntry.PlayerCount);
+            Assert.IsTrue(module.MapTests[MapName].First().ServerIP == TestPlayEntry.ServerIP);
+            Assert.IsTrue(module.MapTests[MapName].First().TimeEntered == TestPlayEntry.TimeEntered);
+            Console.WriteLine("Done");
         }
 
         [TestMethod()]
@@ -59,6 +50,14 @@ namespace MapModuleTests
             module.AddEntry(MapName, TestPlayEntry);
             module.AddEntry(MapName, TestPlayEntry);
             Assert.IsTrue(module.MapTests[MapName].Count == 2);
+        }
+
+        // Use TestInitialize to run code before running each test
+        [TestInitialize()]
+        public void Initialize()
+        {
+            MakeNewModule();
+            TestPlayEntry = new TrackingServerListHolder.PlayEntry("25", "128.0.0.0", "1:00pm");
         }
 
         [TestMethod()]
@@ -75,19 +74,20 @@ namespace MapModuleTests
             Console.WriteLine("Done");
         }
 
-        [TestMethod()]
-        public void DoublePersistancy()
+        private Dictionary<string, Dictionary<string, object>> MakeConfig()
         {
-            module.AddEntry(MapName, TestPlayEntry);
-            module.AddEntry(MapName, TestPlayEntry);
-            Assert.IsTrue(module.MapTests[MapName].Contains(TestPlayEntry));
-            Console.WriteLine("Making new entry");
-            MakeNewModule();
-            Assert.IsTrue(module.MapTests[MapName].Count > 0);
-            Assert.IsTrue(module.MapTests[MapName].First().PlayerCount == TestPlayEntry.PlayerCount);
-            Assert.IsTrue(module.MapTests[MapName].First().ServerIP == TestPlayEntry.ServerIP);
-            Assert.IsTrue(module.MapTests[MapName].First().TimeEntered == TestPlayEntry.TimeEntered);
-            Console.WriteLine("Done");
+            Dictionary<string, Dictionary<string, object>> ModuleHolder = new Dictionary<string, Dictionary<string, object>>();
+            Dictionary<string, object> ModuleData = new Dictionary<string, object>();
+            ModuleData.Add("ListConfigs", "");
+            ModuleHolder.Add("TrackingServerListHolder", ModuleData);
+
+            return ModuleHolder;
+        }
+
+        private void MakeNewModule()
+        {
+            TestUserHandler tester = new TestUserHandler();
+            module = new TrackingServerListHolder(tester, tester, MakeConfig());
         }
     }
 }

@@ -6,20 +6,9 @@ namespace SteamBotLite
 {
     public abstract class BaseModule
     {
-        public List<BaseCommand> commands { get; private set; }
-        public List<BaseCommand> adminCommands { get; private set; }
-        public List<BaseTask> tasks { get; private set; }
-
-        public string ModuleSavedDataFilePath()
-        {
-            return Path.Combine(userhandler.GetType().Name, this.GetType().Name + ".json");
-        }
-
-        protected ModuleHandler userhandler;
-
-        public bool DeletableModule = true;
-
         public Dictionary<string, object> config;
+        public bool DeletableModule = true;
+        protected ModuleHandler userhandler;
 
         public BaseModule(ModuleHandler bot, Dictionary<string, Dictionary<string, object>> Config)
         {
@@ -35,13 +24,20 @@ namespace SteamBotLite
             LoadDependencies(bot);
         }
 
-        private void LoadDependencies(ModuleHandler bot)
+        public List<BaseCommand> adminCommands { get; private set; }
+        public List<BaseCommand> commands { get; private set; }
+        public List<BaseTask> tasks { get; private set; }
+
+        abstract public string getPersistentData();
+
+        abstract public void loadPersistentData();
+
+        public string ModuleSavedDataFilePath()
         {
-            this.userhandler = bot;
-            commands = new List<BaseCommand>();
-            adminCommands = new List<BaseCommand>();
-            tasks = new List<BaseTask>();
+            return Path.Combine(userhandler.GetType().Name, this.GetType().Name + ".json");
         }
+
+        public abstract void OnAllModulesLoaded();
 
         public void savePersistentData()
         {
@@ -58,10 +54,12 @@ namespace SteamBotLite
             };
         }
 
-        public abstract void OnAllModulesLoaded();
-
-        abstract public string getPersistentData();
-
-        abstract public void loadPersistentData();
+        private void LoadDependencies(ModuleHandler bot)
+        {
+            this.userhandler = bot;
+            commands = new List<BaseCommand>();
+            adminCommands = new List<BaseCommand>();
+            tasks = new List<BaseTask>();
+        }
     }
 }

@@ -8,9 +8,9 @@ namespace SteamBotLite
     public abstract class DiscordInterface : ApplicationInterface
     {
         private DiscordClient _client;
-        private string Token;
-
         private List<ulong> BroadCastChatrooms;
+        private Game StatusName;
+        private string Token;
 
         public DiscordInterface()
         {
@@ -40,43 +40,18 @@ namespace SteamBotLite
             Console.WriteLine("Connected to discord!");
         }
 
-        private void _client_MessageReceived(object sender, Discord.MessageEventArgs e)
+        public override void BroadCastMessage(object sender, string message)
         {
-            Console.WriteLine(e.Message.RawText);
-            if (!e.Message.IsAuthor)
+            foreach (ulong chatroom in BroadCastChatrooms)
             {
-                SteamBotLite.User user = new SteamBotLite.User(e.User.Id, this);
-                user.DisplayName = e.User.Name;
-                user.ExtraData = e.User;
-
                 try
                 {
-                    if (e.User.ServerPermissions.Administrator)
-                    {
-                        user.Rank = ChatroomEntity.AdminStatus.True;
-                    }
-                    else
-                    {
-                        user.Rank = ChatroomEntity.AdminStatus.False;
-                    }
+                    Channel Destination = _client.GetChannel(chatroom);
+                    Destination.SendMessage(message);
                 }
-                catch
+                catch (Exception e)
                 {
-                }
-
-                MessageEventArgs Msg = new MessageEventArgs(this);
-                Msg.ReceivedMessage = e.Message.RawText;
-                Msg.Sender = user;
-
-                Msg.Chatroom = new Chatroom(e.Message.Channel, this);
-
-                if (e.Message.Channel != null)
-                {
-                    ChatRoomMessageProcessEvent(Msg);
-                }
-                else
-                {
-                    PrivateMessageProcessEvent(Msg);
+                    Console.WriteLine(e);
                 }
             }
         }
@@ -137,6 +112,16 @@ namespace SteamBotLite
             }
         }
 
+        public void SendLargeMessage(Discord.User user, string message)
+        {
+            while (message.Length > 1999)
+            {
+                user.SendMessage(message.Substring(0, 1999));
+                message = message.Remove(0, 1999);
+            }
+            user.SendMessage(message);
+        }
+
         public override void SendPrivateMessage(object sender, MessageEventArgs messagedata)
         {
             try
@@ -152,14 +137,10 @@ namespace SteamBotLite
             }
         }
 
-        public void SendLargeMessage(Discord.User user, string message)
+        public override void SetStatusMessage(object sender, string message)
         {
-            while (message.Length > 1999)
-            {
-                user.SendMessage(message.Substring(0, 1999));
-                message = message.Remove(0, 1999);
-            }
-            user.SendMessage(message);
+            StatusName = new Game(message);
+            _client.SetGame(StatusName);
         }
 
         public override void SetUsername(object sender, string Username)
@@ -171,28 +152,45 @@ namespace SteamBotLite
         {
         }
 
-        public override void BroadCastMessage(object sender, string message)
+        private void _client_MessageReceived(object sender, Discord.MessageEventArgs e)
         {
-            foreach (ulong chatroom in BroadCastChatrooms)
+            Console.WriteLine(e.Message.RawText);
+            if (!e.Message.IsAuthor)
             {
+                SteamBotLite.User user = new SteamBotLite.User(e.User.Id, this);
+                user.DisplayName = e.User.Name;
+                user.ExtraData = e.User;
+
                 try
                 {
-                    Channel Destination = _client.GetChannel(chatroom);
-                    Destination.SendMessage(message);
+                    if (e.User.ServerPermissions.Administrator)
+                    {
+                        user.Rank = ChatroomEntity.AdminStatus.True;
+                    }
+                    else
+                    {
+                        user.Rank = ChatroomEntity.AdminStatus.False;
+                    }
                 }
-                catch (Exception e)
+                catch
                 {
-                    Console.WriteLine(e);
+                }
+
+                MessageEventArgs Msg = new MessageEventArgs(this);
+                Msg.ReceivedMessage = e.Message.RawText;
+                Msg.Sender = user;
+
+                Msg.Chatroom = new Chatroom(e.Message.Channel, this);
+
+                if (e.Message.Channel != null)
+                {
+                    ChatRoomMessageProcessEvent(Msg);
+                }
+                else
+                {
+                    PrivateMessageProcessEvent(Msg);
                 }
             }
-        }
-
-        private Game StatusName;
-
-        public override void SetStatusMessage(object sender, string message)
-        {
-            StatusName = new Game(message);
-            _client.SetGame(StatusName);
         }
     }
 }
