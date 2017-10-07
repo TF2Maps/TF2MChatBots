@@ -1,16 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamBotLite", "SteamBotLite.csproj", "{D74C1993-F305-4333-B7A5-4B51600CAD1F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TF2MChatBots", "TF2MChatBots.csproj", "{D74C1993-F305-4333-B7A5-4B51600CAD1F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{787C944D-16AF-4C36-B7F0-DD181B6D7A9C}"
-	ProjectSection(SolutionItems) = preProject
-		BotSavedData.cs = BotSavedData.cs
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapModuleTests", "UnitTests\MapModuleTests\MapModuleTests.csproj", "{4FE85902-9F12-4C1F-B1FB-AFBFEE39D65D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModuleTests", "UnitTests\MapModuleTests\ModuleTests.csproj", "{4FE85902-9F12-4C1F-B1FB-AFBFEE39D65D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,5 +24,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7B9C82F7-3777-4A37-869A-3853B01A18A6}
 	EndGlobalSection
 EndGlobal
