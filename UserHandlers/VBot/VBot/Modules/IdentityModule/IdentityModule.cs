@@ -1,10 +1,9 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 
 namespace SteamBotLite
 {
-    public class IdentityModule : BaseModule, OnLoginCompletedListiners, MapListChangeListiner
+    public partial class IdentityModule : BaseModule, OnLoginCompletedListiners, MapListChangeListiner
     {
         private ModuleHandler modulehandler;
         private string status;
@@ -82,105 +81,6 @@ namespace SteamBotLite
         private string getusername()
         {
             return username;
-        }
-
-        private class CheckStatus : BaseCommand
-        {
-            // Command to query if a server is active
-            private IdentityModule module;
-
-            public CheckStatus(ModuleHandler bot, IdentityModule module) : base(bot, "!CheckData")
-            {
-                this.module = module;
-            }
-
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                return Msg.Sender.Rank.ToString();
-            }
-        }
-
-        private class Rename : BaseCommand
-        {
-            // Command to query if a server is active
-            private IdentityModule module;
-
-            public Rename(ModuleHandler bot, IdentityModule module) : base(bot, "!Rename")
-            {
-                this.module = module;
-            }
-
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                if (param.Length > 0)
-                {
-                    module.userhandler.SetUsernameEventProcess(param);
-
-                    module.savePersistentData();
-                    return "Renamed";
-                }
-                else
-                {
-                    return "There was no name!";
-                }
-            }
-        }
-
-        private class SetStatusMessage : BaseCommand
-        {
-            // Command to query if a server is active
-            private UserHandler bot;
-
-            private IdentityModule module;
-
-            public SetStatusMessage(UserHandler bot, ModuleHandler modulehandler, IdentityModule module) : base(modulehandler, "!StatusSet")
-            {
-                this.module = module;
-                this.bot = bot;
-            }
-
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                module.status = param;
-                module.UseStatus = true;
-                module.savePersistentData();
-                bot.SetStatusmessageEvent(param);
-
-                return "Status has been updated";
-            }
-
-            private void Bot_SetStatusmessage(object sender, string e)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        private class UnsetStatusMessage : BaseCommand
-        {
-            // Command to query if a server is active
-            private UserHandler bot;
-
-            private IdentityModule module;
-
-            public UnsetStatusMessage(UserHandler bot, ModuleHandler modulehandler, IdentityModule module) : base(modulehandler, "!StatusRemove")
-            {
-                this.module = module;
-                this.bot = bot;
-            }
-
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                module.UseStatus = false;
-                module.savePersistentData();
-
-                bot.SetStatusmessageEvent(null);
-                return "Status has been removed";
-            }
-
-            private void Bot_SetStatusmessage(object sender, string e)
-            {
-                throw new NotImplementedException();
-            }
         }
     }
 }

@@ -5,7 +5,7 @@ using System.IO;
 
 namespace SteamBotLite
 {
-    internal class SearchModule : BaseModule
+    internal partial class SearchModule : BaseModule
     {
         private List<SearchClassEntry> Searches;
 
@@ -37,21 +37,6 @@ namespace SteamBotLite
 
         public override void OnAllModulesLoaded()
         {
-        }
-
-        private class Search : BaseCommand
-        {
-            private SearchClassEntry SearchData;
-
-            public Search(VBot bot, SearchClassEntry SearchEntry) : base(bot, SearchEntry.Command)
-            {
-                this.SearchData = SearchEntry;
-            }
-
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                return (SearchClass.Search(SearchData, param));
-            }
         }
     }
 }

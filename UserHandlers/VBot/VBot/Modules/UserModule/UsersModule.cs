@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace SteamBotLite
 {
-    public class UsersModule : BaseModule
+    public partial class UsersModule : BaseModule
     {
         public List<string> admins = new List<string>();
         public List<string> bans = new List<string>();
@@ -70,21 +70,6 @@ namespace SteamBotLite
             {
                 admins.Remove(info.identifier.ToString());
                 savePersistentData();
-            }
-        }
-
-        private class CheckStatus : BaseCommand
-        {
-            private UsersModule module;
-
-            public CheckStatus(ModuleHandler bot, UsersModule module) : base(bot, "!CheckAdmin")
-            {
-                this.module = module;
-            }
-
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                return module.admincheck(Msg.Sender).ToString();
             }
         }
     }

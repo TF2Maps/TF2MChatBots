@@ -9,7 +9,7 @@ using System.Text;
 
 namespace SteamBotLite
 {
-    public class ServerTrackingModule : BaseModule
+    public partial class ServerTrackingModule : BaseModule
     {
         public ModuleHandler Bot;
 
@@ -38,7 +38,7 @@ namespace SteamBotLite
                 ServersBeingTracked = JsonConvert.DeserializeObject<List<TrackingServerInfo>>(System.IO.File.ReadAllText(ModuleSavedDataFilePath()));
                 for (int i = 0; i < ServersBeingTracked.Count; i++)
                 {
-                    commands.Add(new Status(bot, ServersBeingTracked[i], this));
+                    commands.Add(new ServerStatus(bot, ServersBeingTracked[i], this));
                 }
             }
             else
@@ -49,7 +49,7 @@ namespace SteamBotLite
 
             TrackedServers = new TrackingServerList(this, ServersBeingTracked);
 
-            commands.Add(new Active(bot, this));
+            commands.Add(new ActiveServers(bot, this));
             commands.Add(new SpecificServerStatus(bot, this));
             adminCommands.Add(new ServerAdd(bot, this));
             adminCommands.Add(new ServerRemove(bot, this));
@@ -213,191 +213,6 @@ namespace SteamBotLite
                 string RecentlyTestedTableLabel = "Recently Tested";
                 WebServer.SetTableHeader(RecentlyTestedTableLabel, new TableDataValue[] { HeaderName, HeaderNamePlayerCount, HeaderTime, HeaderServer });
                 WebServer.AddEntryWithLimit(RecentlyTestedTableLabel, new TableDataValue[] { MapName, PlayerCount, Time, ServerLabel }, 10);
-            }
-        }
-
-        // Special status commands
-
-        private class Active : BaseCommand
-        {
-            // Command to query if a server is active
-            private ServerTrackingModule module;
-
-            public Active(ModuleHandler bot, ServerTrackingModule module) : base(bot, "!Active")
-            {
-                this.module = module;
-            }
-
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                string activeServers = "";
-                foreach (TrackingServerInfo server in module.TrackedServers.Servers)
-                    if (server.playerCount > 1)
-                    {
-                        if (!activeServers.Equals(string.Empty))
-                            activeServers += "\n";
-
-                        activeServers += server.ToString();
-                    }
-                return activeServers.Equals(string.Empty) ? "No server is currently active" : activeServers;
-            }
-        }
-
-        // Other commands
-        private class FullServerQuery : BaseCommand
-        {
-            // Command to query if a server is active
-            private ServerTrackingModule module;
-
-            public FullServerQuery(ModuleHandler bot, ServerTrackingModule module) : base(bot, "!Serverquery")
-            {
-                this.module = module;
-            }
-
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                string activeServers = "";
-                foreach (TrackingServerInfo server in module.TrackedServers.Servers)
-                {
-                    if (!activeServers.Equals(string.Empty))
-                    {
-                        activeServers += "\n";
-                    }
-                    activeServers += server.ToString();
-                }
-                return activeServers.Equals(string.Empty) ? "No server is currently active" : activeServers;
-            }
-        }
-
-        private class ServerAdd : BaseCommand
-        {
-            private ServerTrackingModule module;
-
-            public ServerAdd(ModuleHandler bot, ServerTrackingModule module) : base(bot, "!serveradd")
-            {
-                this.module = module;
-            }
-
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                string[] parameters = param.Split(new char[] { ' ' });
-
-                if (parameters.Length > 2)
-                {
-                    try
-                    {
-                        IPEndPoint ep = new IPEndPoint(System.Net.IPAddress.Parse(parameters[1]), int.Parse(parameters[2]));
-                        TrackingServerInfo Server = new TrackingServerInfo(parameters[1], int.Parse(parameters[2]), parameters[0]);
-                        module.TrackedServers.Add(Server);
-
-                        return string.Format("Server {0} has been successfully added at: {1}", Server.tag, Server.serverIP);
-                    }
-                    catch
-                    {
-                        return "Your data types were invalid!";
-                    }
-                }
-                else
-                {
-                    return "Your Server was not added, remember the command is: !serveradd servername serverIP serverPort";
-                }
-            }
-        }
-
-        private class ServerRemove : BaseCommand
-        {
-            private ServerTrackingModule module;
-
-            public ServerRemove(ModuleHandler bot, ServerTrackingModule module) : base(bot, "!serverremove")
-            {
-                this.module = module;
-            }
-
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                foreach (TrackingServerInfo server in module.TrackedServers.Servers)
-                {
-                    if (param.Equals(server.tag, StringComparison.OrdinalIgnoreCase))
-                    {
-                        module.TrackedServers.Remove(server);
-                        return "The server has been removed from the list";
-                    }
-                }
-                return "Server was not found, remember the servername does not include ! preceeding or 'server' afterwards (EUserver would be EU)";
-            }
-        }
-
-        private sealed class SpecificServerStatus : BaseCommand
-        {
-            // Automaticaly generated status command for each server under the config
-            private ServerTrackingModule ServerTrackingModule;
-
-            public SpecificServerStatus(ModuleHandler bot, ServerTrackingModule module) : base(bot, "")
-            {
-                ServerTrackingModule = module;
-            }
-
-            public override bool CheckCommandExists(MessageEventArgs Msg, string Message)
-            {
-                foreach (TrackingServerInfo server in ServerTrackingModule.TrackedServers)
-                {
-                    if (Message.StartsWith(ServerTrackingModule.NameToserverCommand(server.tag), StringComparison.OrdinalIgnoreCase))
-                    {
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-            public override string[] GetCommmand()
-            {
-                int AmountOfServers = ServerTrackingModule.TrackedServers.Count();
-                string[] TrackingServerList = new string[AmountOfServers];
-
-                for (int x = 0; x < AmountOfServers; x++)
-                {
-                    TrackingServerList[x] = ServerTrackingModule.NameToserverCommand(ServerTrackingModule.TrackedServers.Servers[x].tag);
-                }
-
-                return TrackingServerList;
-            }
-
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                foreach (TrackingServerInfo server in ServerTrackingModule.TrackedServers)
-                {
-                    if (server.tag.Equals(param))
-                    {
-                        return ServerTrackingModule.ServerQuery(server).ToString();
-                    }
-                }
-                return "An error occured when querying the server!";
-            }
-        }
-
-        private sealed class Status : BaseCommand
-        {
-            // Automaticaly generated status command for each server under the config
-            private TrackingServerInfo server;
-
-            private ServerTrackingModule ServerTrackingModule;
-
-            public Status(ModuleHandler bot, TrackingServerInfo server, ServerTrackingModule module) : base(bot, module.NameToserverCommand(server.tag))
-            {
-                this.server = server;
-                ServerTrackingModule = module;
-            }
-
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                TrackingServerInfo status = ServerTrackingModule.ServerQuery(server);
-                if (status != null)
-                {
-                    server.update(status);
-                    return server.ToString();
-                }
-                else
-                    return server.tag + " server did not respond";
             }
         }
     }

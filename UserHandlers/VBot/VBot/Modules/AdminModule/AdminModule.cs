@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace SteamBotLite
 {
-    public class AdminModule : BaseModule, OnLoginCompletedListiners
+    public partial class AdminModule : BaseModule, OnLoginCompletedListiners
     {
         private List<string[]> CommandList;
         private Dictionary<string, List<string[]>> CommandListHeld;
@@ -71,139 +70,6 @@ namespace SteamBotLite
 
         public void OnLoginCompleted()
         {
-        }
-
-        private class CommandListRetrieve : BaseCommand
-        {
-            // Command to query if a server is active
-            private AdminModule module;
-
-            public CommandListRetrieve(ModuleHandler bot, AdminModule module) : base(bot, "!CommandList")
-            {
-                this.module = module;
-            }
-
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                string buildresponse = "";
-
-                foreach (KeyValuePair<string, List<string[]>> item in module.CommandListHeld)
-                {
-                    buildresponse += System.Environment.NewLine;
-                    buildresponse += item.Key;
-                    buildresponse += System.Environment.NewLine;
-                    foreach (string[] entry in item.Value)
-                    {
-                        buildresponse += "    " + entry[1] + " (" + entry[0] + " )" + System.Environment.NewLine; ;
-                    }
-                }
-                userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = Msg.Sender, ReplyMessage = buildresponse });
-                return "Sent command list as private message!";
-            }
-        }
-
-        private class GetAllModules : BaseCommand
-        {
-            // Command to query if a server is active
-            private AdminModule module;
-
-            private ModuleHandler modulehandler;
-
-            public GetAllModules(ModuleHandler bot, AdminModule module) : base(bot, "!ModuleList")
-            {
-                this.module = module;
-                this.modulehandler = bot;
-            }
-
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                string Response = "";
-
-                foreach (BaseModule ModuleEntry in modulehandler.GetAllModules())
-                {
-                    Response += ModuleEntry.GetType().Name.ToString() + " ";
-                }
-
-                return Response;
-            }
-        }
-
-        private class Reboot : BaseCommand
-        {
-            // Command to query if a server is active
-            private AdminModule module;
-
-            public Reboot(ModuleHandler bot, AdminModule module) : base(bot, "!Reboot")
-            {
-                this.module = module;
-            }
-
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                module.userhandler.Reboot();
-                return "Rebooted";
-            }
-        }
-
-        private class Rejoin : BaseCommand
-        {
-            // Command to query if a server is active
-            private AdminModule module;
-
-            public Rejoin(UserHandler bot, ModuleHandler modulehandler, AdminModule module) : base(modulehandler, "!Rejoin")
-            {
-                this.module = module;
-            }
-
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                module.userhandler.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.LeaveChat);
-                module.userhandler.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.EnterChat);
-                return "Rejoined!";
-            }
-        }
-
-        private class RunScript : BaseCommand
-        {
-            // Command to query if a server is active
-            private AdminModule module;
-
-            public RunScript(ModuleHandler bot, AdminModule module) : base(bot, "!RunUpdateScript")
-            {
-                this.module = module;
-            }
-
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                Process proc = new Process
-                {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = "../../update.sh"
-                    }
-                };
-
-                proc.Start();
-
-                Process.GetCurrentProcess().Kill();
-                return "Script should've ran";
-            }
-        }
-
-        private class UserInfo : BaseCommand
-        {
-            // Command to query if a server is active
-            private AdminModule module;
-
-            public UserInfo(ModuleHandler bot, AdminModule module) : base(bot, "!UserInfo")
-            {
-                this.module = module;
-            }
-
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                return string.Format("Your ID is: {0} | {1} | {2}", Msg.Sender.identifier, Msg.Sender.identifier.ToString(), Msg.Sender.DisplayName);
-            }
         }
     }
 }
