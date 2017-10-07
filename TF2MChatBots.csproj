@@ -143,14 +143,14 @@
     <Compile Include="ApplicationInterfaces\Steam\SteamInterface.cs" />
     <Compile Include="UserHandlers\GhostChecker\GhostChecker.cs" />
     <Compile Include="UserHandlers\MediaHandler\MediaBot.cs" />
-    <Compile Include="UserHandlers\UserHandler.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Interfaces\UserHandler.cs" />
     <Compile Include="ApplicationInterfaces\Discord\Accounts\DiscordAccountVBot.cs" />
     <Compile Include="ApplicationInterfaces\Discord\Accounts\DiscordAccountVFun.cs" />
     <Compile Include="UserHandlers\VBot\OnLoginCompletedListiners.cs" />
-    <Compile Include="UserHandlers\VBot\VBot\Interfaces\HTMLFileFromArray - Copy.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Interfaces\HTMLFileFromArrayListiners.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Interfaces\MapListChangeListiners.cs" />
-    <Compile Include="UserHandlers\VBot\VBot\Interfaces\Interface1.cs" />
-    <Compile Include="UserHandlers\VBot\VBot\ModuleHandler.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Interfaces\ServerMapChangeListiner.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Interfaces\ModuleHandler.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\AdminModule\Commands\CommandListRetrieve.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\AdminModule\Commands\GetAllModules.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\AdminModule\Commands\Reboot.cs" />
@@ -201,7 +201,7 @@
     <Compile Include="UserHandlers\VBot\VBot\Modules\MapModule\DataTypes\MapCollection.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\MapModule\Commands\MapValidityCheck.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\MapModule\UpdateMapValidityCheck.cs" />
-    <Compile Include="UserHandlers\VBot\VBot\Modules\WebServerModule\Commands\RebootModule.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\WebServerModule\Commands\RebootWebModule.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\WebServerModule\Commands\RemoveTable.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\WebServerModule\WebServerHostingModule.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\SearchModule\SearchClass.cs" />

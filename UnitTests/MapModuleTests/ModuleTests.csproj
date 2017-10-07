@@ -92,23 +92,26 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="ServerListHolderTests.cs" />
-    <Compile Include="AdminModuleUnitTests.cs" />
-    <Compile Include="ServerModuleUnitTests.cs" />
-    <Compile Include="TestUserHandler.cs" />
-    <Compile Include="MapModuleUnitTests.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UsersModuleTests.cs" />
+    <Compile Include="Tests\ServerListHolderTests.cs" />
+    <Compile Include="Tests\AdminModuleUnitTests.cs" />
+    <Compile Include="Tests\ServerModuleUnitTests.cs" />
+    <Compile Include="Tests\TestUserHandler.cs" />
+    <Compile Include="Tests\MapModuleUnitTests.cs" />
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Tests\UsersModuleTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\SteamBotLite.csproj">
+    <ProjectReference Include="..\..\TF2MChatBots.csproj">
       <Project>{d74c1993-f305-4333-b7a5-4b51600cad1f}</Project>
-      <Name>SteamBotLite</Name>
+      <Name>TF2MChatBots</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
