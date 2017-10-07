@@ -4,9 +4,13 @@ namespace SteamBotLite
 {
     public class TableDataValue
     {
-        public string VisibleValue;
-        public string Link;
         public string HoverText;
+        public string Link;
+        public string VisibleValue;
+
+        public TableDataValue()
+        {
+        }
 
         public string GetEncodedValue()
         {
@@ -27,10 +31,6 @@ namespace SteamBotLite
                 trailer = "</a>" + trailer;
             }
             return header + WebUtility.HtmlEncode(ValueToDisplay) + trailer;
-        }
-
-        public TableDataValue()
-        {
         }
     }
 }

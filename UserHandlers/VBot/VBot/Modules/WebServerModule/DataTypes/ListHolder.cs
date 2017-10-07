@@ -5,11 +5,35 @@ namespace SteamBotLite
 {
     public class ListHolder : BaseModule
     {
+        private HTMLFileFromArrayListiners handler;
+
         public ListHolder(ModuleHandler handler, HTMLFileFromArrayListiners HTMLHandler, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(handler, Jsconfig)
         {
             this.handler = HTMLHandler;
 
             commands.Add(new FeatureRequest(handler, this));
+        }
+
+        public override string getPersistentData()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void loadPersistentData()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void OnAllModulesLoaded()
+        {
+            //Setup Table
+
+            TableDataValue UsernameHeader = new TableDataValue();
+            UsernameHeader.VisibleValue = "Username";
+            TableDataValue Message = new TableDataValue();
+            Message.VisibleValue = "Message";
+
+            handler.SetTableHeader("Requests", new TableDataValue[] { UsernameHeader, Message });
         }
 
         private class FeatureRequest : BaseCommand
@@ -41,30 +65,6 @@ namespace SteamBotLite
                     return "Actually put in something";
                 }
             }
-        }
-
-        private HTMLFileFromArrayListiners handler;
-
-        public override void OnAllModulesLoaded()
-        {
-            //Setup Table
-
-            TableDataValue UsernameHeader = new TableDataValue();
-            UsernameHeader.VisibleValue = "Username";
-            TableDataValue Message = new TableDataValue();
-            Message.VisibleValue = "Message";
-
-            handler.SetTableHeader("Requests", new TableDataValue[] { UsernameHeader, Message });
-        }
-
-        public override string getPersistentData()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void loadPersistentData()
-        {
-            throw new NotImplementedException();
         }
     }
 }

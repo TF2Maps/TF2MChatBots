@@ -3,12 +3,41 @@ using System.Collections.Generic;
 
 namespace SteamBotLite
 {
+    public class TrackingServerInfo : EventArgs
+    {
+        public int capacity;
+        public string currentMap = "";
+        public int playerCount;
+        public int port;
+        public string serverIP;
+        public string tag;
+
+        public TrackingServerInfo(string serverIP, int port, string tag)
+        {
+            this.serverIP = serverIP;
+            this.port = port;
+            this.tag = tag;
+        }
+
+        public override string ToString()
+        {
+            return this.tag + " server is now on " + this.currentMap +
+                " - " + this.playerCount + "/" + this.capacity +
+                " - join: steam://connect/" + this.serverIP + ":" + this.port;
+        }
+
+        public void update(TrackingServerInfo updated)
+        {
+            this.playerCount = updated.playerCount;
+            this.capacity = updated.capacity;
+            this.currentMap = updated.currentMap;
+        }
+    }
+
     public class TrackingServerList
     {
         private ServerTrackingModule ServerTrackingModule;
         private TrackingServerList trackedServers;
-
-        private List<TrackingServerInfo> TrackingServerListObject { get; }
 
         public TrackingServerList(ServerTrackingModule module, List<TrackingServerInfo> TrackingServerList)
         {
@@ -22,15 +51,19 @@ namespace SteamBotLite
             this.trackedServers = trackedServers;
         }
 
+        public IReadOnlyList<TrackingServerInfo> Servers
+        {
+            get
+            {
+                return TrackingServerListObject.AsReadOnly();
+            }
+        }
+
+        private List<TrackingServerInfo> TrackingServerListObject { get; }
+
         public void Add(TrackingServerInfo server)
         {
             TrackingServerListObject.Add(server);
-            ServerTrackingModule.savePersistentData();
-        }
-
-        public void Remove(TrackingServerInfo server)
-        {
-            TrackingServerListObject.Remove(server);
             ServerTrackingModule.savePersistentData();
         }
 
@@ -38,14 +71,6 @@ namespace SteamBotLite
         {
             TrackingServerListObject.Clear();
             ServerTrackingModule.savePersistentData();
-        }
-
-        public IReadOnlyList<TrackingServerInfo> Servers
-        {
-            get
-            {
-                return TrackingServerListObject.AsReadOnly();
-            }
         }
 
         public int Count()
@@ -57,37 +82,11 @@ namespace SteamBotLite
         {
             return TrackingServerListObject.GetEnumerator();
         }
-    }
 
-    public class TrackingServerInfo : EventArgs
-    {
-        public string serverIP;
-        public int port;
-
-        public string tag;
-        public int playerCount;
-        public int capacity;
-        public string currentMap = "";
-
-        public TrackingServerInfo(string serverIP, int port, string tag)
+        public void Remove(TrackingServerInfo server)
         {
-            this.serverIP = serverIP;
-            this.port = port;
-            this.tag = tag;
-        }
-
-        public void update(TrackingServerInfo updated)
-        {
-            this.playerCount = updated.playerCount;
-            this.capacity = updated.capacity;
-            this.currentMap = updated.currentMap;
-        }
-
-        public override string ToString()
-        {
-            return this.tag + " server is now on " + this.currentMap +
-                " - " + this.playerCount + "/" + this.capacity +
-                " - join: steam://connect/" + this.serverIP + ":" + this.port;
+            TrackingServerListObject.Remove(server);
+            ServerTrackingModule.savePersistentData();
         }
     }
 }

@@ -11,19 +11,18 @@ namespace SteamBotLite
 {
     public class ServerTrackingModule : BaseModule
     {
-        public event EventHandler<TrackingServerInfo> ServerMapChanged;
-
-        private BaseTask serverUpdate;
+        public ModuleHandler Bot;
 
         public TrackingServerList TrackedServers;
 
-        public ModuleHandler Bot;
+        //For Testing Purposes
+        private TrackingServerInfo EmulatedTrackingServerInfo;
+
+        private bool IsEmulating = false;
+
+        private BaseTask serverUpdate;
 
         private HTMLFileFromArrayListiners WebServer;
-
-        public override void OnAllModulesLoaded()
-        {
-        }
 
         public ServerTrackingModule(ModuleHandler bot, HTMLFileFromArrayListiners WebServer, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
@@ -62,71 +61,12 @@ namespace SteamBotLite
             ServerMapChanged += ServerTrackingModule_ServerMapChanged;
         }
 
-        public string NameToserverCommand(string servername)
+        public event EventHandler<TrackingServerInfo> ServerMapChanged;
+
+        public void EmulateServerQuery(TrackingServerInfo Response)
         {
-            return "!" + servername.ToLower() + "server";
-        }
-
-        private void ServerTrackingModule_ServerMapChanged(object sender, TrackingServerInfo e)
-        {
-            string TableLabel = e.tag + " History";
-
-            TableDataValue HeaderName = new TableDataValue();
-            HeaderName.VisibleValue = "Map Name";
-
-            TableDataValue HeaderNamePlayerCount = new TableDataValue();
-            HeaderNamePlayerCount.VisibleValue = "PlayerCount";
-
-            TableDataValue HeaderTime = new TableDataValue();
-            HeaderTime.VisibleValue = "Time (UTC)";
-
-            WebServer.SetTableHeader(TableLabel, new TableDataValue[] { HeaderName, HeaderNamePlayerCount, HeaderTime });
-
-            //Add Entry
-
-            TableDataValue MapName = new TableDataValue();
-            MapName.VisibleValue = e.currentMap;
-
-            TableDataValue PlayerCount = new TableDataValue();
-            PlayerCount.VisibleValue = e.playerCount.ToString();
-
-            TableDataValue Time = new TableDataValue();
-            Time.VisibleValue = DateTime.UtcNow.ToLongDateString() + " " + DateTime.UtcNow.ToLongTimeString();
-
-            WebServer.AddEntryWithLimit(TableLabel, new TableDataValue[] { MapName, PlayerCount, Time }, 10);
-
-            if (e.playerCount > 8)
-            {
-                userhandler.BroadcastMessageProcessEvent(e.ToString());
-
-                TableDataValue HeaderServer = new TableDataValue();
-                HeaderServer.VisibleValue = "Server";
-
-                TableDataValue ServerLabel = new TableDataValue();
-                ServerLabel.VisibleValue = e.tag;
-                ServerLabel.Link = "steam://connect/" + e.serverIP + ":" + e.port;
-
-                string RecentlyTestedTableLabel = "Recently Tested";
-                WebServer.SetTableHeader(RecentlyTestedTableLabel, new TableDataValue[] { HeaderName, HeaderNamePlayerCount, HeaderTime, HeaderServer });
-                WebServer.AddEntryWithLimit(RecentlyTestedTableLabel, new TableDataValue[] { MapName, PlayerCount, Time, ServerLabel }, 10);
-            }
-        }
-
-        public void SyncTrackingServerInfo(object sender, EventArgs e)
-        {
-            for (int x = 0; x < TrackedServers.Servers.Count; x++)
-            {
-                TrackingServerInfo currentserverstate = ServerQuery(TrackedServers.Servers[x]);
-
-                if (currentserverstate != null)
-                {
-                    if (!(TrackedServers.Servers[x].currentMap.Equals(currentserverstate.currentMap)))
-                    {
-                        ServerMapChanged(this, currentserverstate);
-                    }
-                    TrackedServers.Servers[x].update(currentserverstate);
-                }
-            }
+            EmulatedTrackingServerInfo = Response;
+            IsEmulating = true;
         }
 
         public override string getPersistentData()
@@ -151,6 +91,15 @@ namespace SteamBotLite
             {
                 Console.WriteLine("There was an error loading the TrackingServerList");
             }
+        }
+
+        public string NameToserverCommand(string servername)
+        {
+            return "!" + servername.ToLower() + "server";
+        }
+
+        public override void OnAllModulesLoaded()
+        {
         }
 
         // queries a server and returns a <string, int> Tuple (filename, playercount)
@@ -205,90 +154,118 @@ namespace SteamBotLite
             }
         }
 
-        //For Testing Purposes
-        private TrackingServerInfo EmulatedTrackingServerInfo;
-
-        private bool IsEmulating = false;
-
-        public void EmulateServerQuery(TrackingServerInfo Response)
+        public void SyncTrackingServerInfo(object sender, EventArgs e)
         {
-            EmulatedTrackingServerInfo = Response;
-            IsEmulating = true;
+            for (int x = 0; x < TrackedServers.Servers.Count; x++)
+            {
+                TrackingServerInfo currentserverstate = ServerQuery(TrackedServers.Servers[x]);
+
+                if (currentserverstate != null)
+                {
+                    if (!(TrackedServers.Servers[x].currentMap.Equals(currentserverstate.currentMap)))
+                    {
+                        ServerMapChanged(this, currentserverstate);
+                    }
+                    TrackedServers.Servers[x].update(currentserverstate);
+                }
+            }
+        }
+
+        private void ServerTrackingModule_ServerMapChanged(object sender, TrackingServerInfo e)
+        {
+            string TableLabel = e.tag + " History";
+
+            TableDataValue HeaderName = new TableDataValue();
+            HeaderName.VisibleValue = "Map Name";
+
+            TableDataValue HeaderNamePlayerCount = new TableDataValue();
+            HeaderNamePlayerCount.VisibleValue = "PlayerCount";
+
+            TableDataValue HeaderTime = new TableDataValue();
+            HeaderTime.VisibleValue = "Time (UTC)";
+
+            WebServer.SetTableHeader(TableLabel, new TableDataValue[] { HeaderName, HeaderNamePlayerCount, HeaderTime });
+
+            //Add Entry
+
+            TableDataValue MapName = new TableDataValue();
+            MapName.VisibleValue = e.currentMap;
+
+            TableDataValue PlayerCount = new TableDataValue();
+            PlayerCount.VisibleValue = e.playerCount.ToString();
+
+            TableDataValue Time = new TableDataValue();
+            Time.VisibleValue = DateTime.UtcNow.ToLongDateString() + " " + DateTime.UtcNow.ToLongTimeString();
+
+            WebServer.AddEntryWithLimit(TableLabel, new TableDataValue[] { MapName, PlayerCount, Time }, 10);
+
+            if (e.playerCount > 8)
+            {
+                userhandler.BroadcastMessageProcessEvent(e.ToString());
+
+                TableDataValue HeaderServer = new TableDataValue();
+                HeaderServer.VisibleValue = "Server";
+
+                TableDataValue ServerLabel = new TableDataValue();
+                ServerLabel.VisibleValue = e.tag;
+                ServerLabel.Link = "steam://connect/" + e.serverIP + ":" + e.port;
+
+                string RecentlyTestedTableLabel = "Recently Tested";
+                WebServer.SetTableHeader(RecentlyTestedTableLabel, new TableDataValue[] { HeaderName, HeaderNamePlayerCount, HeaderTime, HeaderServer });
+                WebServer.AddEntryWithLimit(RecentlyTestedTableLabel, new TableDataValue[] { MapName, PlayerCount, Time, ServerLabel }, 10);
+            }
         }
 
         // Special status commands
 
-        private sealed class Status : BaseCommand
+        private class Active : BaseCommand
         {
-            // Automaticaly generated status command for each server under the config
-            private TrackingServerInfo server;
+            // Command to query if a server is active
+            private ServerTrackingModule module;
 
-            private ServerTrackingModule ServerTrackingModule;
-
-            public Status(ModuleHandler bot, TrackingServerInfo server, ServerTrackingModule module) : base(bot, module.NameToserverCommand(server.tag))
+            public Active(ModuleHandler bot, ServerTrackingModule module) : base(bot, "!Active")
             {
-                this.server = server;
-                ServerTrackingModule = module;
+                this.module = module;
             }
 
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                TrackingServerInfo status = ServerTrackingModule.ServerQuery(server);
-                if (status != null)
-                {
-                    server.update(status);
-                    return server.ToString();
-                }
-                else
-                    return server.tag + " server did not respond";
+                string activeServers = "";
+                foreach (TrackingServerInfo server in module.TrackedServers.Servers)
+                    if (server.playerCount > 1)
+                    {
+                        if (!activeServers.Equals(string.Empty))
+                            activeServers += "\n";
+
+                        activeServers += server.ToString();
+                    }
+                return activeServers.Equals(string.Empty) ? "No server is currently active" : activeServers;
             }
         }
 
-        private sealed class SpecificServerStatus : BaseCommand
+        // Other commands
+        private class FullServerQuery : BaseCommand
         {
-            // Automaticaly generated status command for each server under the config
-            private ServerTrackingModule ServerTrackingModule;
+            // Command to query if a server is active
+            private ServerTrackingModule module;
 
-            public SpecificServerStatus(ModuleHandler bot, ServerTrackingModule module) : base(bot, "")
+            public FullServerQuery(ModuleHandler bot, ServerTrackingModule module) : base(bot, "!Serverquery")
             {
-                ServerTrackingModule = module;
+                this.module = module;
             }
 
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                foreach (TrackingServerInfo server in ServerTrackingModule.TrackedServers)
+                string activeServers = "";
+                foreach (TrackingServerInfo server in module.TrackedServers.Servers)
                 {
-                    if (server.tag.Equals(param))
+                    if (!activeServers.Equals(string.Empty))
                     {
-                        return ServerTrackingModule.ServerQuery(server).ToString();
+                        activeServers += "\n";
                     }
+                    activeServers += server.ToString();
                 }
-                return "An error occured when querying the server!";
-            }
-
-            public override bool CheckCommandExists(MessageEventArgs Msg, string Message)
-            {
-                foreach (TrackingServerInfo server in ServerTrackingModule.TrackedServers)
-                {
-                    if (Message.StartsWith(ServerTrackingModule.NameToserverCommand(server.tag), StringComparison.OrdinalIgnoreCase))
-                    {
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-            public override string[] GetCommmand()
-            {
-                int AmountOfServers = ServerTrackingModule.TrackedServers.Count();
-                string[] TrackingServerList = new string[AmountOfServers];
-
-                for (int x = 0; x < AmountOfServers; x++)
-                {
-                    TrackingServerList[x] = ServerTrackingModule.NameToserverCommand(ServerTrackingModule.TrackedServers.Servers[x].tag);
-                }
-
-                return TrackingServerList;
+                return activeServers.Equals(string.Empty) ? "No server is currently active" : activeServers;
             }
         }
 
@@ -350,55 +327,77 @@ namespace SteamBotLite
             }
         }
 
-        // Other commands
-
-        private class Active : BaseCommand
+        private sealed class SpecificServerStatus : BaseCommand
         {
-            // Command to query if a server is active
-            private ServerTrackingModule module;
+            // Automaticaly generated status command for each server under the config
+            private ServerTrackingModule ServerTrackingModule;
 
-            public Active(ModuleHandler bot, ServerTrackingModule module) : base(bot, "!Active")
+            public SpecificServerStatus(ModuleHandler bot, ServerTrackingModule module) : base(bot, "")
             {
-                this.module = module;
+                ServerTrackingModule = module;
+            }
+
+            public override bool CheckCommandExists(MessageEventArgs Msg, string Message)
+            {
+                foreach (TrackingServerInfo server in ServerTrackingModule.TrackedServers)
+                {
+                    if (Message.StartsWith(ServerTrackingModule.NameToserverCommand(server.tag), StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            public override string[] GetCommmand()
+            {
+                int AmountOfServers = ServerTrackingModule.TrackedServers.Count();
+                string[] TrackingServerList = new string[AmountOfServers];
+
+                for (int x = 0; x < AmountOfServers; x++)
+                {
+                    TrackingServerList[x] = ServerTrackingModule.NameToserverCommand(ServerTrackingModule.TrackedServers.Servers[x].tag);
+                }
+
+                return TrackingServerList;
             }
 
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                string activeServers = "";
-                foreach (TrackingServerInfo server in module.TrackedServers.Servers)
-                    if (server.playerCount > 1)
+                foreach (TrackingServerInfo server in ServerTrackingModule.TrackedServers)
+                {
+                    if (server.tag.Equals(param))
                     {
-                        if (!activeServers.Equals(string.Empty))
-                            activeServers += "\n";
-
-                        activeServers += server.ToString();
+                        return ServerTrackingModule.ServerQuery(server).ToString();
                     }
-                return activeServers.Equals(string.Empty) ? "No server is currently active" : activeServers;
+                }
+                return "An error occured when querying the server!";
             }
         }
 
-        private class FullServerQuery : BaseCommand
+        private sealed class Status : BaseCommand
         {
-            // Command to query if a server is active
-            private ServerTrackingModule module;
+            // Automaticaly generated status command for each server under the config
+            private TrackingServerInfo server;
 
-            public FullServerQuery(ModuleHandler bot, ServerTrackingModule module) : base(bot, "!Serverquery")
+            private ServerTrackingModule ServerTrackingModule;
+
+            public Status(ModuleHandler bot, TrackingServerInfo server, ServerTrackingModule module) : base(bot, module.NameToserverCommand(server.tag))
             {
-                this.module = module;
+                this.server = server;
+                ServerTrackingModule = module;
             }
 
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                string activeServers = "";
-                foreach (TrackingServerInfo server in module.TrackedServers.Servers)
+                TrackingServerInfo status = ServerTrackingModule.ServerQuery(server);
+                if (status != null)
                 {
-                    if (!activeServers.Equals(string.Empty))
-                    {
-                        activeServers += "\n";
-                    }
-                    activeServers += server.ToString();
+                    server.update(status);
+                    return server.ToString();
                 }
-                return activeServers.Equals(string.Empty) ? "No server is currently active" : activeServers;
+                else
+                    return server.tag + " server did not respond";
             }
         }
     }

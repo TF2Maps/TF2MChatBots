@@ -5,8 +5,10 @@ namespace SteamBotLite
 {
     public class AdminModule : BaseModule, OnLoginCompletedListiners
     {
-        private UserHandler userhandler;
+        private List<string[]> CommandList;
+        private Dictionary<string, List<string[]>> CommandListHeld;
         private ModuleHandler modulehandler;
+        private UserHandler userhandler;
 
         public AdminModule(ModuleHandler handler, UserHandler userhandler, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(handler, Jsconfig)
         {
@@ -36,9 +38,6 @@ namespace SteamBotLite
         public override void loadPersistentData()
         {
         }
-
-        private Dictionary<string, List<string[]>> CommandListHeld;
-        private List<string[]> CommandList;
 
         public override void OnAllModulesLoaded()
         {
@@ -103,19 +102,29 @@ namespace SteamBotLite
             }
         }
 
-        private class UserInfo : BaseCommand
+        private class GetAllModules : BaseCommand
         {
             // Command to query if a server is active
             private AdminModule module;
 
-            public UserInfo(ModuleHandler bot, AdminModule module) : base(bot, "!UserInfo")
+            private ModuleHandler modulehandler;
+
+            public GetAllModules(ModuleHandler bot, AdminModule module) : base(bot, "!ModuleList")
             {
                 this.module = module;
+                this.modulehandler = bot;
             }
 
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                return string.Format("Your ID is: {0} | {1} | {2}", Msg.Sender.identifier, Msg.Sender.identifier.ToString(), Msg.Sender.DisplayName);
+                string Response = "";
+
+                foreach (BaseModule ModuleEntry in modulehandler.GetAllModules())
+                {
+                    Response += ModuleEntry.GetType().Name.ToString() + " ";
+                }
+
+                return Response;
             }
         }
 
@@ -133,6 +142,24 @@ namespace SteamBotLite
             {
                 module.userhandler.Reboot();
                 return "Rebooted";
+            }
+        }
+
+        private class Rejoin : BaseCommand
+        {
+            // Command to query if a server is active
+            private AdminModule module;
+
+            public Rejoin(UserHandler bot, ModuleHandler modulehandler, AdminModule module) : base(modulehandler, "!Rejoin")
+            {
+                this.module = module;
+            }
+
+            protected override string exec(MessageEventArgs Msg, string param)
+            {
+                module.userhandler.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.LeaveChat);
+                module.userhandler.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.EnterChat);
+                return "Rejoined!";
             }
         }
 
@@ -163,47 +190,19 @@ namespace SteamBotLite
             }
         }
 
-        private class Rejoin : BaseCommand
+        private class UserInfo : BaseCommand
         {
             // Command to query if a server is active
             private AdminModule module;
 
-            public Rejoin(UserHandler bot, ModuleHandler modulehandler, AdminModule module) : base(modulehandler, "!Rejoin")
+            public UserInfo(ModuleHandler bot, AdminModule module) : base(bot, "!UserInfo")
             {
                 this.module = module;
             }
 
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                module.userhandler.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.LeaveChat);
-                module.userhandler.FireMainChatRoomEvent(UserHandler.ChatroomEventEnum.EnterChat);
-                return "Rejoined!";
-            }
-        }
-
-        private class GetAllModules : BaseCommand
-        {
-            // Command to query if a server is active
-            private AdminModule module;
-
-            private ModuleHandler modulehandler;
-
-            public GetAllModules(ModuleHandler bot, AdminModule module) : base(bot, "!ModuleList")
-            {
-                this.module = module;
-                this.modulehandler = bot;
-            }
-
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                string Response = "";
-
-                foreach (BaseModule ModuleEntry in modulehandler.GetAllModules())
-                {
-                    Response += ModuleEntry.GetType().Name.ToString() + " ";
-                }
-
-                return Response;
+                return string.Format("Your ID is: {0} | {1} | {2}", Msg.Sender.identifier, Msg.Sender.identifier.ToString(), Msg.Sender.DisplayName);
             }
         }
     }

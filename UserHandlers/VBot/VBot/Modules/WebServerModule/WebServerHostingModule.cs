@@ -8,14 +8,13 @@ namespace SteamBotLite
 {
     internal class WebServerHostingModule : BaseModule, HTMLFileFromArrayListiners
     {
-        private HttpListener listener;
-
-        private string responseString = "<HTML><BODY>Website is still initialising</BODY></HTML>";
-
         readonly protected string header;
         readonly protected string trailer;
         readonly protected string WebsiteFilesDirectory;
+        private Dictionary<string, TableData> DataLists;
+        private HttpListener listener;
 
+        private string responseString = "<HTML><BODY>Website is still initialising</BODY></HTML>";
         //string prefix, ObservableCollection<MapModule.Map> Maplist)
 
         public WebServerHostingModule(VBot bot, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
@@ -42,67 +41,117 @@ namespace SteamBotLite
             adminCommands.Add(new RemoveTable(bot, this));
         }
 
-        private class RebootModule : BaseCommand
-        {
-            // Command to query if a server is active
-            private WebServerHostingModule module;
-
-            private ModuleHandler ModuleHandler;
-            private string address;
-
-            public RebootModule(ModuleHandler bot, WebServerHostingModule module) : base(bot, "!WebsiteReboot")
-            {
-                this.module = module;
-                this.address = (module.config["Address"].ToString());
-            }
-
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                module.CloseWebServer();
-                module.StartWebServer(address);
-                return "Rebooting Serer";
-            }
-        }
-
-        private class RemoveTable : BaseCommand
-        {
-            // Command to query if a server is active
-            private WebServerHostingModule module;
-
-            private ModuleHandler ModuleHandler;
-            private string address;
-
-            public RemoveTable(ModuleHandler bot, WebServerHostingModule module) : base(bot, "!RemoveTable")
-            {
-                this.module = module;
-            }
-
-            protected override string exec(MessageEventArgs Msg, string param)
-            {
-                module.RemoveTableFromEntry(param);
-                return "Removing table";
-            }
-        }
-
-        public override void OnAllModulesLoaded()
-        { }
-
-        private string GetAlltables()
-        {
-            string value = "";
-
-            foreach (KeyValuePair<string, TableData> table in DataLists)
-            {
-                value += table.Value.HtmlTable(table.Key);
-            }
-            return value;
-        }
-
         //When this class is turned off, we close the server properly
         ~WebServerHostingModule()
         {
             CloseWebServer();
         }
+
+        void HTMLFileFromArrayListiners.AddEntryWithLimit(string identifier, TableDataValue[] data, int limit)
+        {
+            GetTableData(identifier).TableValues.Add(data);
+
+            int ExcessToRemove = GetTableData(identifier).TableValues.Count - limit;
+
+            int entriestoremove = limit;
+
+            if (GetTableData(identifier).TableValues.Count > entriestoremove)
+            {
+                GetTableData(identifier).TableValues.RemoveRange(0, ExcessToRemove);
+            }
+
+            AddTableFromEntry(identifier, GetTableData(identifier));
+        }
+
+        void HTMLFileFromArrayListiners.AddEntryWithoutLimit(string identifier, TableDataValue[] data)
+        {
+            GetTableData(identifier).TableValues.Add(data);
+            AddTableFromEntry(identifier, GetTableData(identifier));
+        }
+
+        public void CloseWebServer()
+        {
+            Console.WriteLine("Closing Web Server");
+            listener.Stop();
+            listener.Close();
+        }
+
+        public override string getPersistentData()
+        {
+            return JsonConvert.SerializeObject(DataLists);
+        }
+
+        public TableData GetTableData(string identifier)
+        {
+            if (DataLists.ContainsKey(identifier))
+            {
+                return DataLists[identifier];
+            }
+            else
+            {
+                DataLists.Add(identifier, new TableData());
+                return DataLists[identifier];
+            }
+        }
+
+        //For legacy reasons
+        void HTMLFileFromArrayListiners.HTMLFileFromArray(string[] Headernames, List<string[]> Data, string TableKey)
+        {
+            TableData ThisTableData = new TableData();
+
+            TableDataValue[] Header = new TableDataValue[Headernames.Length];
+            for (int i = 0; i < Headernames.Length; i++)
+            {
+                Header[i] = new TableDataValue();
+                Header[i].VisibleValue = Headernames[i];
+            }
+
+            ThisTableData.Header = Header;
+
+            foreach (string[] Row in Data)
+            {
+                TableDataValue[] DataEntries = new TableDataValue[Row.Length];
+
+                for (int i = 0; i < Row.Length; i++)
+                {
+                    DataEntries[i] = new TableDataValue();
+                    DataEntries[i].VisibleValue = Row[i];
+                }
+
+                ThisTableData.TableValues.Add(DataEntries);
+            }
+
+            AddTableFromEntry(TableKey, ThisTableData);
+        }
+
+        public override void loadPersistentData()
+        {
+            {
+                try
+                {
+                    Console.WriteLine("Loading Website");
+
+                    DataLists = JsonConvert.DeserializeObject<Dictionary<string, TableData>>(System.IO.File.ReadAllText(ModuleSavedDataFilePath()));
+
+                    Console.WriteLine("Loaded saved file");
+                }
+                catch
+                {
+                    DataLists = new Dictionary<string, TableData>();
+                    savePersistentData();
+                    Console.WriteLine("Error Loading Website Table List, creating a new one and wiping the old");
+                }
+            }
+        }
+
+        //Does this pass by value or by reference?
+        void HTMLFileFromArrayListiners.MakeTableFromEntry(string TableKey, TableData TableData)
+        {
+            AddTableFromEntry(TableKey, TableData);
+        }
+
+        public override void OnAllModulesLoaded()
+        { }
 
         public void StartWebServer(string prefix)
         {
@@ -118,11 +167,40 @@ namespace SteamBotLite
             //MapListUpdate(this, null);
         }
 
-        public void CloseWebServer()
+        private void AddTableFromEntry(string TableKey, TableData TableData)
         {
-            Console.WriteLine("Closing Web Server");
-            listener.Stop();
-            listener.Close();
+            if (DataLists.ContainsKey(TableKey))
+            {
+                DataLists[TableKey] = TableData;
+            }
+            else
+            {
+                DataLists.Add(TableKey, TableData);
+            }
+            savePersistentData();
+        }
+
+        private string GetAlltables()
+        {
+            string value = "";
+
+            foreach (KeyValuePair<string, TableData> table in DataLists)
+            {
+                value += table.Value.HtmlTable(table.Key);
+            }
+            return value;
+        }
+
+        private void RemoveTableFromEntry(string TableKey)
+        {
+            if (DataLists.ContainsKey(TableKey))
+            {
+                DataLists.Remove(TableKey);
+            }
+            else
+            {
+            }
+            savePersistentData();
         }
 
         private void ResponseMethod(IAsyncResult result)
@@ -158,138 +236,58 @@ namespace SteamBotLite
             }
         }
 
-        public override string getPersistentData()
-        {
-            return JsonConvert.SerializeObject(DataLists);
-        }
-
-        public override void loadPersistentData()
-        {
-            {
-                try
-                {
-                    Console.WriteLine("Loading Website");
-
-                    DataLists = JsonConvert.DeserializeObject<Dictionary<string, TableData>>(System.IO.File.ReadAllText(ModuleSavedDataFilePath()));
-
-                    Console.WriteLine("Loaded saved file");
-                }
-                catch
-                {
-                    DataLists = new Dictionary<string, TableData>();
-                    savePersistentData();
-                    Console.WriteLine("Error Loading Website Table List, creating a new one and wiping the old");
-                }
-            }
-        }
-
-        //For legacy reasons
-        void HTMLFileFromArrayListiners.HTMLFileFromArray(string[] Headernames, List<string[]> Data, string TableKey)
-        {
-            TableData ThisTableData = new TableData();
-
-            TableDataValue[] Header = new TableDataValue[Headernames.Length];
-            for (int i = 0; i < Headernames.Length; i++)
-            {
-                Header[i] = new TableDataValue();
-                Header[i].VisibleValue = Headernames[i];
-            }
-
-            ThisTableData.Header = Header;
-
-            foreach (string[] Row in Data)
-            {
-                TableDataValue[] DataEntries = new TableDataValue[Row.Length];
-
-                for (int i = 0; i < Row.Length; i++)
-                {
-                    DataEntries[i] = new TableDataValue();
-                    DataEntries[i].VisibleValue = Row[i];
-                }
-
-                ThisTableData.TableValues.Add(DataEntries);
-            }
-
-            AddTableFromEntry(TableKey, ThisTableData);
-        }
-
-        private void SetTableHeader(string tableKey, TableDataValue[] header)
-        {
-            SetTableHeader(tableKey, header);
-        }
-
-        private Dictionary<string, TableData> DataLists;
-
         void HTMLFileFromArrayListiners.SetTableHeader(string TableIdentifier, TableDataValue[] Header)
         {
             GetTableData(TableIdentifier).Header = Header;
         }
 
-        //Does this pass by value or by reference?
-
-        public TableData GetTableData(string identifier)
+        private class RebootModule : BaseCommand
         {
-            if (DataLists.ContainsKey(identifier))
+            private string address;
+
+            // Command to query if a server is active
+            private WebServerHostingModule module;
+
+            private ModuleHandler ModuleHandler;
+
+            public RebootModule(ModuleHandler bot, WebServerHostingModule module) : base(bot, "!WebsiteReboot")
             {
-                return DataLists[identifier];
+                this.module = module;
+                this.address = (module.config["Address"].ToString());
             }
-            else
+
+            protected override string exec(MessageEventArgs Msg, string param)
             {
-                DataLists.Add(identifier, new TableData());
-                return DataLists[identifier];
+                module.CloseWebServer();
+                module.StartWebServer(address);
+                return "Rebooting Serer";
             }
         }
 
-        void HTMLFileFromArrayListiners.AddEntryWithLimit(string identifier, TableDataValue[] data, int limit)
+        private class RemoveTable : BaseCommand
         {
-            GetTableData(identifier).TableValues.Add(data);
+            private string address;
 
-            int ExcessToRemove = GetTableData(identifier).TableValues.Count - limit;
+            // Command to query if a server is active
+            private WebServerHostingModule module;
 
-            int entriestoremove = limit;
+            private ModuleHandler ModuleHandler;
 
-            if (GetTableData(identifier).TableValues.Count > entriestoremove)
+            public RemoveTable(ModuleHandler bot, WebServerHostingModule module) : base(bot, "!RemoveTable")
             {
-                GetTableData(identifier).TableValues.RemoveRange(0, ExcessToRemove);
+                this.module = module;
             }
 
-            AddTableFromEntry(identifier, GetTableData(identifier));
+            protected override string exec(MessageEventArgs Msg, string param)
+            {
+                module.RemoveTableFromEntry(param);
+                return "Removing table";
+            }
         }
 
-        void HTMLFileFromArrayListiners.AddEntryWithoutLimit(string identifier, TableDataValue[] data)
+        private void SetTableHeader(string tableKey, TableDataValue[] header)
         {
-            GetTableData(identifier).TableValues.Add(data);
-            AddTableFromEntry(identifier, GetTableData(identifier));
-        }
-
-        void HTMLFileFromArrayListiners.MakeTableFromEntry(string TableKey, TableData TableData)
-        {
-            AddTableFromEntry(TableKey, TableData);
-        }
-
-        private void AddTableFromEntry(string TableKey, TableData TableData)
-        {
-            if (DataLists.ContainsKey(TableKey))
-            {
-                DataLists[TableKey] = TableData;
-            }
-            else
-            {
-                DataLists.Add(TableKey, TableData);
-            }
-            savePersistentData();
-        }
-
-        private void RemoveTableFromEntry(string TableKey)
-        {
-            if (DataLists.ContainsKey(TableKey))
-            {
-                DataLists.Remove(TableKey);
-            }
-            else
-            {
-            }
-            savePersistentData();
+            SetTableHeader(tableKey, header);
         }
     }
 }
