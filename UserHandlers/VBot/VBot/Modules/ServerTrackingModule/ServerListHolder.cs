@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SteamBotLite
 {
-    public class ServerListHolder : BaseModule, ServerMapChangeListiner
+    public class TrackingServerListHolder : BaseModule, ServerMapChangeListiner
     {
 
         class Maplist
@@ -24,7 +24,7 @@ namespace SteamBotLite
         string[] Header = new string[] { "Map", "Time Played" };
         HTMLFileFromArrayListiners listiner;
 
-        public ServerListHolder(ModuleHandler bot,HTMLFileFromArrayListiners listiner , Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
+        public TrackingServerListHolder(ModuleHandler bot,HTMLFileFromArrayListiners listiner , Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
             loadPersistentData();
             this.Maplists = new List<Maplist>();
@@ -62,7 +62,7 @@ namespace SteamBotLite
             }
         }
 
-        public void OnMapChange(ServerInfo args)
+        public void OnMapChange(TrackingServerInfo args)
         {
           //  Tuple<string,string,string> entry = new Tuple<string, string, string>()
             PlayEntry entry = new PlayEntry(args.playerCount.ToString(), args.serverIP, System.DateTime.Now.ToShortDateString() + " : " + System.DateTime.Now.ToShortTimeString());
@@ -125,7 +125,7 @@ namespace SteamBotLite
             //Assign Values for the Boolean 
             bool SummariseMethod;
 
-            if (MethodToSummariseWith.Equals(ServerListHolder.SummariseMethod.Whitelist))
+            if (MethodToSummariseWith.Equals(TrackingServerListHolder.SummariseMethod.Whitelist))
             {
                 SummariseMethod = true; 
             }

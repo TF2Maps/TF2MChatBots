@@ -19,7 +19,7 @@ namespace SteamBotLite
         RepliesModule replyModule;
         AdminModule adminmodule;
         SearchModule searchModule;
-        ServerListHolder serverlistmodule;
+        TrackingServerListHolder TrackingServerListmodule;
         CountDownModule countdownmodule;
         WebServerHostingModule WebServer;
         IdentityModule identitymodule;
@@ -59,7 +59,7 @@ namespace SteamBotLite
             // loading modules
             WebServer = new WebServerHostingModule(this, jsconfig);
             mapModule = new MapModule(this,this, jsconfig);
-            serverlistmodule = new ServerListHolder(this, this, jsconfig);
+            TrackingServerListmodule = new TrackingServerListHolder(this, this, jsconfig);
             motdModule = new MotdModule(this, jsconfig);
             ServerTrackingModule = new ServerTrackingModule(this, this, jsconfig);
             usersModule = new UsersModule(this, jsconfig);
@@ -69,7 +69,7 @@ namespace SteamBotLite
             identitymodule = new IdentityModule(this, this, jsconfig);
             countdownmodule = new CountDownModule(this, jsconfig);
 
-            ModuleList = new List<BaseModule> { motdModule,mapModule,ServerTrackingModule,identitymodule , usersModule,replyModule,adminmodule,searchModule, WebServer, serverlistmodule , countdownmodule };
+            ModuleList = new List<BaseModule> { motdModule,mapModule,ServerTrackingModule,identitymodule , usersModule,replyModule,adminmodule,searchModule, WebServer, TrackingServerListmodule , countdownmodule };
 
             Console.WriteLine("Modules loaded and ModuleList intitialised");
 
@@ -176,7 +176,7 @@ namespace SteamBotLite
         }
         
 
-        public void ServerUpdated(object sender, ServerInfo args)
+        public void ServerUpdated(object sender, TrackingServerInfo args)
         {
             if (MapChangeEventListiners.Count > 0 )
             {

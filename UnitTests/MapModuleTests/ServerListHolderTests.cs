@@ -8,10 +8,10 @@ using System.Linq;
 namespace MapModuleTests
 {
     [TestClass]
-    public class ServerListHolderTests
+    public class TrackingServerListHolderTests
     {
-        ServerListHolder module;
-        ServerListHolder.PlayEntry TestPlayEntry;
+        TrackingServerListHolder module;
+        TrackingServerListHolder.PlayEntry TestPlayEntry;
         int identifier = 0;
         string MapName = "TESTMAP";
 
@@ -20,7 +20,7 @@ namespace MapModuleTests
             Dictionary<string, Dictionary<string, object>> ModuleHolder = new Dictionary<string, Dictionary<string, object>>();
             Dictionary<string, object> ModuleData = new Dictionary<string, object>();
             ModuleData.Add("ListConfigs", "");
-            ModuleHolder.Add("ServerListHolder", ModuleData);
+            ModuleHolder.Add("TrackingServerListHolder", ModuleData);
 
             return ModuleHolder;
         }
@@ -28,7 +28,7 @@ namespace MapModuleTests
         void MakeNewModule()
         {
             TestUserHandler tester = new TestUserHandler();
-            module = new ServerListHolder(tester, tester, MakeConfig());
+            module = new TrackingServerListHolder(tester, tester, MakeConfig());
         }
 
         // Use TestInitialize to run code before running each test 
@@ -36,7 +36,7 @@ namespace MapModuleTests
         public void Initialize()
         {
             MakeNewModule();
-            TestPlayEntry = new ServerListHolder.PlayEntry("25","128.0.0.0","1:00pm");
+            TestPlayEntry = new TrackingServerListHolder.PlayEntry("25","128.0.0.0","1:00pm");
         }
 
         // Use TestCleanup to run code after each test has run

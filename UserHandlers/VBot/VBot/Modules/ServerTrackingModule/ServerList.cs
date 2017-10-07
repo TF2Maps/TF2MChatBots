@@ -6,54 +6,63 @@ using System.Threading.Tasks;
 
 namespace SteamBotLite
 {
-    public class ServerList
+    public class TrackingServerList
     {
         ServerTrackingModule ServerTrackingModule;
-        List<ServerInfo> ServerListObject { get; }
+        private TrackingServerList trackedServers;
 
-        public ServerList(ServerTrackingModule module, List<ServerInfo> serverlist)
+        List<TrackingServerInfo> TrackingServerListObject { get; }
+
+        public TrackingServerList(ServerTrackingModule module, List<TrackingServerInfo> TrackingServerList)
         {
             ServerTrackingModule = module;
-            ServerListObject = serverlist;
+            TrackingServerListObject = TrackingServerList;
         }
-        public void Add(ServerInfo server)
+
+        public TrackingServerList(ServerTrackingModule serverTrackingModule, TrackingServerList trackedServers)
         {
-            ServerListObject.Add(server);
+            ServerTrackingModule = serverTrackingModule;
+            this.trackedServers = trackedServers;
+        }
+
+        public void Add(TrackingServerInfo server)
+        {
+            TrackingServerListObject.Add(server);
             ServerTrackingModule.savePersistentData();
         }
 
-        public void Remove(ServerInfo server)
+        public void Remove(TrackingServerInfo server)
         {
-            ServerListObject.Remove(server);
+            TrackingServerListObject.Remove(server);
             ServerTrackingModule.savePersistentData();
         }
         public void Clear()
         {
-            ServerListObject.Clear();
+            TrackingServerListObject.Clear();
             ServerTrackingModule.savePersistentData();
         }
 
-        public IReadOnlyList<ServerInfo> Servers
+        public IReadOnlyList<TrackingServerInfo> Servers
         {
             get
             {
-                return ServerListObject.AsReadOnly();
+                return TrackingServerListObject.AsReadOnly();
             }
         }
 
         public int Count()
         {
-            return ServerListObject.Count;
+            return TrackingServerListObject.Count;
         }
 
-        public IEnumerator<ServerInfo> GetEnumerator()
+        public IEnumerator<TrackingServerInfo> GetEnumerator()
         {
-            return ServerListObject.GetEnumerator();
+            return TrackingServerListObject.GetEnumerator();
         }
 
     }
 
-    public class ServerInfo : EventArgs
+    public class TrackingServerInfo : EventArgs
     {
         public string serverIP;
         public int port;
@@ -63,14 +72,14 @@ namespace SteamBotLite
         public int capacity;
         public string currentMap = "";
 
-        public ServerInfo(string serverIP, int port, string tag)
+        public TrackingServerInfo(string serverIP, int port, string tag)
         {
             this.serverIP = serverIP;
             this.port = port;
             this.tag = tag;
         }
 
-        public void update(ServerInfo updated)
+        public void update(TrackingServerInfo updated)
         {
             this.playerCount = updated.playerCount;
             this.capacity = updated.capacity;

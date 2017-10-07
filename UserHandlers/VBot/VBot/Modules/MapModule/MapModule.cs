@@ -197,7 +197,7 @@ namespace SteamBotLite
             }
         }
 
-        public void OnMapChange(ServerInfo args)
+        public void OnMapChange(TrackingServerInfo args)
         {
             Console.WriteLine("Going to possibly remove {0} Map...", args.currentMap);
 

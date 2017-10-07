@@ -43,8 +43,8 @@ namespace UsersModuleTests
         [TestCleanup()]
         public void Cleanup() {
             module = new ServerTrackingModule(new TestUserHandler(), new TestUserHandler(),  MakeConfig());
-            module.serverList.Clear();
-            Assert.IsTrue(module.serverList.Count() == 0);
+            module.TrackedServers.Clear();
+            Assert.IsTrue(module.TrackedServers.Count() == 0);
         }
 
         string FireCommand(MessageEventArgs Message, BaseModule module)
@@ -81,13 +81,13 @@ namespace UsersModuleTests
             Message.Sender = TestUser;
             Console.WriteLine(FireCommand(Message, module));
 
-            Console.WriteLine(module.serverList.Servers[0].serverIP);
+            Console.WriteLine(module.TrackedServers.Servers[0].serverIP);
 
-            Assert.IsTrue(module.serverList.Count() == 1);
+            Assert.IsTrue(module.TrackedServers.Count() == 1);
 
-            Assert.IsTrue(module.serverList.Servers[0].tag.Equals(TestName));
-            Assert.IsTrue(module.serverList.Servers[0].port.Equals(int.Parse(TestPort)));
-            Assert.IsTrue(module.serverList.Servers[0].serverIP.Equals(TestIP));
+            Assert.IsTrue(module.TrackedServers.Servers[0].tag.Equals(TestName));
+            Assert.IsTrue(module.TrackedServers.Servers[0].port.Equals(int.Parse(TestPort)));
+            Assert.IsTrue(module.TrackedServers.Servers[0].serverIP.Equals(TestIP));
             Assert.IsTrue(ContainsCommand(module.NameToserverCommand(TestName), module.commands));
         }
 
@@ -101,7 +101,7 @@ namespace UsersModuleTests
             Message.Sender = TestUser;
             Console.WriteLine(FireCommand(Message, module));
 
-            Assert.IsTrue(module.serverList.Count() == 0);
+            Assert.IsTrue(module.TrackedServers.Count() == 0);
 
         }
 
@@ -115,7 +115,7 @@ namespace UsersModuleTests
             Message.Sender = TestUser;
             Console.WriteLine(FireCommand(Message, module));
 
-            Assert.IsTrue(module.serverList.Count() == 0);
+            Assert.IsTrue(module.TrackedServers.Count() == 0);
 
         }
 
@@ -124,11 +124,11 @@ namespace UsersModuleTests
             AddServer();
             module = new ServerTrackingModule(new TestUserHandler(), new TestUserHandler(),  MakeConfig());
 
-            Assert.IsTrue(module.serverList.Count() == 1);
+            Assert.IsTrue(module.TrackedServers.Count() == 1);
 
-            Assert.IsTrue(module.serverList.Servers[0].tag.Equals(TestName));
-            Assert.IsTrue(module.serverList.Servers[0].port.Equals(int.Parse(TestPort)));
-            Assert.IsTrue(module.serverList.Servers[0].serverIP.Equals(TestIP));
+            Assert.IsTrue(module.TrackedServers.Servers[0].tag.Equals(TestName));
+            Assert.IsTrue(module.TrackedServers.Servers[0].port.Equals(int.Parse(TestPort)));
+            Assert.IsTrue(module.TrackedServers.Servers[0].serverIP.Equals(TestIP));
             Assert.IsTrue(ContainsCommand(module.NameToserverCommand(TestName), module.commands));
         }
 
@@ -143,7 +143,7 @@ namespace UsersModuleTests
 
             Console.WriteLine(FireCommand(Message, module));
 
-            Assert.IsTrue(module.serverList.Count() == 0);
+            Assert.IsTrue(module.TrackedServers.Count() == 0);
 
             Assert.IsFalse  (ContainsCommand(module.NameToserverCommand(TestName), module.commands));
         }
@@ -152,7 +152,7 @@ namespace UsersModuleTests
         public void CheckPersistencyOfRemove() {
             RemoveServerAfterAdd();
             module = new ServerTrackingModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
-            Assert.IsTrue(module.serverList.Count() == 0);
+            Assert.IsTrue(module.TrackedServers.Count() == 0);
 
             Assert.IsFalse  (ContainsCommand(module.NameToserverCommand(TestName), module.commands));
         }
@@ -160,17 +160,17 @@ namespace UsersModuleTests
         [TestMethod()]
         public void ClearPersistency() {
             AddServer();
-            module.serverList.Clear();
+            module.TrackedServers.Clear();
             module = new ServerTrackingModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
-            Assert.IsTrue(module.serverList.Count() == 0);
+            Assert.IsTrue(module.TrackedServers.Count() == 0);
 
             Assert.IsFalse  (ContainsCommand(module.NameToserverCommand(TestName), module.commands));
         }
 
-        ServerInfo TestServerinfo ()
+        TrackingServerInfo TestTrackingServerInfo ()
         {
-            ServerInfo TestServerinfo = new ServerInfo(TestIP, int.Parse(TestPort), TestName);
-            return TestServerinfo;
+            TrackingServerInfo TestTrackingServerInfo = new TrackingServerInfo(TestIP, int.Parse(TestPort), TestName);
+            return TestTrackingServerInfo;
         }
         string testmap = "koth_badlands";
         int testcapacity = 24;
@@ -184,7 +184,7 @@ namespace UsersModuleTests
             int NewPlayercount = testplayercount + 1;
             AddServer();
 
-            ServerInfo TestServer = TestServerinfo();
+            TrackingServerInfo TestServer = TestTrackingServerInfo();
 
             TestServer.currentMap = testmap;
             TestServer.capacity = testcapacity;
@@ -192,18 +192,18 @@ namespace UsersModuleTests
 
             module.EmulateServerQuery(TestServer);
 
-            module.SyncServerInfo(null, null);
+            module.SyncTrackingServerInfo(null, null);
 
             TestServer.currentMap = NewMapName;
             TestServer.capacity = NewCapacity;
             TestServer.playerCount = NewPlayercount;
 
             module.EmulateServerQuery(TestServer);
-            module.SyncServerInfo(null, null);
+            module.SyncTrackingServerInfo(null, null);
 
-            Assert.IsTrue(module.serverList.Servers[0].currentMap.Equals(NewMapName));
-            Assert.IsTrue(module.serverList.Servers[0].playerCount.Equals(NewPlayercount));
-            Assert.IsTrue(module.serverList.Servers[0].capacity.Equals(NewCapacity));
+            Assert.IsTrue(module.TrackedServers.Servers[0].currentMap.Equals(NewMapName));
+            Assert.IsTrue(module.TrackedServers.Servers[0].playerCount.Equals(NewPlayercount));
+            Assert.IsTrue(module.TrackedServers.Servers[0].capacity.Equals(NewCapacity));
         }
 
         [TestMethod()]
@@ -213,7 +213,7 @@ namespace UsersModuleTests
             int NewPlayercount = testplayercount + 1;
             AddServer();
 
-            ServerInfo TestServer = TestServerinfo();
+            TrackingServerInfo TestServer = TestTrackingServerInfo();
 
             TestServer.currentMap = testmap;
             TestServer.capacity = testcapacity;
@@ -221,14 +221,14 @@ namespace UsersModuleTests
 
             module.EmulateServerQuery(TestServer);
 
-            module.SyncServerInfo(null, null);
+            module.SyncTrackingServerInfo(null, null);
 
             TestServer.capacity = NewCapacity;
 
             module.EmulateServerQuery(TestServer);
-            module.SyncServerInfo(null, null);
+            module.SyncTrackingServerInfo(null, null);
 
-            Assert.IsTrue(module.serverList.Servers[0].capacity.Equals(NewCapacity));
+            Assert.IsTrue(module.TrackedServers.Servers[0].capacity.Equals(NewCapacity));
         }
 
         [TestMethod()]
@@ -238,7 +238,7 @@ namespace UsersModuleTests
             int NewPlayercount = testplayercount + 1;
             AddServer();
 
-            ServerInfo TestServer = TestServerinfo();
+            TrackingServerInfo TestServer = TestTrackingServerInfo();
 
             TestServer.currentMap = testmap;
             TestServer.capacity = testcapacity;
@@ -246,14 +246,14 @@ namespace UsersModuleTests
 
             module.EmulateServerQuery(TestServer);
 
-            module.SyncServerInfo(null, null);
+            module.SyncTrackingServerInfo(null, null);
 
             TestServer.playerCount = NewPlayercount;
 
             module.EmulateServerQuery(TestServer);
-            module.SyncServerInfo(null, null);
+            module.SyncTrackingServerInfo(null, null);
 
-            Assert.IsTrue(module.serverList.Servers[0].playerCount.Equals(NewPlayercount));
+            Assert.IsTrue(module.TrackedServers.Servers[0].playerCount.Equals(NewPlayercount));
         }
 
         [TestMethod()]
@@ -263,7 +263,7 @@ namespace UsersModuleTests
 
             AddServer();
 
-            ServerInfo TestServer = TestServerinfo();
+            TrackingServerInfo TestServer = TestTrackingServerInfo();
 
             TestServer.currentMap = testmap;
             TestServer.capacity = testcapacity;
@@ -271,14 +271,14 @@ namespace UsersModuleTests
 
             module.EmulateServerQuery(TestServer);
 
-            module.SyncServerInfo(null, null);
+            module.SyncTrackingServerInfo(null, null);
 
             TestServer.currentMap = NewMapName;
 
             module.EmulateServerQuery(TestServer);
-            module.SyncServerInfo(null, null);
+            module.SyncTrackingServerInfo(null, null);
 
-            Assert.IsTrue(module.serverList.Servers[0].currentMap.Equals(NewMapName));
+            Assert.IsTrue(module.TrackedServers.Servers[0].currentMap.Equals(NewMapName));
         }
 
         bool ContainsCommand(string commandname , List<BaseCommand> commands) {

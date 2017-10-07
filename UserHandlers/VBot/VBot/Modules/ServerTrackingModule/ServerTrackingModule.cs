@@ -13,12 +13,12 @@ namespace SteamBotLite
 {
     public class ServerTrackingModule : BaseModule
     {
-        public event EventHandler<ServerInfo> ServerMapChanged;
+        public event EventHandler<TrackingServerInfo> ServerMapChanged;
 
 
         private BaseTask serverUpdate;
 
-        public ServerList serverList;
+        public TrackingServerList TrackedServers;
 
         public ModuleHandler Bot;
 
@@ -31,17 +31,17 @@ namespace SteamBotLite
         {
             this.WebServer = WebServer;
             Bot = bot;
-            List<ServerInfo> ServerList = new List<ServerInfo>();
+            List<TrackingServerInfo> ServersBeingTracked = new List<TrackingServerInfo>();
 
             int updateInterval = int.Parse(config["updateInterval"].ToString());
             Tuple<string, string, int>[] servers;
 
             if (File.Exists(ModuleSavedDataFilePath()))
             {
-                ServerList = JsonConvert.DeserializeObject<List<ServerInfo>>(System.IO.File.ReadAllText(ModuleSavedDataFilePath()));
-                for (int i = 0; i < ServerList.Count; i++)
+                ServersBeingTracked = JsonConvert.DeserializeObject<List<TrackingServerInfo>>(System.IO.File.ReadAllText(ModuleSavedDataFilePath()));
+                for (int i = 0; i < ServersBeingTracked.Count; i++)
                 {
-                    commands.Add(new Status(bot, ServerList[i], this));
+                    commands.Add(new Status(bot, ServersBeingTracked[i], this));
                 }
             }
             else
@@ -50,14 +50,15 @@ namespace SteamBotLite
                 servers = null;
             }
 
-            serverList = new ServerList(this, ServerList);
+            TrackedServers = new TrackingServerList(this, ServersBeingTracked);
+
             commands.Add(new Active(bot, this));
             commands.Add(new SpecificServerStatus(bot, this));
             adminCommands.Add(new ServerAdd(bot, this));
             adminCommands.Add(new ServerRemove(bot, this));
             adminCommands.Add(new FullServerQuery(bot, this));
 
-            serverUpdate = new BaseTask(updateInterval, new System.Timers.ElapsedEventHandler(SyncServerInfo));
+            serverUpdate = new BaseTask(updateInterval, new System.Timers.ElapsedEventHandler(SyncTrackingServerInfo));
 
             ServerMapChanged += bot.ServerUpdated;
             ServerMapChanged += ServerTrackingModule_ServerMapChanged;
@@ -68,7 +69,7 @@ namespace SteamBotLite
             return "!" + servername.ToLower() + "server";
         }
 
-        private void ServerTrackingModule_ServerMapChanged(object sender, ServerInfo e)
+        private void ServerTrackingModule_ServerMapChanged(object sender, TrackingServerInfo e)
         {
 
             string TableLabel = e.tag + " History";
@@ -117,26 +118,26 @@ namespace SteamBotLite
 
         
 
-        public void SyncServerInfo(object sender, EventArgs e)
+        public void SyncTrackingServerInfo(object sender, EventArgs e)
         {
-            for (int x = 0; x < serverList.Servers.Count; x++)
+            for (int x = 0; x < TrackedServers.Servers.Count; x++)
             {
-                ServerInfo currentserverstate = ServerQuery(serverList.Servers[x]);
+                TrackingServerInfo currentserverstate = ServerQuery(TrackedServers.Servers[x]);
 
                 if (currentserverstate != null)
                 {
-                    if (!(serverList.Servers[x].currentMap.Equals(currentserverstate.currentMap)))
+                    if (!(TrackedServers.Servers[x].currentMap.Equals(currentserverstate.currentMap)))
                     {
                         ServerMapChanged(this, currentserverstate);
                     }
-                    serverList.Servers[x].update(currentserverstate);
+                    TrackedServers.Servers[x].update(currentserverstate);
                 }
             }
         }
 
         public override string getPersistentData()
         {
-            return JsonConvert.SerializeObject(serverList.Servers);
+            return JsonConvert.SerializeObject(TrackedServers.Servers);
         }
 
         public override void loadPersistentData()
@@ -148,27 +149,27 @@ namespace SteamBotLite
                 foreach (Tuple<string, string, int> servconf in servers)
                 {
                     IPEndPoint ep = new IPEndPoint(System.Net.IPAddress.Parse(servconf.Item2), servconf.Item3);
-                    ServerInfo serverInfo = new ServerInfo(servconf.Item2, servconf.Item3, servconf.Item1);
-                    serverList.Add(serverInfo);
+                    TrackingServerInfo TrackingServerInfo = new TrackingServerInfo(servconf.Item2, servconf.Item3, servconf.Item1);
+                    TrackedServers.Add(TrackingServerInfo);
                 }
             }
             catch
             {
-                Console.WriteLine("There was an error loading the serverlist");
+                Console.WriteLine("There was an error loading the TrackingServerList");
             }
         }
 
         
         // queries a server and returns a <string, int> Tuple (filename, playercount)
-        public  ServerInfo ServerQuery(ServerInfo server)
+        public  TrackingServerInfo ServerQuery(TrackingServerInfo server)
         {
-            if (IsEmulating) //For testing purposes, we can assign and set an emulated serverinfo response
+            if (IsEmulating) //For testing purposes, we can assign and set an emulated TrackingServerInfo response
             {
-                return EmulatedServerInfo;
+                return EmulatedTrackingServerInfo;
             }
             else
             {
-                ServerInfo updatedServer = null;
+                TrackingServerInfo updatedServer = null;
                 // request server infos
                 IPEndPoint localEndpoint = new IPEndPoint(IPAddress.Any, 0);
 
@@ -189,14 +190,14 @@ namespace SteamBotLite
                     {
                         var data = client.Receive(ref localEndpoint).Skip(6).ToArray();
 
-                        updatedServer = new ServerInfo(server.serverIP, server.port, server.tag);
-                        string[] serverinfos = Encoding.ASCII.GetString(data).Split(new char[] { '\0' }, 5);
+                        updatedServer = new TrackingServerInfo(server.serverIP, server.port, server.tag);
+                        string[] TrackingServerInfos = Encoding.ASCII.GetString(data).Split(new char[] { '\0' }, 5);
                         // getting and sanitizing filename
-                        updatedServer.currentMap = serverinfos[1].Split('.')[0].Replace("workshop/", "");
+                        updatedServer.currentMap = TrackingServerInfos[1].Split('.')[0].Replace("workshop/", "");
                         // getting playerount
-                        updatedServer.playerCount = (int)Encoding.ASCII.GetBytes(serverinfos[4]).Skip(2).ToArray()[0];
+                        updatedServer.playerCount = (int)Encoding.ASCII.GetBytes(TrackingServerInfos[4]).Skip(2).ToArray()[0];
                         // getting server capacity
-                        updatedServer.capacity = (int)Encoding.ASCII.GetBytes(serverinfos[4]).Skip(2).ToArray()[1];
+                        updatedServer.capacity = (int)Encoding.ASCII.GetBytes(TrackingServerInfos[4]).Skip(2).ToArray()[1];
 
                         client.Close();
                     }
@@ -212,12 +213,12 @@ namespace SteamBotLite
         }
 
         //For Testing Purposes
-        private ServerInfo EmulatedServerInfo;
+        private TrackingServerInfo EmulatedTrackingServerInfo;
         private bool IsEmulating = false;
 
-        public void EmulateServerQuery(ServerInfo Response)
+        public void EmulateServerQuery(TrackingServerInfo Response)
         {
-            EmulatedServerInfo = Response;
+            EmulatedTrackingServerInfo = Response;
             IsEmulating = true;
         }
 
@@ -226,10 +227,10 @@ namespace SteamBotLite
         private sealed class Status : BaseCommand
         {
             // Automaticaly generated status command for each server under the config
-            ServerInfo server;
+            TrackingServerInfo server;
             ServerTrackingModule ServerTrackingModule;
 
-            public Status(ModuleHandler bot, ServerInfo server, ServerTrackingModule module) : base(bot, module.NameToserverCommand(server.tag))
+            public Status(ModuleHandler bot, TrackingServerInfo server, ServerTrackingModule module) : base(bot, module.NameToserverCommand(server.tag))
             {
                 this.server = server;
                 ServerTrackingModule = module;
@@ -237,7 +238,7 @@ namespace SteamBotLite
             }
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                ServerInfo status = ServerTrackingModule.ServerQuery(server);
+                TrackingServerInfo status = ServerTrackingModule.ServerQuery(server);
                 if (status != null)
                 {
                     server.update(status);
@@ -260,7 +261,7 @@ namespace SteamBotLite
             }
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                foreach (ServerInfo server in ServerTrackingModule.serverList)
+                foreach (TrackingServerInfo server in ServerTrackingModule.TrackedServers)
                 {
                     if (server.tag.Equals(param))
                     {
@@ -272,7 +273,7 @@ namespace SteamBotLite
 
             public override bool CheckCommandExists(MessageEventArgs Msg, string Message)
             {
-                foreach (ServerInfo server in ServerTrackingModule.serverList)
+                foreach (TrackingServerInfo server in ServerTrackingModule.TrackedServers)
                 {
                     if (Message.StartsWith(ServerTrackingModule.NameToserverCommand(server.tag), StringComparison.OrdinalIgnoreCase))
                     {
@@ -285,15 +286,15 @@ namespace SteamBotLite
             
             public override string[] GetCommmand()
             {
-                int AmountOfServers = ServerTrackingModule.serverList.Count();
-                string[] ServerList = new string[AmountOfServers];
+                int AmountOfServers = ServerTrackingModule.TrackedServers.Count();
+                string[] TrackingServerList = new string[AmountOfServers];
 
                 for (int x = 0; x < AmountOfServers; x++ )
                 {
-                    ServerList[x] = ServerTrackingModule.NameToserverCommand(ServerTrackingModule.serverList.Servers[x].tag);
+                    TrackingServerList[x] = ServerTrackingModule.NameToserverCommand(ServerTrackingModule.TrackedServers.Servers[x].tag);
                 }
 
-                return ServerList;
+                return TrackingServerList;
             }
         }
 
@@ -314,8 +315,8 @@ namespace SteamBotLite
                     try
                     {
                         IPEndPoint ep = new IPEndPoint(System.Net.IPAddress.Parse(parameters[1]), int.Parse(parameters[2]));
-                        ServerInfo Server = new ServerInfo(parameters[1], int.Parse(parameters[2]), parameters[0]);
-                        module.serverList.Add(Server);
+                        TrackingServerInfo Server = new TrackingServerInfo(parameters[1], int.Parse(parameters[2]), parameters[0]);
+                        module.TrackedServers.Add(Server);
 
                         return string.Format("Server {0} has been successfully added at: {1}", Server.tag, Server.serverIP);
                     }
@@ -341,11 +342,11 @@ namespace SteamBotLite
             }
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                foreach (ServerInfo server in module.serverList.Servers)
+                foreach (TrackingServerInfo server in module.TrackedServers.Servers)
                 {
                     if (param.Equals(server.tag, StringComparison.OrdinalIgnoreCase))
                     {
-                        module.serverList.Remove(server);
+                        module.TrackedServers.Remove(server);
                         return "The server has been removed from the list";
                     }
                 }
@@ -366,7 +367,7 @@ namespace SteamBotLite
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 string activeServers = "";
-                foreach (ServerInfo server in module.serverList.Servers)
+                foreach (TrackingServerInfo server in module.TrackedServers.Servers)
                     if (server.playerCount > 1)
                     {
                         if (!activeServers.Equals(string.Empty))
@@ -389,7 +390,7 @@ namespace SteamBotLite
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 string activeServers = "";
-                foreach (ServerInfo server in module.serverList.Servers)
+                foreach (TrackingServerInfo server in module.TrackedServers.Servers)
                 {
                     if (!activeServers.Equals(string.Empty))
                     {

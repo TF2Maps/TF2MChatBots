@@ -94,7 +94,7 @@ namespace SteamBotLite
         {
         }
 
-        void ModuleHandler.ServerUpdated(object sender, ServerInfo args)
+        void ModuleHandler.ServerUpdated(object sender, TrackingServerInfo args)
         {
         }
 
