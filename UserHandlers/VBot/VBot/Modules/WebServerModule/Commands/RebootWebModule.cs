@@ -2,7 +2,7 @@
 {
     internal partial class WebServerHostingModule
     {
-        private class RebootModule : BaseCommand
+        private class RebootWebModule : BaseCommand
         {
             private string address;
 
@@ -11,7 +11,7 @@
 
             private ModuleHandler ModuleHandler;
 
-            public RebootModule(ModuleHandler bot, WebServerHostingModule module) : base(bot, "!WebsiteReboot")
+            public RebootWebModule(ModuleHandler bot, WebServerHostingModule module) : base(bot, "!WebsiteReboot")
             {
                 this.module = module;
                 this.address = (module.config["Address"].ToString());

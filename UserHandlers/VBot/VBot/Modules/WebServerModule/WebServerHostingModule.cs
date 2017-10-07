@@ -37,7 +37,7 @@ namespace SteamBotLite
                 Console.WriteLine("Files not found, webserver load failed");
             }
 
-            adminCommands.Add(new RebootModule(bot, this));
+            adminCommands.Add(new RebootWebModule(bot, this));
             adminCommands.Add(new RemoveTable(bot, this));
         }
 
@@ -164,7 +164,6 @@ namespace SteamBotLite
 
             Console.WriteLine("Website Loaded");
 
-            //MapListUpdate(this, null);
         }
 
         private void AddTableFromEntry(string TableKey, TableData TableData)
