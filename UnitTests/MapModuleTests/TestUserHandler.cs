@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SteamBotLite
 {
-    class TestUserHandler : UserHandler, ModuleHandler, HTMLFileFromArrayListiners
+    internal class TestUserHandler : UserHandler, ModuleHandler, HTMLFileFromArrayListiners
     {
         public void AddEntryWithLimit(string identifier, TableDataValue[] data, int limit)
         {
@@ -60,10 +56,12 @@ namespace SteamBotLite
 
         bool ModuleHandler.admincheck(ChatroomEntity user)
         {
-            if (user.Rank == ChatroomEntity.AdminStatus.True) {
+            if (user.Rank == ChatroomEntity.AdminStatus.True)
+            {
                 return true;
             }
-            else {
+            else
+            {
                 return false;
             }
         }
@@ -72,9 +70,8 @@ namespace SteamBotLite
         {
         }
 
-        
-
-        List<BaseModule> ModuleHandler.GetAllModules() {
+        List<BaseModule> ModuleHandler.GetAllModules()
+        {
             return new List<BaseModule>();
         }
 
@@ -101,7 +98,6 @@ namespace SteamBotLite
         void ModuleHandler.SetStatusmessageEvent(string statusMessage)
         {
         }
-
 
         void ModuleHandler.UpdateUsernameEvent(object sender, string Username)
         {

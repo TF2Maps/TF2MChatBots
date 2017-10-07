@@ -1,8 +1,7 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SteamBotLite;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MapModuleTests
@@ -10,12 +9,12 @@ namespace MapModuleTests
     [TestClass]
     public class TrackingServerListHolderTests
     {
-        TrackingServerListHolder module;
-        TrackingServerListHolder.PlayEntry TestPlayEntry;
-        int identifier = 0;
-        string MapName = "TESTMAP";
+        private TrackingServerListHolder module;
+        private TrackingServerListHolder.PlayEntry TestPlayEntry;
+        private int identifier = 0;
+        private string MapName = "TESTMAP";
 
-        Dictionary<string, Dictionary<string, object>> MakeConfig()
+        private Dictionary<string, Dictionary<string, object>> MakeConfig()
         {
             Dictionary<string, Dictionary<string, object>> ModuleHolder = new Dictionary<string, Dictionary<string, object>>();
             Dictionary<string, object> ModuleData = new Dictionary<string, object>();
@@ -25,18 +24,18 @@ namespace MapModuleTests
             return ModuleHolder;
         }
 
-        void MakeNewModule()
+        private void MakeNewModule()
         {
             TestUserHandler tester = new TestUserHandler();
             module = new TrackingServerListHolder(tester, tester, MakeConfig());
         }
 
-        // Use TestInitialize to run code before running each test 
+        // Use TestInitialize to run code before running each test
         [TestInitialize()]
         public void Initialize()
         {
             MakeNewModule();
-            TestPlayEntry = new TrackingServerListHolder.PlayEntry("25","128.0.0.0","1:00pm");
+            TestPlayEntry = new TrackingServerListHolder.PlayEntry("25", "128.0.0.0", "1:00pm");
         }
 
         // Use TestCleanup to run code after each test has run
@@ -53,6 +52,7 @@ namespace MapModuleTests
             module.AddEntry(MapName, TestPlayEntry);
             Assert.IsTrue(module.MapTests[MapName].Contains(TestPlayEntry));
         }
+
         [TestMethod()]
         public void GroupingEntries()
         {
@@ -60,6 +60,7 @@ namespace MapModuleTests
             module.AddEntry(MapName, TestPlayEntry);
             Assert.IsTrue(module.MapTests[MapName].Count == 2);
         }
+
         [TestMethod()]
         public void Persistancy()
         {
@@ -73,6 +74,7 @@ namespace MapModuleTests
             Assert.IsTrue(module.MapTests[MapName].First().TimeEntered == TestPlayEntry.TimeEntered);
             Console.WriteLine("Done");
         }
+
         [TestMethod()]
         public void DoublePersistancy()
         {
@@ -87,6 +89,5 @@ namespace MapModuleTests
             Assert.IsTrue(module.MapTests[MapName].First().TimeEntered == TestPlayEntry.TimeEntered);
             Console.WriteLine("Done");
         }
-
     }
 }

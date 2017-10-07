@@ -3,28 +3,23 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SteamBotLite
 {
     public class TrackingServerListHolder : BaseModule, ServerMapChangeListiner
     {
-
-        class Maplist
+        private class Maplist
         {
             public List<string> Maps;
             public SummariseMethod ListKind;
             public string ListName;
         }
 
+        private string[] Header = new string[] { "Map", "Time Played" };
+        private HTMLFileFromArrayListiners listiner;
 
-
-        string[] Header = new string[] { "Map", "Time Played" };
-        HTMLFileFromArrayListiners listiner;
-
-        public TrackingServerListHolder(ModuleHandler bot,HTMLFileFromArrayListiners listiner , Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
+        public TrackingServerListHolder(ModuleHandler bot, HTMLFileFromArrayListiners listiner, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
             loadPersistentData();
             this.Maplists = new List<Maplist>();
@@ -38,22 +33,21 @@ namespace SteamBotLite
             UpdateList();
 
             bot.AddMapChangeEventListiner(this);
-            
         }
 
         public override void OnAllModulesLoaded()
         {
-
         }
 
-        List<Maplist> Maplists;
+        private List<Maplist> Maplists;
         public Dictionary<string, List<PlayEntry>> MapTests;
 
         public class PlayEntry
         {
-            public string PlayerCount {get; set;}
+            public string PlayerCount { get; set; }
             public string ServerIP { get; set; }
             public string TimeEntered { get; set; }
+
             public PlayEntry(string playercount, string serverip, string timeentered)
             {
                 this.PlayerCount = playercount;
@@ -64,28 +58,25 @@ namespace SteamBotLite
 
         public void OnMapChange(TrackingServerInfo args)
         {
-          //  Tuple<string,string,string> entry = new Tuple<string, string, string>()
+            //  Tuple<string,string,string> entry = new Tuple<string, string, string>()
             PlayEntry entry = new PlayEntry(args.playerCount.ToString(), args.serverIP, System.DateTime.Now.ToShortDateString() + " : " + System.DateTime.Now.ToShortTimeString());
             AddEntry(args.currentMap, entry);
             savePersistentData();
             UpdateList();
-            
         }
 
-        void UpdateList ()
+        private void UpdateList()
         {
-            
             foreach (Maplist entry in Maplists)
             {
                 listiner.HTMLFileFromArray(Header, ParseSummarisedListToHTMLTable(SummariseEntries(MapTests, entry.Maps, entry.ListKind)), entry.ListName);
             }
-            
         }
 
-        void Export ()
+        private void Export()
         {
             List<string[]> Data = new List<string[]>();
-            string[] header =  { "MapName", "IP", "Playercount", "TimeEntered" };
+            string[] header = { "MapName", "IP", "Playercount", "TimeEntered" };
             foreach (KeyValuePair<string, List<PlayEntry>> Item in MapTests)
             {
                 foreach (PlayEntry PlayCache in Item.Value)
@@ -111,8 +102,8 @@ namespace SteamBotLite
             savePersistentData();
         }
 
-
-        enum SummariseMethod { Blacklist,Whitelist}
+        private enum SummariseMethod
+        { Blacklist, Whitelist }
 
         /// <summary>
         /// Used to summarise the Dictionary but only return entries in the whitelist or not in the blacklist
@@ -120,14 +111,14 @@ namespace SteamBotLite
         /// <param name="Dictionary"></param>
         /// <param name="Filter"></param>
         /// <returns></returns>
-        Dictionary<string, int> SummariseEntries(Dictionary<string, List<PlayEntry>> Dictionary, List<string> Filter , SummariseMethod MethodToSummariseWith)
+        private Dictionary<string, int> SummariseEntries(Dictionary<string, List<PlayEntry>> Dictionary, List<string> Filter, SummariseMethod MethodToSummariseWith)
         {
-            //Assign Values for the Boolean 
+            //Assign Values for the Boolean
             bool SummariseMethod;
 
             if (MethodToSummariseWith.Equals(TrackingServerListHolder.SummariseMethod.Whitelist))
             {
-                SummariseMethod = true; 
+                SummariseMethod = true;
             }
             else
             {
@@ -146,10 +137,10 @@ namespace SteamBotLite
             return SumamrisedDictionary;
         }
 
-        List<string[]> ParseSummarisedListToHTMLTable (Dictionary<string,int> Dictionary)
+        private List<string[]> ParseSummarisedListToHTMLTable(Dictionary<string, int> Dictionary)
         {
             List<string[]> Array = new List<string[]>();
-            foreach(KeyValuePair<string,int> entry in Dictionary)
+            foreach (KeyValuePair<string, int> entry in Dictionary)
             {
                 Array.Add(new string[] { entry.Key, entry.Value.ToString() });
             }
@@ -171,9 +162,7 @@ namespace SteamBotLite
             }
         }
 
-        
-
-        public string Decompress (string data)
+        public string Decompress(string data)
         {
             if (string.IsNullOrWhiteSpace(data))
             {
@@ -199,10 +188,12 @@ namespace SteamBotLite
             {
                 string data = System.IO.File.ReadAllText(ModuleSavedDataFilePath());
                 string DataAsString = Decompress(data);
-                if ( string.IsNullOrEmpty(DataAsString) ) {
+                if (string.IsNullOrEmpty(DataAsString))
+                {
                     MapTests = new Dictionary<string, List<PlayEntry>>();
                 }
-                else{
+                else
+                {
                     MapTests = JsonConvert.DeserializeObject<Dictionary<string, List<PlayEntry>>>(DataAsString);
                 }
             }

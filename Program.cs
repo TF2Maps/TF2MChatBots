@@ -1,22 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SteamKit2;
-using System.IO;
-using Newtonsoft.Json;
 using System.Threading;
 
 namespace SteamBotLite
 {
-    class Program
+    internal class Program
     {
-
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-
-            
             //Create userHandlers//
             List<UserHandler> UserHandlers = new List<UserHandler>();
             Console.WriteLine("RUNNING");
@@ -24,7 +15,6 @@ namespace SteamBotLite
             MediaBot MediaHandler = new MediaBot();
             VBot VbotHandler = new VBot();
             GhostChecker ghostchecker = new GhostChecker();
-            
 
             // Create Interfaces//
             List<ApplicationInterface> Bots = new List<ApplicationInterface>();
@@ -70,26 +60,23 @@ namespace SteamBotLite
             AssignConnection(consolehandler, SteamPlatformInterface);
             AssignConnection(ghostchecker, SteamPlatformInterface);
 
-            
-
             Thread[] BotThreads = new Thread[Bots.Count];
-            
+
             //Start looping and iterating//
             for (int x = 0; x < Bots.Count; x++)
             {
                 BotThreads[x] = new Thread(new ThreadStart(Bots[x].StartTickThreadLoop));
                 BotThreads[x].Start();
             }
-            
+
             bool Running = true;
-            
+
             while (Running)
             {
-                
             }
         }
 
-        public static void AssignConnection (UserHandler userhandler , ApplicationInterface applicationinterface)
+        public static void AssignConnection(UserHandler userhandler, ApplicationInterface applicationinterface)
         {
             userhandler.AssignAppInterface(applicationinterface);
             applicationinterface.AssignUserHandler(userhandler);
@@ -102,8 +89,6 @@ namespace SteamBotLite
             {
                 Bot.tick();
             }
-
         }
     }
 }
-    

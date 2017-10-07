@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SteamKit2;
 
 namespace SteamBotLite
 {
     public abstract class UserHandler
     {
-       
         /// <summary>
         /// Sets the SteamConnectionHandler to Bot
         /// </summary>
@@ -18,7 +12,7 @@ namespace SteamBotLite
         {
         }
 
-        public void AssignAppInterface (ApplicationInterface appinterface)
+        public void AssignAppInterface(ApplicationInterface appinterface)
         {
             appinterface.AnnounceLoginCompletedEvent += OnLoginCompleted;
             appinterface.PrivateMessageEvent += ProcessPrivateMessage;
@@ -32,12 +26,12 @@ namespace SteamBotLite
 
         public abstract void OnLoginCompleted(object sender, EventArgs e);
 
-
         public EventHandler<Tuple<ChatroomEntity, bool>> ChatMemberInfoEvent;
 
-        public abstract void ChatMemberInfo(object sender , Tuple<ChatroomEntity,bool> e); //TODO make this an object, not a bool
+        public abstract void ChatMemberInfo(object sender, Tuple<ChatroomEntity, bool> e); //TODO make this an object, not a bool
 
         public event EventHandler<EventArgs> RebootEvent;
+
         /// <summary>
         /// Reboot the connection with steam
         /// </summary>
@@ -50,13 +44,11 @@ namespace SteamBotLite
             }
         }
 
-
         public event EventHandler<string> SetUsernameEvent;
 
         //The event-invoking method that derived classes can override.
         public virtual void SetUsernameEventProcess(string e)
         {
-            
             // Make a temporary copy of the event to avoid possibility of
             // a race condition if the last subscriber unsubscribes
             // immediately after the null check and before the event is raised.
@@ -67,15 +59,16 @@ namespace SteamBotLite
             }
         }
 
-        public enum ChatroomEventEnum { LeaveChat, EnterChat , Other };
-
+        public enum ChatroomEventEnum { LeaveChat, EnterChat, Other };
 
         public event EventHandler<ChatroomEntity> ChatRoomJoin;
+
         public event EventHandler<ChatroomEntity> ChatRoomLeave;
+
         public event EventHandler<ChatroomEntity> ChatRoomOther;
 
         //The event-invoking method that derived classes can override.
-        protected virtual void FireChatRoomEvent(ChatroomEventEnum e , ChatroomEntity chatroom)
+        protected virtual void FireChatRoomEvent(ChatroomEventEnum e, ChatroomEntity chatroom)
         {
             EventHandler<ChatroomEntity> handler;
             switch (e)
@@ -83,12 +76,15 @@ namespace SteamBotLite
                 case ChatroomEventEnum.EnterChat:
                     handler = ChatRoomJoin;
                     break;
+
                 case ChatroomEventEnum.LeaveChat:
                     handler = ChatRoomLeave;
                     break;
+
                 case ChatroomEventEnum.Other:
                     handler = ChatRoomOther;
                     break;
+
                 default:
                     handler = null;
                     break;
@@ -100,8 +96,11 @@ namespace SteamBotLite
         }
 
         public event EventHandler<EventArgs> MainChatRoomJoin;
+
         public event EventHandler<EventArgs> MainChatRoomLeave;
+
         public event EventHandler<EventArgs> MainChatRoomOther;
+
         //The event-invoking method that derived classes can override.
         public virtual void FireMainChatRoomEvent(ChatroomEventEnum e)
         {
@@ -111,12 +110,15 @@ namespace SteamBotLite
                 case ChatroomEventEnum.EnterChat:
                     handler = MainChatRoomJoin;
                     break;
+
                 case ChatroomEventEnum.LeaveChat:
                     handler = MainChatRoomLeave;
                     break;
+
                 case ChatroomEventEnum.Other:
                     handler = MainChatRoomOther;
                     break;
+
                 default:
                     handler = null;
                     break;
@@ -183,8 +185,5 @@ namespace SteamBotLite
                 handler(this, e);
             }
         }
-
-
-
     }
 }

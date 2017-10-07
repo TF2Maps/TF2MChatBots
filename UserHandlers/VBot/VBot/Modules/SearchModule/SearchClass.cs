@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Net;
 using System.IO;
-using System.Net.Cache;
+using System.Net;
 
 namespace SteamBotLite
 {
@@ -14,8 +13,9 @@ namespace SteamBotLite
         public string SpiderSuffix { get; set; }
         public bool IsCustomUrl { get; set; }
     }
+
     //TODO Better dumping and properly do it maybe static isn't best
-    static class SearchClass
+    internal static class SearchClass
     {
         public static bool CheckDataExistsOnWebPage(string URL, string data, Int32 Timeout = 15000)
         {
@@ -32,15 +32,11 @@ namespace SteamBotLite
                     return false;
                 }
             }
-
             catch (Exception ex)
             {
                 return false;
             }
-
         }
-
-       
 
         public static string GetWebPageAsString(string URL, Int32 Timeout = 15000)
         {
@@ -65,7 +61,6 @@ namespace SteamBotLite
             {
                 throw;
             }
-
         }
 
         public static string Search(SearchClassEntry SearchEntry, string SearchURL, Int32 Timeout = 15000)

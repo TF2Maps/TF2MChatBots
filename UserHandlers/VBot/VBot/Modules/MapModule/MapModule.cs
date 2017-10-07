@@ -1,38 +1,36 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using Newtonsoft.Json;
-
+using System.Linq;
 
 namespace SteamBotLite
 {
-    public class MapModule : BaseModule , ServerMapChangeListiner
+    public class MapModule : BaseModule, ServerMapChangeListiner
     {
         // public List<Map> mapList = new List<Map>();  //OLD MAP SYSTEM
 
         public MapCollection mapList;
 
-        int MaxMapNumber = 10;
-        string ServerMapListUrl;
-        
+        private int MaxMapNumber = 10;
+        private string ServerMapListUrl;
+
         public MapModule(VBot bot, HTMLFileFromArrayListiners HtmlListiner, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
             this.HTMLlistiner = HtmlListiner;
             LoadModule(bot);
-
         }
-        HTMLFileFromArrayListiners HTMLlistiner;
 
-        public MapModule(ModuleHandler bot,HTMLFileFromArrayListiners HtmlListiner, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
+        private HTMLFileFromArrayListiners HTMLlistiner;
+
+        public MapModule(ModuleHandler bot, HTMLFileFromArrayListiners HtmlListiner, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
             this.HTMLlistiner = HtmlListiner;
             LoadModule(bot);
-            
         }
 
-        void LoadModule (ModuleHandler bot)
+        private void LoadModule(ModuleHandler bot)
         {
             HTMLlistiner.SetTableHeader(TableName, GetMapListTableHeader()); //Ensures the maplist is shown before deleted maps
 
@@ -62,7 +60,7 @@ namespace SteamBotLite
             bot.AddMapChangeEventListiner(this);
         }
 
-        bool CheckIfMapIsUploaded(string filename)
+        private bool CheckIfMapIsUploaded(string filename)
         {
             if (SubstitutingWebPage)
             {
@@ -74,13 +72,12 @@ namespace SteamBotLite
             }
         }
 
-
         //This exists for testing purposes, Allowing us to emulate a webpage being returned
 
-        bool SubstitutingWebPage = false;
-        string MapListUploadCheck; 
+        private bool SubstitutingWebPage = false;
+        private string MapListUploadCheck;
 
-        public void SubstituteWebPageWithString (string data)
+        public void SubstituteWebPageWithString(string data)
         {
             SubstitutingWebPage = true;
             MapListUploadCheck = data;
@@ -88,18 +85,18 @@ namespace SteamBotLite
 
         public override void OnAllModulesLoaded()
         {
-            userhandler.OnMaplistchange(mapList.GetAllMaps(), null, null); 
+            userhandler.OnMaplistchange(mapList.GetAllMaps(), null, null);
         }
-       
-        void MapChange(object sender, NotifyCollectionChangedEventArgs args)
+
+        private void MapChange(object sender, NotifyCollectionChangedEventArgs args)
         {
             userhandler.OnMaplistchange(mapList.GetAllMaps(), sender, args);
             ConvertMaplistToTable();
         }
 
-        string TableName = "Current Maps";
+        private string TableName = "Current Maps";
 
-        TableDataValue[] GetMapListTableHeader ()
+        private TableDataValue[] GetMapListTableHeader()
         {
             TableDataValue[] HeaderName = new TableDataValue[4];
             HeaderName[0] = new TableDataValue(); //There's gotta be a way to fix this
@@ -112,11 +109,10 @@ namespace SteamBotLite
             HeaderName[2].VisibleValue = "Notes";
             HeaderName[3].VisibleValue = "Submitter";
 
-
             return HeaderName;
         }
 
-        void ConvertMaplistToTable ()
+        private void ConvertMaplistToTable()
         {
             List<TableDataValue[]> Entries = new List<TableDataValue[]>();
 
@@ -138,11 +134,14 @@ namespace SteamBotLite
                 Values[3].VisibleValue = entry.SubmitterName;
                 Values[3].HoverText = entry.Submitter.ToString();
 
-                if (string.IsNullOrEmpty(entry.SubmitterContact)) {
-                } else {
+                if (string.IsNullOrEmpty(entry.SubmitterContact))
+                {
+                }
+                else
+                {
                     Values[3].Link = entry.SubmitterContact;
                 }
-                
+
                 Entries.Add(Values);
 
                 HTMLlistiner.AddEntryWithoutLimit(TableName, Values);
@@ -162,7 +161,7 @@ namespace SteamBotLite
 
             Dictionary<string, object> ConfigData = new Dictionary<string, object>();
             ConfigData.Add("AllowOnlyUploadedMaps", mapList.AllowOnlyUploadedMaps.ToString());
-            ConfigData.Add("AllowOnlyUploadedMapsErrMsg",mapList.ForceMapsToBeUploadedErrorResponse);
+            ConfigData.Add("AllowOnlyUploadedMapsErrMsg", mapList.ForceMapsToBeUploadedErrorResponse);
 
             PersistantData.Add("Config", JsonConvert.SerializeObject(ConfigData));
 
@@ -174,7 +173,6 @@ namespace SteamBotLite
             try
             {
                 Console.WriteLine("Loading Map List");
-               
 
                 Dictionary<string, string> PersistantData = JsonConvert.DeserializeObject<Dictionary<string, string>>(System.IO.File.ReadAllText(ModuleSavedDataFilePath()));
                 mapList = new MapCollection(JsonConvert.DeserializeObject<ObservableCollection<Map>>(PersistantData["Maplist"].ToString()), HTMLlistiner);
@@ -189,8 +187,8 @@ namespace SteamBotLite
             catch
             {
                 mapList = new MapCollection(new ObservableCollection<Map>(), HTMLlistiner);
-                mapList.RestrictMapsToBeUploaded(false,"TESTING");
-                
+                mapList.RestrictMapsToBeUploaded(false, "TESTING");
+
                 savePersistentData();
 
                 Console.WriteLine("Error Loading Map List, creating a new one and wiping the old");
@@ -205,27 +203,26 @@ namespace SteamBotLite
 
             if (map != null && args.playerCount > 8)
             {
-                User Submitter = new User(map.Submitter,null);
+                User Submitter = new User(map.Submitter, null);
 
                 Console.WriteLine("Found map, sending message to {0}", Submitter);
                 string ReasonForDeletion = string.Format("Map {0} is being tested on the {1} server and has been DELETED.", map.Filename, args.tag);
                 userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = Submitter, ReplyMessage = ReasonForDeletion });
-                mapList.RemoveMap(map , ReasonForDeletion);
+                mapList.RemoveMap(map, ReasonForDeletion);
                 Console.WriteLine("Map {0} is being tested on the {1} server and has been DELETED.", map.Filename, args.tag);
                 savePersistentData();
             }
             Console.Write("...Not Found");
             return;
         }
-        
 
         abstract public class MapCommand : BaseCommand
         {
             protected MapModule MapModule;
-            string syntax;
-            string command;
+            private string syntax;
+            private string command;
 
-            public MapCommand(ModuleHandler bot, string command, MapModule mapMod, string Syntax): base(bot, command)
+            public MapCommand(ModuleHandler bot, string command, MapModule mapMod, string Syntax) : base(bot, command)
             {
                 this.MapModule = mapMod;
                 this.syntax = Syntax;
@@ -236,19 +233,19 @@ namespace SteamBotLite
             {
                 string[] commandsplit = param.Split(new char[] { ' ' }, 2);
 
-                if((commandsplit[0].StartsWith(command, StringComparison.OrdinalIgnoreCase)))
+                if ((commandsplit[0].StartsWith(command, StringComparison.OrdinalIgnoreCase)))
                 {
-                    return "Incorrect Syntax!: " + syntax; 
+                    return "Incorrect Syntax!: " + syntax;
                 }
                 else
                 {
-                    return runcommand(Msg,param);
+                    return runcommand(Msg, param);
                 }
             }
 
             public abstract string runcommand(MessageEventArgs Msg, string param);
 
-            public Map CleanupAndParseMsgToMap (MessageEventArgs Msg , string param)
+            public Map CleanupAndParseMsgToMap(MessageEventArgs Msg, string param)
             {
                 string message = RemoveWhiteSpacesFromString(param);
 
@@ -265,32 +262,37 @@ namespace SteamBotLite
                 string[] parameters = message.Split(new char[] { ' ' }, 2);
                 string trailer = "";
 
-                if (parameters.Length > 1) {
+                if (parameters.Length > 1)
+                {
                     trailer = parameters[1];
                 }
 
                 Map map = new Map();
                 map.Filename = parameters[0];
 
-                if (MapIsUploadedToWebsite(map.Filename)){
+                if (MapIsUploadedToWebsite(map.Filename))
+                {
                     map.Uploaded = true;
                 }
-                else {
+                else
+                {
                     string[] TrailerSplitByFirstWord = trailer.Split(new char[] { ' ' }, 2);
 
                     map.DownloadURL = TrailerSplitByFirstWord[0];
 
-                    if (TrailerSplitByFirstWord.Length > 1) {
+                    if (TrailerSplitByFirstWord.Length > 1)
+                    {
                         trailer = TrailerSplitByFirstWord[1];
                     }
-                    else {
+                    else
+                    {
                         trailer = "";
                     }
                 }
 
                 map.Notes = trailer;
 
-                return map; 
+                return map;
             }
 
             public bool MapIsUploadedToWebsite(string filename)
@@ -301,8 +303,8 @@ namespace SteamBotLite
 
         private sealed class UploadCheck : MapCommand
         {
-            public UploadCheck(ModuleHandler bot, MapModule mapModule) : base(bot, "!uploadcheck", mapModule , "!uploadcheck <mapname>")
-            {}
+            public UploadCheck(ModuleHandler bot, MapModule mapModule) : base(bot, "!uploadcheck", mapModule, "!uploadcheck <mapname>")
+            { }
 
             public override string runcommand(MessageEventArgs Msg, string param)
             {
@@ -312,38 +314,45 @@ namespace SteamBotLite
 
         private sealed class AllowOnlyUploadedMapsSetter : BaseCommand
         {
-            MapModule mapmodule;
+            private MapModule mapmodule;
+
             public AllowOnlyUploadedMapsSetter(ModuleHandler bot, MapModule module) : base(bot, "!forceuploaded")
             {
                 mapmodule = module;
             }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 string[] parameters = param.Split(new char[] { ' ' }, 2);
                 bool AllowOnlyUploadedMaps = bool.Parse(parameters[0]);
-                if (parameters.Count() != 2 && AllowOnlyUploadedMaps)   {
+                if (parameters.Count() != 2 && AllowOnlyUploadedMaps)
+                {
                     return "The syntax is: !forceuploaded true/false <reason>";
                 }
-                if (AllowOnlyUploadedMaps == false) {
+                if (AllowOnlyUploadedMaps == false)
+                {
                     mapmodule.mapList.RestrictMapsToBeUploaded(AllowOnlyUploadedMaps, "");
                 }
-                else {
+                else
+                {
                     string RejectUnUploadedMapsReply = parameters[1];
                     mapmodule.mapList.RestrictMapsToBeUploaded(AllowOnlyUploadedMaps, RejectUnUploadedMapsReply);
                 }
                 mapmodule.savePersistentData();
 
-                return string.Format("Config has been updated, forcing maps to be uploaded has been set to: {0} with an error msg: {1}",mapmodule.mapList.AllowOnlyUploadedMaps.ToString(), mapmodule.mapList.ForceMapsToBeUploadedErrorResponse);
+                return string.Format("Config has been updated, forcing maps to be uploaded has been set to: {0} with an error msg: {1}", mapmodule.mapList.AllowOnlyUploadedMaps.ToString(), mapmodule.mapList.ForceMapsToBeUploadedErrorResponse);
             }
         }
 
         private sealed class UpdateName : BaseCommand
         {
-            MapModule mapmodule;
+            private MapModule mapmodule;
+
             public UpdateName(ModuleHandler bot, MapModule module) : base(bot, "!nameupdate")
             {
                 mapmodule = module;
             }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 NotifyCollectionChangedEventArgs args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
@@ -356,25 +365,26 @@ namespace SteamBotLite
 
         private class Add : MapCommand
         {
-
-            public Add(ModuleHandler bot, MapModule mapModule) : base(bot, "!add", mapModule , "!add <mapname> <url> <notes>") { }
+            public Add(ModuleHandler bot, MapModule mapModule) : base(bot, "!add", mapModule, "!add <mapname> <url> <notes>")
+            {
+            }
 
             public override string runcommand(MessageEventArgs Msg, string param)
             {
-                Map UserMap = CleanupAndParseMsgToMap(Msg , param);
-                
+                Map UserMap = CleanupAndParseMsgToMap(Msg, param);
 
-                string Reply =  MapModule.mapList.AddMap(UserMap);
+                string Reply = MapModule.mapList.AddMap(UserMap);
                 MapModule.savePersistentData();
 
                 return Reply;
-
             }
         }
 
         private class Insert : MapCommand
         {
-            public Insert(ModuleHandler bot, MapModule mapModule) : base(bot, "!insert", mapModule , "!insert <index> <filename> <url> <notes>") { }
+            public Insert(ModuleHandler bot, MapModule mapModule) : base(bot, "!insert", mapModule, "!insert <index> <filename> <url> <notes>")
+            {
+            }
 
             public override string runcommand(MessageEventArgs msg, string param)
             {
@@ -408,7 +418,6 @@ namespace SteamBotLite
                     return string.Format("Your new file name was rejected because: {0}", exception.Message);
                 }
 
-
                 map.Notes = string.Format("Inserted in position {0} by {1} //", index, msg.Sender.identifier.ToString());
 
                 if (MapModule.CheckIfMapIsUploaded(map.Filename)) //Check if the map is uploaded
@@ -440,34 +449,39 @@ namespace SteamBotLite
                 MapModule.savePersistentData();
 
                 return Reply;
-
             }
         }
 
         private class Maps : BaseCommand
         {
-            MapModule module;
+            private MapModule module;
 
-            DateTime LastExecuted;
+            private DateTime LastExecuted;
 
-            public Maps(ModuleHandler bot, MapModule mapMod) : base(bot, "!maps") {
+            public Maps(ModuleHandler bot, MapModule mapMod) : base(bot, "!maps")
+            {
                 module = mapMod;
             }
-            enum MapSearchFilter { StartsWith, EndsWith, NoFilter, Contains};
 
-            bool MapNamePassesFilter (string MapName, MapSearchFilter FilterType, string Filter)
+            private enum MapSearchFilter
+            { StartsWith, EndsWith, NoFilter, Contains };
+
+            private bool MapNamePassesFilter(string MapName, MapSearchFilter FilterType, string Filter)
             {
                 switch (FilterType)
                 {
                     case MapSearchFilter.StartsWith:
                         return MapName.StartsWith(Filter);
                         break;
+
                     case MapSearchFilter.EndsWith:
-                        return MapName.EndsWith(Filter); 
+                        return MapName.EndsWith(Filter);
                         break;
+
                     case MapSearchFilter.Contains:
                         return MapName.Contains(Filter);
                         break;
+
                     case MapSearchFilter.NoFilter:
                         return true;
                         break;
@@ -475,16 +489,14 @@ namespace SteamBotLite
                 return true; //Why did we arrive here
             }
 
-            Tuple<string,string> GetMapsWithFilter (string Filter, MapSearchFilter FilterType , bool OnlyReturnUploadedMaps)
+            private Tuple<string, string> GetMapsWithFilter(string Filter, MapSearchFilter FilterType, bool OnlyReturnUploadedMaps)
             {
-
                 IReadOnlyList<Map> maps = module.mapList.GetAllMaps();
 
                 if (maps.Count == 0)
                 {
                     return new Tuple<string, string>("The map list is empty", " ");
                 }
-
                 else
                 {
                     string chatResponse = "";
@@ -494,17 +506,18 @@ namespace SteamBotLite
                     int MapsInResponseLimit = module.MaxMapNumber;
 
                     //Build Chat Response
-                    for (int i = 0; i < maps.Count; i++ )
+                    for (int i = 0; i < maps.Count; i++)
                     {
                         if (OnlyReturnUploadedMaps && (module.CheckIfMapIsUploaded(maps[i].Filename) == false))
                         {
                             // do nothing
                         }
-                        else if (MapNamePassesFilter(maps[i].Filename, FilterType,Filter))
+                        else if (MapNamePassesFilter(maps[i].Filename, FilterType, Filter))
                         {
                             if (MapsAddedToResponse < MapsInResponseLimit)
                             {
-                                if (MapsAddedToResponse > 0) {
+                                if (MapsAddedToResponse > 0)
+                                {
                                     chatResponse += " , ";
                                 }
 
@@ -524,20 +537,22 @@ namespace SteamBotLite
                         }
                     }
 
-                    if (maps.Count > MapsAddedToResponse) {
+                    if (maps.Count > MapsAddedToResponse)
+                    {
                         chatResponse += string.Format(" (and {0} more at: http://vbot.site )", maps.Count - MapsAddedToResponse);
                     }
-                    else {
+                    else
+                    {
                         chatResponse += " at: http://vbot.site";
                     }
 
-                    if (MapsAddedToResponse == 0) {
+                    if (MapsAddedToResponse == 0)
+                    {
                         return new Tuple<string, string>("There were no maps found with those search terms!", "");
                     }
-   
-                    return new Tuple<string, string>(chatResponse,pmResponse);
-                }
 
+                    return new Tuple<string, string>(chatResponse, pmResponse);
+                }
             }
 
             protected override string exec(MessageEventArgs Msg, string param)
@@ -548,12 +563,12 @@ namespace SteamBotLite
                 bool ValidData = (string.IsNullOrWhiteSpace(param) != true && param.StartsWith("!maps", StringComparison.OrdinalIgnoreCase) != true);
                 bool OnlyWantUploaded = Msg.ReceivedMessage.StartsWith("!mapsuploaded", StringComparison.OrdinalIgnoreCase);
 
-                if (ValidData) {
-
+                if (ValidData)
+                {
                     char asterisk = '*';
                     bool StartsWithAsterisk = param.StartsWith(asterisk.ToString());
                     bool EndsWithAsterisk = param.EndsWith(asterisk.ToString());
-                    
+
                     param.TrimStart(asterisk);
                     param.TrimEnd(asterisk);
 
@@ -576,25 +591,30 @@ namespace SteamBotLite
                     MapFilter = param;
                 }
 
-                Tuple<string, string>Responses = GetMapsWithFilter(MapFilter, Filter, OnlyWantUploaded);
+                Tuple<string, string> Responses = GetMapsWithFilter(MapFilter, Filter, OnlyWantUploaded);
 
                 userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = Msg.Sender, ReplyMessage = Responses.Item2 });
-                
-                if (DateTime.Now < LastExecuted.AddMinutes(1)) {
+
+                if (DateTime.Now < LastExecuted.AddMinutes(1))
+                {
                     userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = Msg.Sender, ReplyMessage = Responses.Item1 });
-                    
+
                     return null;
-                } else {
+                }
+                else
+                {
                     LastExecuted = DateTime.Now;
                     return Responses.Item1;
                 }
-
             }
         }
 
         private class Reposition : MapCommand
         {
-            public Reposition(ModuleHandler bot, MapModule mapMod) : base(bot, "!reposition", mapMod , "!reposition <new position> <filename>") { }
+            public Reposition(ModuleHandler bot, MapModule mapMod) : base(bot, "!reposition", mapMod, "!reposition <new position> <filename>")
+            {
+            }
+
             public override string runcommand(MessageEventArgs Msg, string param)
             {
                 string[] parameters = param.Split(' ');
@@ -626,11 +646,10 @@ namespace SteamBotLite
                         return "Map not found";
                     }
 
-
                     // Map editedMap = MapModule.mapList.Find(map => map.filename.Equals(parameters[0])); //OLD Map CODE
                     if (editedMap.Submitter.Equals(Msg.Sender.identifier.ToString()) | (userhandler.admincheck(Msg.Sender)))
                     {
-                        MapModule.mapList.RemoveMap(editedMap , "Map Repositioned");
+                        MapModule.mapList.RemoveMap(editedMap, "Map Repositioned");
                         editedMap.Notes += string.Format("Map repositioned to {0} by {1} // ", index, Msg.Sender.identifier.ToString());
                         MapModule.mapList.InsertMap(index, editedMap);
                         MapModule.savePersistentData();
@@ -644,10 +663,12 @@ namespace SteamBotLite
             }
         }
 
-
         private class Update : MapCommand
         {
-            public Update(ModuleHandler bot, MapModule mapMod) : base(bot, "!update", mapMod , "!update <Current Filename> <New filename> <New Url> <new notes>") { }
+            public Update(ModuleHandler bot, MapModule mapMod) : base(bot, "!update", mapMod, "!update <Current Filename> <New filename> <New Url> <new notes>")
+            {
+            }
+
             public override string runcommand(MessageEventArgs msg, string param)
             {
                 string[] parameters = param.Split(new char[] { ' ' }, 2);
@@ -655,10 +676,11 @@ namespace SteamBotLite
                 if (parameters.Length > 1)
                 {
                     Map NewMapdata = ParseStringToMap(parameters[1]);
-                    if (userhandler.admincheck(msg.Sender)) {
+                    if (userhandler.admincheck(msg.Sender))
+                    {
                         msg.Sender.Rank = ChatroomEntity.AdminStatus.True;
                     }
-                     
+
                     return MapModule.mapList.UpdateMap(parameters[0], NewMapdata, msg.Sender);
                 }
                 else
@@ -670,19 +692,18 @@ namespace SteamBotLite
 
         private class Delete : MapCommand
         {
-            public Delete(ModuleHandler bot, MapModule mapMod) : base(bot, "!delete", mapMod, "!delete <filename> OR !delete <position> ") {
-             
+            public Delete(ModuleHandler bot, MapModule mapMod) : base(bot, "!delete", mapMod, "!delete <filename> OR !delete <position> ")
+            {
             }
 
             public override string runcommand(MessageEventArgs Msg, string param)
             {
                 string[] parameters = param.Split(new char[] { ' ' }, 2);
                 int MapPositionInList = 0;
-                Map deletedMap = new Map() ;
+                Map deletedMap = new Map();
 
-
-                if (int.TryParse(parameters[0], out MapPositionInList)) {
-                    
+                if (int.TryParse(parameters[0], out MapPositionInList))
+                {
                     if ((MapPositionInList > MapModule.mapList.GetSize()) | (MapPositionInList <= 0))
                     {
                         return "That index does not exist! Please use a valid number when deleting maps";
@@ -692,11 +713,10 @@ namespace SteamBotLite
                         MapPositionInList--;
                         deletedMap = MapModule.mapList.GetMap(MapPositionInList);
                     }
-                  
                 }
-                else {
+                else
+                {
                     deletedMap = MapModule.mapList.GetMapByFilename(parameters[0]);
-                    
                 }
 
                 if (deletedMap == null)
@@ -705,11 +725,8 @@ namespace SteamBotLite
                 }
                 else
                 {
-
                     if ((deletedMap.IsOwner(Msg.Sender.identifier)) || (userhandler.admincheck(Msg.Sender)))
                     {
-
-                        
                         string Reason = "Deleted by " + Msg.Sender.DisplayName + " (" + Msg.Sender.identifier + "). ";
                         string ExplicitReason = param.Substring(parameters[0].Length, param.Length - parameters[0].Length);
 
@@ -734,16 +751,17 @@ namespace SteamBotLite
                     }
                 }
             }
-
-       }
+        }
 
         private class GetOwner : BaseCommand
         {
-            MapModule module;
+            private MapModule module;
+
             public GetOwner(ModuleHandler bot, MapModule mapMod) : base(bot, "!GetOwner")
             {
                 module = mapMod;
             }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 string[] parameters = param.Split(' ');
@@ -758,20 +776,22 @@ namespace SteamBotLite
                     }
                     else
                     {
-                        return string.Format("Map owner is: {0} Extra info: {1} | {2} | Owner: {3} ", GetMap.Submitter, GetMap.Submitter.ToString(),GetMap.SubmitterName ,GetMap.IsOwner(Msg.Sender.identifier));
+                        return string.Format("Map owner is: {0} Extra info: {1} | {2} | Owner: {3} ", GetMap.Submitter, GetMap.Submitter.ToString(), GetMap.SubmitterName, GetMap.IsOwner(Msg.Sender.identifier));
                     }
                 }
                 return "Invalid parameters for !GetOwner. Syntax: !GetOwner <filename>";
             }
-
         }
+
         private class Wipe : MapCommand
         {
-            MapModule module;
-            public Wipe(ModuleHandler bot, MapModule mapMod) : base(bot, "!wipe" , mapMod, "!wipe <reason>")
+            private MapModule module;
+
+            public Wipe(ModuleHandler bot, MapModule mapMod) : base(bot, "!wipe", mapMod, "!wipe <reason>")
             {
                 module = mapMod;
             }
+
             public override string runcommand(MessageEventArgs Msg, string param)
             {
                 if (!string.IsNullOrEmpty(param))
@@ -787,7 +807,6 @@ namespace SteamBotLite
             }
         }
 
-
         public void ClearMapListWithMessage(string message)
         {
             ObservableCollection<Map> TempMapList = new ObservableCollection<Map>();
@@ -796,7 +815,7 @@ namespace SteamBotLite
             {
                 MessageEventArgs Msg = new MessageEventArgs(null);
                 Msg.ReplyMessage = string.Format("Hi, the Maplist has been cleared and your map was removed for the following reason: {0}", message);
-                Msg.Destination = new User(mapList.GetMap(0).Submitter,  null);
+                Msg.Destination = new User(mapList.GetMap(0).Submitter, null);
                 userhandler.SendPrivateMessageProcessEvent(Msg);
                 mapList.RemoveMap(0);
             };

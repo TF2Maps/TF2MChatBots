@@ -1,58 +1,53 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Google.GData;
-using Google.Apis.YouTube.v3;
 using System.IO;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Text.RegularExpressions;
-using System.Net;
 using System.Xml;
 
 namespace SteamBotLite
 {
     public class MediaBot : UserHandler
     {
+        private string ApiKey;
 
-        string ApiKey;
-
-        void SetApiKey (string value)
+        private void SetApiKey(string value)
         {
             System.IO.File.WriteAllText(ApiKeySaveFile, value);
             ApiKey = value;
         }
-       
-        
-        
-        public MediaBot() {
+
+        public MediaBot()
+        {
             GetVideoData("xrbrQhpvn8E");
             ApiKey = GetConfig();
         }
 
-        string ApiKeySaveFile = "Media.txt";
-        string APICommand = "!YoutubeAPIKEY";
-        string GetConfig()
+        private string ApiKeySaveFile = "Media.txt";
+        private string APICommand = "!YoutubeAPIKEY";
+
+        private string GetConfig()
         {
-            if (File.Exists(ApiKeySaveFile)) {
+            if (File.Exists(ApiKeySaveFile))
+            {
                 return System.IO.File.ReadAllText(@ApiKeySaveFile);
             }
-            else {
-                Console.WriteLine("API Functionality will be disabled until a user sends the command: " + APICommand + " <Key>" );
+            else
+            {
+                Console.WriteLine("API Functionality will be disabled until a user sends the command: " + APICommand + " <Key>");
                 return null;
             }
         }
 
-        
-        public override void ChatMemberInfo(object sender, Tuple<ChatroomEntity, bool> e){
+        public override void ChatMemberInfo(object sender, Tuple<ChatroomEntity, bool> e)
+        {
         }
 
-        public override void OnLoginCompleted(object sender, EventArgs e) {
+        public override void OnLoginCompleted(object sender, EventArgs e)
+        {
         }
-        
-        public override void ProcessChatRoomMessage(object sender, MessageEventArgs e) {
+
+        public override void ProcessChatRoomMessage(object sender, MessageEventArgs e)
+        {
             string[] SplitMessage = e.ReceivedMessage.Split(null);
             foreach (string Word in SplitMessage) //We do this to handle multiple videos
             {
@@ -62,17 +57,17 @@ namespace SteamBotLite
                 {
                     //Do Nothing
                 }
-                else {
+                else
+                {
                     string VideoData = GetVideoData(VideoID);
                     if (string.IsNullOrEmpty(VideoData))
                     {
                         //Do Nothing
                     }
-                    else {
-
+                    else
+                    {
                         string item = VideoData;//.Replace("\n", string.Empty);
                         string TimeString;
-
 
                         Console.WriteLine(item);
 
@@ -85,7 +80,8 @@ namespace SteamBotLite
                         {
                             TimeString = "Over 24 Hours long";
                         }
-                        else {
+                        else
+                        {
                             TimeString = XmlConvert.ToTimeSpan(time).ToString();
                         }
 
@@ -102,10 +98,8 @@ namespace SteamBotLite
                         e.InterfaceHandlerDestination.SendChatRoomMessage(this, e);
                     }
                     Console.WriteLine(GetVideoData(VideoID));
-
                 }
             }
-                
         }
 
         public class Snippet
@@ -121,7 +115,6 @@ namespace SteamBotLite
         public class ContentDetails
         {
             public string duration { get; set; }
-           
         }
 
         public class Item
@@ -135,7 +128,7 @@ namespace SteamBotLite
             public List<Item> items { get; set; }
         }
 
-        string GetVideoData (string ID)
+        private string GetVideoData(string ID)
         {
             try
             {
@@ -153,7 +146,8 @@ namespace SteamBotLite
             }
         }
 
-        public override void ProcessPrivateMessage(object sender, MessageEventArgs e) {
+        public override void ProcessPrivateMessage(object sender, MessageEventArgs e)
+        {
             e.InterfaceHandlerDestination.SendPrivateMessage(this, e);
             if (e.ReceivedMessage.StartsWith(APICommand, StringComparison.OrdinalIgnoreCase))
             {
@@ -164,43 +158,44 @@ namespace SteamBotLite
                 SetApiKey(Key);
                 e.ReplyMessage = "Retrieved Key";
                 e.InterfaceHandlerDestination.SendPrivateMessage(this, e);
-
             }
         }
-        string TrimOpeningForURL (string MainString, int Trimmer)
+
+        private string TrimOpeningForURL(string MainString, int Trimmer)
         {
             int StartIndex = Trimmer;
             int CharactersRemaining = MainString.Length - Trimmer;
             return MainString.Substring(StartIndex, CharactersRemaining);
         }
-        string TrimEnding (string Message)
+
+        private string TrimEnding(string Message)
         {
-            
             return Message.Split(null)[0];
         }
 
-        string ExtractID (string Message) {
+        private string ExtractID(string Message)
+        {
             string[] YoutubeRepresentations = new string[] {
                 "https://youtu.be/",
                 "https://www.youtube.com/watch?v=",
                 "https://www.m.youtube.com/watch?v="
             };
 
-            for (int i = 0 ; i < YoutubeRepresentations.Length;i++)
+            for (int i = 0; i < YoutubeRepresentations.Length; i++)
             {
-                if (Message.ToLower().Contains(YoutubeRepresentations[i])) {
-                    
+                if (Message.ToLower().Contains(YoutubeRepresentations[i]))
+                {
                     string Value = TrimOpeningForURL(Message, YoutubeRepresentations[i].Length);
 
                     Value = TrimEnding(Value);
 
-                    if (Value.EndsWith("/")) {
+                    if (Value.EndsWith("/"))
+                    {
                         Value = Value.Substring(0, Value.Length - 1);
                     }
                     if (Value.Contains("?t="))
                     {
-                        Value = Value.Split(new string[] { "?t=" },StringSplitOptions.RemoveEmptyEntries)[0];
-                        
+                        Value = Value.Split(new string[] { "?t=" }, StringSplitOptions.RemoveEmptyEntries)[0];
                     }
 
                     return Value;
@@ -208,7 +203,9 @@ namespace SteamBotLite
             }
             return null;
         }
-        string ExtractURL (string Message) {
+
+        private string ExtractURL(string Message)
+        {
             return Message;
         }
     }

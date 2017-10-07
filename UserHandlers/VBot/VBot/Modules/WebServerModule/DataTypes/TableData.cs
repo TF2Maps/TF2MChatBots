@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace SteamBotLite
 {
@@ -11,15 +7,12 @@ namespace SteamBotLite
         public TableDataValue[] Header;
         public List<TableDataValue[]> TableValues;
 
-        
-
         public TableData()
         {
             TableValues = new List<TableDataValue[]>();
         }
 
-
-        public string HtmlTable (string Heading)
+        public string HtmlTable(string Heading)
         {
             string Table = string.Format("<table> <caption> <h1> {0} </h1> </caption> <tbody> <tr>", Heading);
 
@@ -48,7 +41,4 @@ namespace SteamBotLite
             return Table;
         }
     }
-
-    
-
 }

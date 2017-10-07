@@ -1,28 +1,26 @@
-using System;
-using System.Timers;
-using System.Collections.Generic;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Collections.ObjectModel;
 
 namespace SteamBotLite
 {
     public class VBot : UserHandler, HTMLFileFromArrayListiners, ModuleHandler
     {
-        
-        bool Autojoin = true; 
+        private bool Autojoin = true;
 
         // Class members
-        MotdModule motdModule;
+        private MotdModule motdModule;
+
         public MapModule mapModule;
-        ServerTrackingModule ServerTrackingModule;
-        RepliesModule replyModule;
-        AdminModule adminmodule;
-        SearchModule searchModule;
-        TrackingServerListHolder TrackingServerListmodule;
-        CountDownModule countdownmodule;
-        WebServerHostingModule WebServer;
-        IdentityModule identitymodule;
+        private ServerTrackingModule ServerTrackingModule;
+        private RepliesModule replyModule;
+        private AdminModule adminmodule;
+        private SearchModule searchModule;
+        private TrackingServerListHolder TrackingServerListmodule;
+        private CountDownModule countdownmodule;
+        private WebServerHostingModule WebServer;
+        private IdentityModule identitymodule;
 
         public UsersModule usersModule;
 
@@ -30,23 +28,23 @@ namespace SteamBotLite
 
         public List<HTMLFileFromArrayListiners> HTMLParsers;
 
-        List<BaseCommand> chatCommands = new List<BaseCommand>();
-        List<BaseCommand> chatAdminCommands = new List<BaseCommand>();
+        private List<BaseCommand> chatCommands = new List<BaseCommand>();
+        private List<BaseCommand> chatAdminCommands = new List<BaseCommand>();
 
         public List<MapListChangeListiner> ListChangeEventListiners = new List<MapListChangeListiner>();
 
         public List<ServerMapChangeListiner> MapChangeEventListiners = new List<ServerMapChangeListiner>();
+
         // Loading Config
-        Dictionary<string, Dictionary<string,object>> jsconfig = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string,object>>>(System.IO.File.ReadAllText(@"config.json"));
+        private Dictionary<string, Dictionary<string, object>> jsconfig = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, object>>>(System.IO.File.ReadAllText(@"config.json"));
 
         /// <summary>
-        /// Do not try using steamfriends, steamuser and all that since it'll be uninitialised at this point 
+        /// Do not try using steamfriends, steamuser and all that since it'll be uninitialised at this point
         /// </summary>
         /// <param name="SteamConnectionHandler"></param>
-        public VBot() 
+        public VBot()
         {
-
-           // base.SetUsernameEvent += UpdateUsernameEvent;
+            // base.SetUsernameEvent += UpdateUsernameEvent;
             Console.WriteLine("VBot Initialised");
             Console.WriteLine("Loading modules and stuff");
 
@@ -54,22 +52,21 @@ namespace SteamBotLite
             HTMLParsers = new List<HTMLFileFromArrayListiners>();
             OnLoginlistiners = new List<OnLoginCompletedListiners>();
             ListChangeEventListiners = new List<MapListChangeListiner>();
-            
 
             // loading modules
             WebServer = new WebServerHostingModule(this, jsconfig);
-            mapModule = new MapModule(this,this, jsconfig);
+            mapModule = new MapModule(this, this, jsconfig);
             TrackingServerListmodule = new TrackingServerListHolder(this, this, jsconfig);
             motdModule = new MotdModule(this, jsconfig);
             ServerTrackingModule = new ServerTrackingModule(this, this, jsconfig);
             usersModule = new UsersModule(this, jsconfig);
             replyModule = new RepliesModule(this, jsconfig);
             searchModule = new SearchModule(this, jsconfig);
-            adminmodule = new AdminModule(this,this, jsconfig);
+            adminmodule = new AdminModule(this, this, jsconfig);
             identitymodule = new IdentityModule(this, this, jsconfig);
             countdownmodule = new CountDownModule(this, jsconfig);
 
-            ModuleList = new List<BaseModule> { motdModule,mapModule,ServerTrackingModule,identitymodule , usersModule,replyModule,adminmodule,searchModule, WebServer, TrackingServerListmodule , countdownmodule };
+            ModuleList = new List<BaseModule> { motdModule, mapModule, ServerTrackingModule, identitymodule, usersModule, replyModule, adminmodule, searchModule, WebServer, TrackingServerListmodule, countdownmodule };
 
             Console.WriteLine("Modules loaded and ModuleList intitialised");
 
@@ -77,11 +74,8 @@ namespace SteamBotLite
             {
                 module.OnAllModulesLoaded();
             }
-
-         
         }
 
-        
         public void UpdateUsernameEvent(object sender, string e)
         {
             base.SetUsernameEventProcess(e);
@@ -100,23 +94,23 @@ namespace SteamBotLite
             ListChangeEventListiners.Add(listiner);
         }
 
-
         public List<OnLoginCompletedListiners> OnLoginlistiners;
 
         public override void OnLoginCompleted(object sender, EventArgs e)
         {
             if (Autojoin)
-                {
-                    base.FireMainChatRoomEvent(ChatroomEventEnum.EnterChat);
-                }
-            foreach (OnLoginCompletedListiners listiner in OnLoginlistiners) {
+            {
+                base.FireMainChatRoomEvent(ChatroomEventEnum.EnterChat);
+            }
+            foreach (OnLoginCompletedListiners listiner in OnLoginlistiners)
+            {
                 listiner.OnLoginCompleted();
             }
 
             Console.WriteLine("UserHandler: {0} Has Loaded", this.GetType());
         }
 
-        public override void ProcessPrivateMessage(object sender, MessageEventArgs e) 
+        public override void ProcessPrivateMessage(object sender, MessageEventArgs e)
         {
             ApplicationInterface AppInterface = (ApplicationInterface)sender;
             e.InterfaceHandlerDestination = AppInterface;
@@ -136,8 +130,7 @@ namespace SteamBotLite
             }
         }
 
-       
-        public string ChatMessageHandler(MessageEventArgs Msg , string Message)
+        public string ChatMessageHandler(MessageEventArgs Msg, string Message)
         {
             string response = null;
 
@@ -147,13 +140,12 @@ namespace SteamBotLite
                 {
                     foreach (BaseCommand c in module.commands)
                     {
-                        if (c.CheckCommandExists(Msg,Message))
+                        if (c.CheckCommandExists(Msg, Message))
                         {
                             response = c.run(Msg, Message);
                             return response;
                         }
                     }
-                    
                 }
             }
 
@@ -174,27 +166,26 @@ namespace SteamBotLite
             }
             return response;
         }
-        
 
         public void ServerUpdated(object sender, TrackingServerInfo args)
         {
-            if (MapChangeEventListiners.Count > 0 )
+            if (MapChangeEventListiners.Count > 0)
             {
-                foreach(ServerMapChangeListiner Listiner in MapChangeEventListiners)
+                foreach (ServerMapChangeListiner Listiner in MapChangeEventListiners)
                 {
                     Listiner.OnMapChange(args);
                 }
             }
         }
 
-        public override void ChatMemberInfo(object sender, Tuple<ChatroomEntity,bool>e)
+        public override void ChatMemberInfo(object sender, Tuple<ChatroomEntity, bool> e)
         {
             usersModule.updateUserInfo(e.Item1, e.Item2);
         }
 
         public void HTMLFileFromArray(string[] Headernames, List<string[]> Data, string TableKey)
         {
-            foreach(HTMLFileFromArrayListiners Listiner in HTMLParsers)
+            foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)
             {
                 Listiner.HTMLFileFromArray(Headernames, Data, TableKey);
             }
@@ -240,7 +231,7 @@ namespace SteamBotLite
         {
             foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)
             {
-                Listiner.AddEntryWithLimit(identifier, data , limit);
+                Listiner.AddEntryWithLimit(identifier, data, limit);
             }
         }
 

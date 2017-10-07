@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Timers;
+﻿using System.Timers;
 
 namespace SteamBotLite
 {
     public class BaseTask
     {
-        Timer timer;
+        private Timer timer;
+
         public BaseTask(int delay, ElapsedEventHandler e)
         {
             timer = new Timer(delay);

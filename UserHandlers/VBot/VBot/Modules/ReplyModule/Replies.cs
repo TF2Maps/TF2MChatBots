@@ -1,41 +1,34 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using SteamKit2;
 
 namespace SteamBotLite
 {
-    class RepliesModule : BaseModule
+    internal class RepliesModule : BaseModule
     {
-       
         public string SaveDataFile;
 
-        Dictionary<string, string> Responses;
+        private Dictionary<string, string> Responses;
 
         public RepliesModule(VBot bot, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
-            
             SaveDataFile = ModuleSavedDataFilePath();
 
             Responses = GetDataDictionary();
 
             commands.Add(new ReplyFunction(bot, this));
             adminCommands.Add(new ReplyAdd(bot, this));
-            adminCommands.Add(new ReplyRemove(bot, this));            
+            adminCommands.Add(new ReplyRemove(bot, this));
         }
 
         public override void OnAllModulesLoaded()
         {
-
-
         }
 
         public override string getPersistentData()
         {
-               return "";
+            return "";
         }
 
         public override void loadPersistentData()
@@ -46,23 +39,24 @@ namespace SteamBotLite
         private class ReplyFunction : BaseCommand
         {
             // Command to query if a server is active
-            RepliesModule module;
+            private RepliesModule module;
 
             public ReplyFunction(VBot bot, RepliesModule module) : base(bot, null)
             {
                 this.module = module;
             }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 return (module.Responses[param]);
             }
+
             public override bool CheckCommandExists(MessageEventArgs Msg, string Message)
             {
                 if (module.Responses.ContainsKey(Message))
                 {
                     return true;
                 }
-
                 else
                 {
                     return false;
@@ -82,25 +76,26 @@ namespace SteamBotLite
             }
         }
 
-
         private class Reply : BaseCommand
         {
             // Command to query if a server is active
-            RepliesModule module;
-            string reply;
-            public Reply(VBot bot, RepliesModule module, KeyValuePair<string,string> entry) : base(bot, entry.Key)
+            private RepliesModule module;
+
+            private string reply;
+
+            public Reply(VBot bot, RepliesModule module, KeyValuePair<string, string> entry) : base(bot, entry.Key)
             {
                 this.module = module;
                 this.reply = entry.Value;
             }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 return (reply);
-
             }
-
         }
-        Dictionary<string, string> GetDataDictionary ()
+
+        private Dictionary<string, string> GetDataDictionary()
         {
             try
             {
@@ -108,18 +103,19 @@ namespace SteamBotLite
             }
             catch
             {
-                
-                return new Dictionary<string,string>();
+                return new Dictionary<string, string>();
             }
         }
-        
+
         private class ReplyAdd : BaseCommand
         {
-            RepliesModule replymodule;
+            private RepliesModule replymodule;
+
             public ReplyAdd(VBot bot, RepliesModule repliesModule) : base(bot, "!replyadd")
             {
                 replymodule = repliesModule;
             }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 string[] command = param.Split(new char[] { ' ' }, 2);
@@ -129,7 +125,7 @@ namespace SteamBotLite
                 if (!values.ContainsKey(command[0]) && (command.Length > 1))
                 {
                     replymodule.Responses.Add(command[0], command[1]);
-                    values.Add(command[0],command[1]);
+                    values.Add(command[0], command[1]);
                     System.IO.File.WriteAllText(replymodule.SaveDataFile, JsonConvert.SerializeObject(values));
                     return "Reply Added";
                 }
@@ -140,11 +136,13 @@ namespace SteamBotLite
 
         private class ReplyRemove : BaseCommand
         {
-            RepliesModule replymodule;
+            private RepliesModule replymodule;
+
             public ReplyRemove(VBot bot, RepliesModule repliesModule) : base(bot, "!ReplyRemove")
             {
                 replymodule = repliesModule;
             }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 string[] command = param.Split(new char[] { ' ' }, 2);

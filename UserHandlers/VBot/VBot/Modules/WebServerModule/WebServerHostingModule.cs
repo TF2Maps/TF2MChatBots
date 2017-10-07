@@ -1,23 +1,20 @@
-﻿using System.Net;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
+﻿using Newtonsoft.Json;
 using System;
-using System.IO;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.IO;
+using System.Net;
 
 namespace SteamBotLite
 {
-    class WebServerHostingModule : BaseModule , HTMLFileFromArrayListiners
+    internal class WebServerHostingModule : BaseModule, HTMLFileFromArrayListiners
     {
-        HttpListener listener;
+        private HttpListener listener;
 
-        string responseString = "<HTML><BODY>Website is still initialising</BODY></HTML>";
+        private string responseString = "<HTML><BODY>Website is still initialising</BODY></HTML>";
 
         readonly protected string header;
         readonly protected string trailer;
         readonly protected string WebsiteFilesDirectory;
-        
 
         //string prefix, ObservableCollection<MapModule.Map> Maplist)
 
@@ -48,48 +45,49 @@ namespace SteamBotLite
         private class RebootModule : BaseCommand
         {
             // Command to query if a server is active
-            WebServerHostingModule module;
-            ModuleHandler ModuleHandler;
-            string address;
+            private WebServerHostingModule module;
+
+            private ModuleHandler ModuleHandler;
+            private string address;
 
             public RebootModule(ModuleHandler bot, WebServerHostingModule module) : base(bot, "!WebsiteReboot")
             {
                 this.module = module;
                 this.address = (module.config["Address"].ToString());
             }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 module.CloseWebServer();
                 module.StartWebServer(address);
                 return "Rebooting Serer";
             }
-
         }
 
         private class RemoveTable : BaseCommand
         {
             // Command to query if a server is active
-            WebServerHostingModule module;
-            ModuleHandler ModuleHandler;
-            string address;
+            private WebServerHostingModule module;
+
+            private ModuleHandler ModuleHandler;
+            private string address;
 
             public RemoveTable(ModuleHandler bot, WebServerHostingModule module) : base(bot, "!RemoveTable")
             {
                 this.module = module;
             }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 module.RemoveTableFromEntry(param);
                 return "Removing table";
             }
-
         }
 
-
         public override void OnAllModulesLoaded()
-        {   }
+        { }
 
-        string GetAlltables ()
+        private string GetAlltables()
         {
             string value = "";
 
@@ -119,6 +117,7 @@ namespace SteamBotLite
 
             //MapListUpdate(this, null);
         }
+
         public void CloseWebServer()
         {
             Console.WriteLine("Closing Web Server");
@@ -126,10 +125,9 @@ namespace SteamBotLite
             listener.Close();
         }
 
-        void ResponseMethod(IAsyncResult result)
+        private void ResponseMethod(IAsyncResult result)
         {
             HttpListener listener = (HttpListener)result.AsyncState;
-
 
             HttpListenerContext context = listener.EndGetContext(result);
             HttpListenerResponse response = context.Response;
@@ -151,20 +149,15 @@ namespace SteamBotLite
                         buff = System.Text.Encoding.UTF8.GetBytes(System.IO.File.ReadAllText(path).ToString());
                     }
                 }
-                
             }
-
             finally
             {
                 response.ContentLength64 = buff.Length;
                 response.Close(buff, true);
                 listener.BeginGetContext(new AsyncCallback(ResponseMethod), listener);
             }
-
-            
-
         }
-        
+
         public override string getPersistentData()
         {
             return JsonConvert.SerializeObject(DataLists);
@@ -178,7 +171,7 @@ namespace SteamBotLite
                     Console.WriteLine("Loading Website");
 
                     DataLists = JsonConvert.DeserializeObject<Dictionary<string, TableData>>(System.IO.File.ReadAllText(ModuleSavedDataFilePath()));
-                    
+
                     Console.WriteLine("Loaded saved file");
                 }
                 catch
@@ -189,7 +182,6 @@ namespace SteamBotLite
                 }
             }
         }
-
 
         //For legacy reasons
         void HTMLFileFromArrayListiners.HTMLFileFromArray(string[] Headernames, List<string[]> Data, string TableKey)
@@ -204,7 +196,6 @@ namespace SteamBotLite
             }
 
             ThisTableData.Header = Header;
-            
 
             foreach (string[] Row in Data)
             {
@@ -222,21 +213,19 @@ namespace SteamBotLite
             AddTableFromEntry(TableKey, ThisTableData);
         }
 
-        
-
         private void SetTableHeader(string tableKey, TableDataValue[] header)
         {
             SetTableHeader(tableKey, header);
         }
 
-        Dictionary<string, TableData> DataLists;
+        private Dictionary<string, TableData> DataLists;
 
         void HTMLFileFromArrayListiners.SetTableHeader(string TableIdentifier, TableDataValue[] Header)
         {
             GetTableData(TableIdentifier).Header = Header;
         }
 
-        //Does this pass by value or by reference? 
+        //Does this pass by value or by reference?
 
         public TableData GetTableData(string identifier)
         {
@@ -249,7 +238,6 @@ namespace SteamBotLite
                 DataLists.Add(identifier, new TableData());
                 return DataLists[identifier];
             }
-           
         }
 
         void HTMLFileFromArrayListiners.AddEntryWithLimit(string identifier, TableDataValue[] data, int limit)
@@ -257,7 +245,6 @@ namespace SteamBotLite
             GetTableData(identifier).TableValues.Add(data);
 
             int ExcessToRemove = GetTableData(identifier).TableValues.Count - limit;
-
 
             int entriestoremove = limit;
 
@@ -280,24 +267,27 @@ namespace SteamBotLite
             AddTableFromEntry(TableKey, TableData);
         }
 
-        void AddTableFromEntry(string TableKey, TableData TableData)
+        private void AddTableFromEntry(string TableKey, TableData TableData)
         {
-            if (DataLists.ContainsKey(TableKey)) {
+            if (DataLists.ContainsKey(TableKey))
+            {
                 DataLists[TableKey] = TableData;
             }
-            else {
+            else
+            {
                 DataLists.Add(TableKey, TableData);
             }
             savePersistentData();
         }
 
-        void RemoveTableFromEntry(string TableKey)
+        private void RemoveTableFromEntry(string TableKey)
         {
             if (DataLists.ContainsKey(TableKey))
             {
                 DataLists.Remove(TableKey);
             }
-            else {
+            else
+            {
             }
             savePersistentData();
         }

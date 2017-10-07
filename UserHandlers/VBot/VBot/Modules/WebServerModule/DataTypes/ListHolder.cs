@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SteamBotLite
 {
     public class ListHolder : BaseModule
     {
-        public ListHolder(ModuleHandler handler, HTMLFileFromArrayListiners HTMLHandler,  Dictionary<string, Dictionary<string, object>> Jsconfig) : base(handler, Jsconfig)
+        public ListHolder(ModuleHandler handler, HTMLFileFromArrayListiners HTMLHandler, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(handler, Jsconfig)
         {
             this.handler = HTMLHandler;
 
@@ -18,16 +14,16 @@ namespace SteamBotLite
 
         private class FeatureRequest : BaseCommand
         {
-            ListHolder module;
+            private ListHolder module;
 
             public FeatureRequest(ModuleHandler bot, ListHolder module) : base(bot, "!Request")
             {
-
                 this.module = module;
             }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                if ( !param.Equals("!Request"))
+                if (!param.Equals("!Request"))
                 {
                     TableDataValue Username = new TableDataValue();
                     Username.VisibleValue = Msg.Sender.identifier.ToString();
@@ -47,12 +43,11 @@ namespace SteamBotLite
             }
         }
 
-        HTMLFileFromArrayListiners handler;
+        private HTMLFileFromArrayListiners handler;
 
-       
         public override void OnAllModulesLoaded()
         {
-            //Setup Table 
+            //Setup Table
 
             TableDataValue UsernameHeader = new TableDataValue();
             UsernameHeader.VisibleValue = "Username";

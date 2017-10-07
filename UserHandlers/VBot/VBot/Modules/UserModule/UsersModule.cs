@@ -1,11 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using SteamKit2;
-using Newtonsoft.Json;
 
 namespace SteamBotLite
 {
@@ -21,19 +17,23 @@ namespace SteamBotLite
             commands.Add(new CheckStatus(bot, this));
         }
 
-        public override void OnAllModulesLoaded() { }
+        public override void OnAllModulesLoaded()
+        {
+        }
 
         private class CheckStatus : BaseCommand
         {
-            UsersModule module;
+            private UsersModule module;
 
-            public CheckStatus(ModuleHandler bot, UsersModule module) : base(bot, "!CheckAdmin") {
+            public CheckStatus(ModuleHandler bot, UsersModule module) : base(bot, "!CheckAdmin")
+            {
                 this.module = module;
             }
-            protected override string exec(MessageEventArgs Msg, string param) {
+
+            protected override string exec(MessageEventArgs Msg, string param)
+            {
                 return module.admincheck(Msg.Sender).ToString();
             }
-
         }
 
         public override string getPersistentData()
@@ -78,11 +78,12 @@ namespace SteamBotLite
         {
             string data = UserToVerify.identifier.ToString();
 
-            
-            if (UserToVerify.Rank == ChatroomEntity.AdminStatus.True | (admins.Any(s => UserToVerify.UserEquals(s)))) {
+            if (UserToVerify.Rank == ChatroomEntity.AdminStatus.True | (admins.Any(s => UserToVerify.UserEquals(s))))
+            {
                 return true;
             }
-            else {
+            else
+            {
                 return false;
             }
         }

@@ -1,21 +1,17 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-
 
 namespace SteamBotLite
 {
     public class IdentityModule : BaseModule, OnLoginCompletedListiners, MapListChangeListiner
     {
-        UserHandler userhandler;
-        ModuleHandler modulehandler;
-        string StatusPrefix = "";
-        string username;
-        string status;
-        bool UseStatus;
+        private UserHandler userhandler;
+        private ModuleHandler modulehandler;
+        private string StatusPrefix = "";
+        private string username;
+        private string status;
+        private bool UseStatus;
 
         public IdentityModule(UserHandler bot, ModuleHandler handler, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(handler, Jsconfig)
         {
@@ -33,7 +29,6 @@ namespace SteamBotLite
 
             handler.AddLoginEventListiner(this);
 
-
             adminCommands.Add(new Rename(handler, this));
             adminCommands.Add(new SetStatusMessage(userhandler, modulehandler, this));
             adminCommands.Add(new UnsetStatusMessage(userhandler, modulehandler, this));
@@ -44,7 +39,6 @@ namespace SteamBotLite
             userhandler.SetUsernameEventProcess(username);
             userhandler.SetStatusmessageEvent(StatusPrefix + status);
         }
-
 
         public override string getPersistentData()
         {
@@ -65,14 +59,14 @@ namespace SteamBotLite
             }
             catch
             {
-
             }
         }
 
-        string getusername()
+        private string getusername()
         {
             return username;
         }
+
         public void OnLoginCompleted()
         {
             if (UseStatus)
@@ -88,20 +82,21 @@ namespace SteamBotLite
             StatusPrefix = "[" + maplist.Count + "] ";
             userhandler.SetUsernameEventProcess(username);
             userhandler.SetStatusmessageEvent(StatusPrefix + status);
-
         }
 
         private class SetStatusMessage : BaseCommand
         {
             // Command to query if a server is active
-            UserHandler bot;
-            IdentityModule module;
+            private UserHandler bot;
+
+            private IdentityModule module;
 
             public SetStatusMessage(UserHandler bot, ModuleHandler modulehandler, IdentityModule module) : base(modulehandler, "!StatusSet")
             {
                 this.module = module;
                 this.bot = bot;
             }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 module.status = param;
@@ -121,13 +116,16 @@ namespace SteamBotLite
         private class UnsetStatusMessage : BaseCommand
         {
             // Command to query if a server is active
-            UserHandler bot;
-            IdentityModule module;
+            private UserHandler bot;
+
+            private IdentityModule module;
+
             public UnsetStatusMessage(UserHandler bot, ModuleHandler modulehandler, IdentityModule module) : base(modulehandler, "!StatusRemove")
             {
                 this.module = module;
                 this.bot = bot;
             }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 module.UseStatus = false;
@@ -143,32 +141,32 @@ namespace SteamBotLite
             }
         }
 
-
         private class CheckStatus : BaseCommand
         {
             // Command to query if a server is active
-            IdentityModule module;
+            private IdentityModule module;
 
             public CheckStatus(ModuleHandler bot, IdentityModule module) : base(bot, "!CheckData")
             {
                 this.module = module;
             }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 return Msg.Sender.Rank.ToString();
             }
-
         }
 
         private class Rename : BaseCommand
         {
             // Command to query if a server is active
-            IdentityModule module;
+            private IdentityModule module;
 
             public Rename(ModuleHandler bot, IdentityModule module) : base(bot, "!Rename")
             {
                 this.module = module;
             }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 if (param.Length > 0)
@@ -183,9 +181,6 @@ namespace SteamBotLite
                     return "There was no name!";
                 }
             }
-
         }
-
-
     }
 }

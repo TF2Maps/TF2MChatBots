@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Net;
 
 namespace SteamBotLite
 {
@@ -13,21 +8,20 @@ namespace SteamBotLite
         public string Link;
         public string HoverText;
 
-        public string GetEncodedValue ()
+        public string GetEncodedValue()
         {
             string header = "";
             string trailer = "";
             string ValueToDisplay = VisibleValue;
-            
-            if ( !string.IsNullOrEmpty(HoverText))
+
+            if (!string.IsNullOrEmpty(HoverText))
             {
                 header += "<span title = \"" + WebUtility.HtmlEncode(HoverText) + "\">";
 
-                trailer = "</span>" ;
-                
+                trailer = "</span>";
             }
 
-            if ( !string.IsNullOrEmpty(Link))
+            if (!string.IsNullOrEmpty(Link))
             {
                 header += "<a href=\"" + WebUtility.HtmlEncode(Link) + "\">";
                 trailer = "</a>" + trailer;
@@ -35,6 +29,8 @@ namespace SteamBotLite
             return header + WebUtility.HtmlEncode(ValueToDisplay) + trailer;
         }
 
-        public TableDataValue() { }
+        public TableDataValue()
+        {
+        }
     }
 }

@@ -1,54 +1,50 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SteamBotLite;
-
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 
 namespace MapModuleTests
 {
-
-    abstract class MapModuleTest
+    internal abstract class MapModuleTest
     {
         public MapModuleTest()
         {
-            
         }
     }
+
     [TestClass]
-    public class SyntaxUnitTests 
+    public class SyntaxUnitTests
     {
-        string AddCommand = "!add";
-        string DeleteCommand = "!delete";
-        string UpdateCommand = "!update";
-        string WipeCommand = "!wipe";
-        string Mapname = "mapname";
-        string url = "http://URL";
-        string notes = "these are notes";
-        MapModule module;
+        private string AddCommand = "!add";
+        private string DeleteCommand = "!delete";
+        private string UpdateCommand = "!update";
+        private string WipeCommand = "!wipe";
+        private string Mapname = "mapname";
+        private string url = "http://URL";
+        private string notes = "these are notes";
+        private MapModule module;
 
-        string identifier = "0";
-        ChatroomEntity TestUser;
-        
+        private string identifier = "0";
+        private ChatroomEntity TestUser;
 
-        public SyntaxUnitTests() {
+        public SyntaxUnitTests()
+        {
             TestUser = new User(identifier, null);
             module = new MapModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
-            
         }
 
-        Dictionary<string, object> MakeConfig()
+        private Dictionary<string, object> MakeConfig()
         {
             Dictionary<string, object> MapModuleConfig = new Dictionary<string, object>();
 
             MapModuleConfig.Add("ServerMapListUrl", new ObservableCollection<Map>());
             MapModuleConfig.Add("MaxMapList", 5);
-            
+
             return MapModuleConfig;
         }
 
-        // Use TestInitialize to run code before running each test 
+        // Use TestInitialize to run code before running each test
         [TestInitialize()]
         public void Initialize()
         {
@@ -66,19 +62,17 @@ namespace MapModuleTests
             Assert.IsTrue(module.mapList.GetSize() == 0);
         }
 
-
-
         [TestMethod]
         public void RegularSyntax()
         {
             MessageEventArgs Message = new MessageEventArgs(null);
-            Message.ReceivedMessage = AddCommand  +" "+  Mapname  +" "+  url +" "+  notes;
+            Message.ReceivedMessage = AddCommand + " " + Mapname + " " + url + " " + notes;
             Message.Sender = TestUser;
 
-            Console.WriteLine(FireCommand(Message , module));
+            Console.WriteLine(FireCommand(Message, module));
 
             Map TestMap = module.mapList.GetMap(0);
-            
+
             Assert.AreEqual(TestMap.Filename, Mapname);
             Assert.AreEqual(TestMap.DownloadURL, url);
             Assert.AreEqual(TestMap.Notes, notes);
@@ -110,8 +104,8 @@ namespace MapModuleTests
             MessageEventArgs Message = new MessageEventArgs(null);
             Message.ReceivedMessage = command;
             Message.Sender = TestUser;
-            
-            FireAdminCommand(Message,module);
+
+            FireAdminCommand(Message, module);
 
             Message = new MessageEventArgs(null);
             Message.ReceivedMessage = AddCommand + " " + Mapname + " " + url + " " + notes;
@@ -122,20 +116,17 @@ namespace MapModuleTests
             AssertMaplistSize(0);
 
             module = module = new MapModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
-            
-            
+
             command = "!forceuploaded" + " " + "false" + " " + "Map Not Uploaded";
             Message.ReceivedMessage = command;
             FireAdminCommand(Message, module);
             Assert.IsFalse(module.mapList.AllowOnlyUploadedMaps);
-            
+
             module = module = new MapModule(new TestUserHandler(), new TestUserHandler(), MakeConfig());
 
             RegularSyntax();
 
             AssertMaplistSize(1);
-
-
         }
 
         [TestMethod]
@@ -147,7 +138,7 @@ namespace MapModuleTests
             Message.Sender.Rank = ChatroomEntity.AdminStatus.False;
 
             RegularSyntax();
-            
+
             FireCommand(Message, module);
             AssertMaplistSize(0);
         }
@@ -156,7 +147,7 @@ namespace MapModuleTests
         public void DeleteFirstMap()
         {
             MessageEventArgs Message = new MessageEventArgs(null);
-            Message.ReceivedMessage = DeleteCommand + " " + "0" ;
+            Message.ReceivedMessage = DeleteCommand + " " + "0";
 
             Message.Sender = new User(TestUser.identifier.ToString() + 1, null);
             Message.Sender.Rank = ChatroomEntity.AdminStatus.True;
@@ -166,6 +157,7 @@ namespace MapModuleTests
             Console.WriteLine(FireCommand(Message, module));
             AssertMaplistSize(0);
         }
+
         [TestMethod]
         public void AdminDeleteMap()
         {
@@ -200,7 +192,7 @@ namespace MapModuleTests
         public void DeleteSpecificMapFIFO()
         {
             MessageEventArgs Message = new MessageEventArgs(null);
-            
+
             Message.Sender = TestUser;
             RegularSyntax();
             string SecondMapName = Mapname + 2;
@@ -246,7 +238,7 @@ namespace MapModuleTests
             Assert.AreEqual(SecondTestMap.Filename, SecondMapName);
         }
 
-        void AddNumberOfMaps(int numberofmaps)
+        private void AddNumberOfMaps(int numberofmaps)
         {
             for (int i = 0; i < numberofmaps; i++)
             {
@@ -256,7 +248,6 @@ namespace MapModuleTests
                 Message.Sender.identifier += i.ToString();
                 FireAdminCommand(Message, module);
             }
-           
         }
 
         [TestMethod]
@@ -275,8 +266,7 @@ namespace MapModuleTests
             AssertMaplistSize(0);
         }
 
-
-        string FireCommand (MessageEventArgs Message , BaseModule module)
+        private string FireCommand(MessageEventArgs Message, BaseModule module)
         {
             string param = " ";
 
@@ -288,11 +278,10 @@ namespace MapModuleTests
                 }
             }
 
-            
             return param;
         }
 
-        string FireAdminCommand(MessageEventArgs Message, BaseModule module)
+        private string FireAdminCommand(MessageEventArgs Message, BaseModule module)
         {
             string param = " ";
 
@@ -304,13 +293,12 @@ namespace MapModuleTests
                 }
             }
 
-
             return param;
         }
+
         [TestMethod]
         public void NoURL()
         {
-
             MessageEventArgs Message = new MessageEventArgs(null);
             Message.ReceivedMessage = AddCommand + " " + Mapname;
             Message.Sender = TestUser;
@@ -323,7 +311,6 @@ namespace MapModuleTests
         [TestMethod]
         public void NoData()
         {
-
             MessageEventArgs Message = new MessageEventArgs(null);
             Message.ReceivedMessage = AddCommand;
             Message.Sender = TestUser;
@@ -336,7 +323,6 @@ namespace MapModuleTests
         [TestMethod]
         public void ExtraSpacing()
         {
-
             MessageEventArgs Message = new MessageEventArgs(null);
             Message.ReceivedMessage = AddCommand + "   " + Mapname + "   " + url + "          " + notes;
             Message.Sender = TestUser;
@@ -394,7 +380,6 @@ namespace MapModuleTests
         [TestMethod]
         public void NonUploadedMapAndNoNote()
         {
-
             MessageEventArgs Message = new MessageEventArgs(null);
             Message.ReceivedMessage = AddCommand + " " + Mapname + " " + url;
             Message.Sender = TestUser;
@@ -411,11 +396,10 @@ namespace MapModuleTests
             Assert.AreNotEqual(TestMap.Filename, Mapname + 1); //Ensure that its a string check
         }
 
-        void AssertMaplistSize(int i)
+        private void AssertMaplistSize(int i)
         {
             Assert.IsTrue(module.mapList.GetSize() == i);
         }
-        
 
         [TestMethod]
         public void MapNotUploaded()
@@ -436,7 +420,6 @@ namespace MapModuleTests
         {
             string NewMapName = "foo";
 
-
             MessageEventArgs Message = new MessageEventArgs(null);
             Message.ReceivedMessage = AddCommand + " " + Mapname + " " + url + " " + notes;
             Message.Sender = TestUser;
@@ -452,11 +435,12 @@ namespace MapModuleTests
 
             Map TestMap = module.mapList.GetMap(0);
 
-            Assert.AreEqual(NewMapName, TestMap.Filename );
-            Assert.AreEqual(NewURL , TestMap.DownloadURL);
-            Assert.AreEqual(NewNote , TestMap.Notes );
-            Assert.AreEqual(identifier , TestMap.Submitter );
+            Assert.AreEqual(NewMapName, TestMap.Filename);
+            Assert.AreEqual(NewURL, TestMap.DownloadURL);
+            Assert.AreEqual(NewNote, TestMap.Notes);
+            Assert.AreEqual(identifier, TestMap.Submitter);
         }
+
         [TestMethod]
         public void Update_RejectNoURL()
         {
@@ -479,6 +463,7 @@ namespace MapModuleTests
 
             Assert.AreEqual(TestMap.Filename, Mapname);
         }
+
         [TestMethod]
         public void Update_RejectSpace()
         {
@@ -551,6 +536,7 @@ namespace MapModuleTests
             Assert.IsFalse(TestMap.Uploaded);
             Assert.AreEqual(TestMap.Submitter, identifier);
         }
+
         //First map isn't uploaded, so it needs a url, but the second map is uploaded and needs a url
         [TestMethod]
         public void UpdateMapOnlyNewOneUploaded()
@@ -575,7 +561,7 @@ namespace MapModuleTests
             Assert.AreEqual(TestMap.Filename, NewMapName);
             Assert.IsNull(TestMap.DownloadURL);
             Assert.IsTrue(TestMap.Uploaded);
-            
+
             Assert.AreEqual(TestMap.Submitter, identifier);
         }
 
@@ -602,6 +588,7 @@ namespace MapModuleTests
 
             Assert.AreEqual(TestMap.Filename, Mapname);
         }
+
         [TestMethod]
         public void UpdateSingleMap()
         {
@@ -612,7 +599,6 @@ namespace MapModuleTests
                 Message.ReceivedMessage = AddCommand + " " + Mapname + i + " " + url + " " + notes;
                 Console.WriteLine(FireCommand(Message, module));
             }
-
 
             string NewMapName = "newmap";
             string NewURL = "HTTP://NEWURL";
@@ -629,6 +615,7 @@ namespace MapModuleTests
             Assert.AreEqual(TestMap.Notes, NewNote);
             Assert.AreEqual(TestMap.Submitter, identifier);
         }
+
         [TestMethod]
         public void NoDoubling()
         {
@@ -636,7 +623,6 @@ namespace MapModuleTests
             RegularSyntax();
 
             AssertMaplistSize(1);
-
         }
 
         [TestMethod]
@@ -647,8 +633,8 @@ namespace MapModuleTests
             Message.Sender = TestUser;
 
             AssertMaplistSize(0);
-
         }
+
         [TestMethod]
         public void SmallerThan27Chars()
         {
@@ -658,7 +644,5 @@ namespace MapModuleTests
 
             AssertMaplistSize(0);
         }
-
-
     }
 }

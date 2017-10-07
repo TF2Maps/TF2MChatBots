@@ -1,13 +1,11 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SteamKit2;
 using System.Net;
 using System.Net.Sockets;
-using Newtonsoft.Json;
-using System.IO;
+using System.Text;
 
 namespace SteamBotLite
 {
@@ -15,17 +13,17 @@ namespace SteamBotLite
     {
         public event EventHandler<TrackingServerInfo> ServerMapChanged;
 
-
         private BaseTask serverUpdate;
 
         public TrackingServerList TrackedServers;
 
         public ModuleHandler Bot;
 
-        HTMLFileFromArrayListiners WebServer;
+        private HTMLFileFromArrayListiners WebServer;
 
-        public override void OnAllModulesLoaded() { }
-
+        public override void OnAllModulesLoaded()
+        {
+        }
 
         public ServerTrackingModule(ModuleHandler bot, HTMLFileFromArrayListiners WebServer, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
@@ -64,16 +62,14 @@ namespace SteamBotLite
             ServerMapChanged += ServerTrackingModule_ServerMapChanged;
         }
 
-        public string NameToserverCommand (string servername)
+        public string NameToserverCommand(string servername)
         {
             return "!" + servername.ToLower() + "server";
         }
 
         private void ServerTrackingModule_ServerMapChanged(object sender, TrackingServerInfo e)
         {
-
             string TableLabel = e.tag + " History";
-            
 
             TableDataValue HeaderName = new TableDataValue();
             HeaderName.VisibleValue = "Map Name";
@@ -99,7 +95,8 @@ namespace SteamBotLite
 
             WebServer.AddEntryWithLimit(TableLabel, new TableDataValue[] { MapName, PlayerCount, Time }, 10);
 
-            if (e.playerCount > 8) {
+            if (e.playerCount > 8)
+            {
                 userhandler.BroadcastMessageProcessEvent(e.ToString());
 
                 TableDataValue HeaderServer = new TableDataValue();
@@ -110,13 +107,10 @@ namespace SteamBotLite
                 ServerLabel.Link = "steam://connect/" + e.serverIP + ":" + e.port;
 
                 string RecentlyTestedTableLabel = "Recently Tested";
-                WebServer.SetTableHeader(RecentlyTestedTableLabel, new TableDataValue[] { HeaderName, HeaderNamePlayerCount, HeaderTime,  HeaderServer });
-                WebServer.AddEntryWithLimit(RecentlyTestedTableLabel, new TableDataValue[] { MapName, PlayerCount, Time, ServerLabel}, 10);
+                WebServer.SetTableHeader(RecentlyTestedTableLabel, new TableDataValue[] { HeaderName, HeaderNamePlayerCount, HeaderTime, HeaderServer });
+                WebServer.AddEntryWithLimit(RecentlyTestedTableLabel, new TableDataValue[] { MapName, PlayerCount, Time, ServerLabel }, 10);
             }
-
         }
-
-        
 
         public void SyncTrackingServerInfo(object sender, EventArgs e)
         {
@@ -159,9 +153,8 @@ namespace SteamBotLite
             }
         }
 
-        
         // queries a server and returns a <string, int> Tuple (filename, playercount)
-        public  TrackingServerInfo ServerQuery(TrackingServerInfo server)
+        public TrackingServerInfo ServerQuery(TrackingServerInfo server)
         {
             if (IsEmulating) //For testing purposes, we can assign and set an emulated TrackingServerInfo response
             {
@@ -214,6 +207,7 @@ namespace SteamBotLite
 
         //For Testing Purposes
         private TrackingServerInfo EmulatedTrackingServerInfo;
+
         private bool IsEmulating = false;
 
         public void EmulateServerQuery(TrackingServerInfo Response)
@@ -227,15 +221,16 @@ namespace SteamBotLite
         private sealed class Status : BaseCommand
         {
             // Automaticaly generated status command for each server under the config
-            TrackingServerInfo server;
-            ServerTrackingModule ServerTrackingModule;
+            private TrackingServerInfo server;
+
+            private ServerTrackingModule ServerTrackingModule;
 
             public Status(ModuleHandler bot, TrackingServerInfo server, ServerTrackingModule module) : base(bot, module.NameToserverCommand(server.tag))
             {
                 this.server = server;
                 ServerTrackingModule = module;
-
             }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 TrackingServerInfo status = ServerTrackingModule.ServerQuery(server);
@@ -252,13 +247,13 @@ namespace SteamBotLite
         private sealed class SpecificServerStatus : BaseCommand
         {
             // Automaticaly generated status command for each server under the config
-            ServerTrackingModule ServerTrackingModule;
+            private ServerTrackingModule ServerTrackingModule;
 
             public SpecificServerStatus(ModuleHandler bot, ServerTrackingModule module) : base(bot, "")
             {
                 ServerTrackingModule = module;
-
             }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 foreach (TrackingServerInfo server in ServerTrackingModule.TrackedServers)
@@ -279,17 +274,16 @@ namespace SteamBotLite
                     {
                         return true;
                     }
-
                 }
                 return false;
             }
-            
+
             public override string[] GetCommmand()
             {
                 int AmountOfServers = ServerTrackingModule.TrackedServers.Count();
                 string[] TrackingServerList = new string[AmountOfServers];
 
-                for (int x = 0; x < AmountOfServers; x++ )
+                for (int x = 0; x < AmountOfServers; x++)
                 {
                     TrackingServerList[x] = ServerTrackingModule.NameToserverCommand(ServerTrackingModule.TrackedServers.Servers[x].tag);
                 }
@@ -300,7 +294,8 @@ namespace SteamBotLite
 
         private class ServerAdd : BaseCommand
         {
-            ServerTrackingModule module;
+            private ServerTrackingModule module;
+
             public ServerAdd(ModuleHandler bot, ServerTrackingModule module) : base(bot, "!serveradd")
             {
                 this.module = module;
@@ -329,17 +324,18 @@ namespace SteamBotLite
                 {
                     return "Your Server was not added, remember the command is: !serveradd servername serverIP serverPort";
                 }
-
             }
         }
+
         private class ServerRemove : BaseCommand
         {
-            ServerTrackingModule module;
+            private ServerTrackingModule module;
 
             public ServerRemove(ModuleHandler bot, ServerTrackingModule module) : base(bot, "!serverremove")
             {
                 this.module = module;
             }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 foreach (TrackingServerInfo server in module.TrackedServers.Servers)
@@ -359,11 +355,13 @@ namespace SteamBotLite
         private class Active : BaseCommand
         {
             // Command to query if a server is active
-            ServerTrackingModule module;
+            private ServerTrackingModule module;
+
             public Active(ModuleHandler bot, ServerTrackingModule module) : base(bot, "!Active")
             {
                 this.module = module;
             }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 string activeServers = "";
@@ -382,11 +380,13 @@ namespace SteamBotLite
         private class FullServerQuery : BaseCommand
         {
             // Command to query if a server is active
-            ServerTrackingModule module;
+            private ServerTrackingModule module;
+
             public FullServerQuery(ModuleHandler bot, ServerTrackingModule module) : base(bot, "!Serverquery")
             {
                 this.module = module;
             }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 string activeServers = "";
@@ -401,8 +401,5 @@ namespace SteamBotLite
                 return activeServers.Equals(string.Empty) ? "No server is currently active" : activeServers;
             }
         }
-
-
-
     }
 }

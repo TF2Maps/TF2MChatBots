@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SteamBotLite
 {
-    class ConsoleInterface : ApplicationInterface
+    internal class ConsoleInterface : ApplicationInterface
     {
         public override void BroadCastMessage(object sender, string message)
         {

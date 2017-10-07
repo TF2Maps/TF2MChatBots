@@ -1,28 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SteamKit2;
+﻿using SteamKit2;
+using SteamKit2.Internal;
+using System;
 using System.IO;
 using System.Security.Cryptography;
-using Newtonsoft.Json;
-using SteamKit2.Internal;
-using System.Net;
 
 namespace SteamBotLite
 {
     public abstract class SteamInterface : ApplicationInterface
     {
-        
         /// <summary>
         /// We store this, in case we need to reboot
         /// </summary>
         public SteamBotData SteamBotLiteLoginData;
+
         /// <summary>
         /// Bot's ID
         /// </summary>
         public int ID;
+
         /// <summary>
         /// Username we will login with
         /// </summary>
@@ -37,25 +32,28 @@ namespace SteamBotLite
         /// Login Data that is sent to steam when we attempt logging in
         /// </summary>
         public SteamUser.LogOnDetails LoginData;
+
         /// <summary>
         /// File name of the sentryfile
         /// </summary>
         private string SentryFileName = "sentry.bin";
+
         /// <summary>
         /// File name of the loginkey
         /// </summary>
         private string LoginKeyName = "key.txt";
+
         /// <summary>
         /// The path to the sentry file
         /// </summary>
-        string SentryFile;
+        private string SentryFile;
+
         /// <summary>
         /// The path to the login file
         /// </summary>
-        string LoginKeyFile;
+        private string LoginKeyFile;
 
-        
-        SteamClient steamClient;
+        private SteamClient steamClient;
         public SteamUser steamUser;
         public SteamFriends SteamFriends;
 
@@ -78,19 +76,17 @@ namespace SteamBotLite
                 Console.WriteLine("Exception Handled: {0}", ex);
             }
         }
+
         public SteamInterface()
         {
             string user = config["username"].ToString();
             string pass = config["password"].ToString();
             bool shouldrememberpass = (bool)config["ShouldRememberPassword"];
-            SteamBotData SteamBotLoginData = new SteamBotData(user,pass, shouldrememberpass);
-            
+            SteamBotData SteamBotLoginData = new SteamBotData(user, pass, shouldrememberpass);
+
             LoginData = SteamBotLoginData.LoginData;
             ResetConnection(SteamBotLoginData);
         }
-        
-
-        
 
         /// <summary>
         /// Creates an instance of SteamConnectionHandler with the data given and logs in, also can be fired to reset the bot
@@ -119,8 +115,6 @@ namespace SteamBotLite
                 LoginData.Password = null;
             }
 
-           
-
             // create our steamclient instance
             steamClient = new SteamClient(System.Net.Sockets.ProtocolType.Tcp);
 
@@ -144,12 +138,11 @@ namespace SteamBotLite
             manager.Subscribe<SteamUser.LoggedOnCallback>(OnLoggedOn);
             manager.Subscribe<SteamUser.LoggedOffCallback>(OnLoggedOff);
 
-            //These callbacks are to handler the bot being online/offline 
+            //These callbacks are to handler the bot being online/offline
 
             //In the future, these callbacks should be migrated over to the UserHandler to utilise instead
             manager.Subscribe<SteamUser.AccountInfoCallback>(OnAccountInfo); //We receive this when we're logged-in, the method referenced makes us go online on community
             manager.Subscribe<SteamFriends.FriendsListCallback>(OnFriendsList); //We receive this when we go online on community
-
 
             //We will pass some down to the UserHandler instead, as these manage users not the connection
             manager.Subscribe<SteamFriends.FriendMsgCallback>(ReceivePrivateMessage);
@@ -168,20 +161,18 @@ namespace SteamBotLite
             Console.WriteLine("Connecting User: {0}", user);
 
             Console.WriteLine("Connecting to Steam...");
-            
-            SteamDirectory.Initialize().Wait(); //Gets a new server list, this is REALLY necessary. 
+
+            SteamDirectory.Initialize().Wait(); //Gets a new server list, this is REALLY necessary.
 
             // initiate the connection
             Reconnect();
-            
         }
 
-       
         /// <summary>
-        /// Callback fired when get get chat member info 
+        /// Callback fired when get get chat member info
         /// </summary>
         /// <param name="Callback"></param>
-        void chatmemberinfo(SteamFriends.ChatActionResultCallback Callback)
+        private void chatmemberinfo(SteamFriends.ChatActionResultCallback Callback)
         {
             Console.WriteLine("Info: " + Callback.ChatterID.ConvertToUInt64() + ": " + Callback.Action + ", " + Callback.Result);
         }
@@ -190,7 +181,7 @@ namespace SteamBotLite
         /// Callback for receiving data about connecting to steam
         /// </summary>
         /// <param name="callback"></param>
-        void OnConnected(SteamClient.ConnectedCallback callback)
+        private void OnConnected(SteamClient.ConnectedCallback callback)
         {
             if (callback.Result != EResult.OK) //If we're not Logged in
             {
@@ -211,15 +202,15 @@ namespace SteamBotLite
                 LoginData.SentryFileHash = sentryHash; //We'll save the hash in the login data
             }
 
-            Login(LoginData); //Lets login and send the login data we've been preparing now that we've connected to steam 
-
+            Login(LoginData); //Lets login and send the login data we've been preparing now that we've connected to steam
         }
+
         /// <summary>
-        /// The callback that is fired when going online once connected to steam, we use it to tell the 
+        /// The callback that is fired when going online once connected to steam, we use it to tell the
         /// userhandler class to run its login method
         /// </summary>
         /// <param name="callback"></param>
-        void OnFriendsList(SteamFriends.FriendsListCallback callback)
+        private void OnFriendsList(SteamFriends.FriendsListCallback callback)
         {
             // at this point, the client has received it's friends list
             Console.WriteLine("Steam Logged in");
@@ -231,79 +222,82 @@ namespace SteamBotLite
                 SteamID ChatroomToJoin = ConvertEntityToSteamID(Chatroom);
                 SteamFriends.JoinChat(ChatroomToJoin);
             }
-
         }
+
         /// <summary>
         /// Now that we're logged in, lets go online so we can properly interact on steamfriends.
         /// If there is difficulty interacting with people, it is likely because you're not online
         /// </summary>
         /// <param name="callback"></param>
 
-        void OnAccountInfo(SteamUser.AccountInfoCallback callback)
+        private void OnAccountInfo(SteamUser.AccountInfoCallback callback)
         {
             // before being able to interact with friends, you must wait for the account info callback
             // this callback is posted shortly after a successful logon
 
             // at this point, we can go online on friends, so lets do that
             SteamFriends.SetPersonaState(EPersonaState.Online); //Set the State to Online
-            
         }
+
         /// <summary>
         /// A method to Login using the given Data
         /// </summary>
         /// <param name="LoginDetails"></param>
-        void Login(SteamUser.LogOnDetails LoginDetails)
+        private void Login(SteamUser.LogOnDetails LoginDetails)
         {
             steamUser.LogOn(LoginDetails);
         }
+
         /// <summary>
-        /// This callback fires when steam tells us we've been disconnected, currently the 
+        /// This callback fires when steam tells us we've been disconnected, currently the
         /// bot will run the reconnect method
         /// </summary>
         /// <param name="callback"></param>
-        void OnDisconnected(SteamClient.DisconnectedCallback callback)
+        private void OnDisconnected(SteamClient.DisconnectedCallback callback)
         {
             Console.WriteLine("Disconnected from , UserSetup: {0}", callback.UserInitiated);
-            
+
             Reconnect();
         }
 
         /// <summary>
-        /// This method should be used when we need to reconnect SteamClient, it'll allow us to keep things more organised 
+        /// This method should be used when we need to reconnect SteamClient, it'll allow us to keep things more organised
         /// </summary>
-        void Reconnect()
+        private void Reconnect()
         {
             SteamDirectory.Initialize().Wait(15); //Update internal list that is heavily used before attempting login. And wait 2 Seconds to avoid Spam
-            //IPEndPoint Address = new IPEndPoint(IPAddress.Parse("72.165.61.187"), 27017); //IF you ever need a sample address, use this
-           // Console.WriteLine("CONNECTING:");
+                                                  //IPEndPoint Address = new IPEndPoint(IPAddress.Parse("72.165.61.187"), 27017); //IF you ever need a sample address, use this
+                                                  // Console.WriteLine("CONNECTING:");
             steamClient.Connect(); //Lets try and log back in
         }
+
         /// <summary>
         /// This is fired when steam gives the login key, so we store it
         /// </summary>
         /// <param name="callback"></param>
-        void OnLoginKey(SteamUser.LoginKeyCallback callback)
+        private void OnLoginKey(SteamUser.LoginKeyCallback callback)
         {
             if ((callback != null) && (!string.IsNullOrEmpty(callback.LoginKey))) //Check if the data is valid
             {
                 steamUser.AcceptNewLoginKey(callback); //Tell steam we have accepted their offering
-                File.WriteAllText(LoginKeyFile, callback.LoginKey); //We now will write the data 
+                File.WriteAllText(LoginKeyFile, callback.LoginKey); //We now will write the data
                 LoginData.LoginKey = callback.LoginKey; //We will now set the login Key used in Log-in
                 Console.WriteLine("Wrote New LoginKey"); //Tell the user we have wrote a new login key file
             }
         }
+
         /// <summary>
         /// The Callback fired when attempting to logon
         /// </summary>
         /// <param name="callback"></param>
-        void OnLoggedOn(SteamUser.LoggedOnCallback callback)
+        private void OnLoggedOn(SteamUser.LoggedOnCallback callback)
         {
             bool isSteamGuard = callback.Result == EResult.AccountLogonDenied; //Setup a bool to see if steamguard blocked the login
             bool is2FA = callback.Result == EResult.AccountLoginDeniedNeedTwoFactor; //Setup a bool to see if two factor auth blocked the login
 
             if (callback.Result != EResult.OK) //If we didn't log in
             {
-                if (isSteamGuard || is2FA) //Check If steamguard is what stopped us  
+                if (isSteamGuard || is2FA) //Check If steamguard is what stopped us
                 {
                     Console.WriteLine("This account is SteamGuard protected!");
 
@@ -327,23 +321,23 @@ namespace SteamBotLite
                     //Often we can get denied login due to a bad login Key, so we'll switch to using passwords instead
                     //TODO add an IF argument to check if that was the reason, and add a delay
 
-
-                    LoginData.LoginKey = null; //We will set the login Key to Null to tell steam we no longer want to use that method  
-                    LoginData.Password = pass; //We set the Password as this is how we're verifying now 
+                    LoginData.LoginKey = null; //We will set the login Key to Null to tell steam we no longer want to use that method
+                    LoginData.Password = pass; //We set the Password as this is how we're verifying now
 
                     return; //We go back now and try again
                 }
             }
             else
             {
-                Console.WriteLine("{0} Successfully logged on!", LoginData.Username); //Lets tell the user we logged on               
+                Console.WriteLine("{0} Successfully logged on!", LoginData.Username); //Lets tell the user we logged on
             }
         }
+
         /// <summary>
-        /// This callback fires when we receive data for the sentry file, so we save it 
+        /// This callback fires when we receive data for the sentry file, so we save it
         /// </summary>
         /// <param name="callback"></param>
-        void OnMachineAuth(SteamUser.UpdateMachineAuthCallback callback)
+        private void OnMachineAuth(SteamUser.UpdateMachineAuthCallback callback)
         {
             Console.WriteLine("Updating sentryfile...");
 
@@ -388,19 +382,19 @@ namespace SteamBotLite
 
             Console.WriteLine("Done!");
         }
-        //TODO Lets Turn the following four into events, so errors aren't thrown if a userhandler doesn't exist 
 
+        //TODO Lets Turn the following four into events, so errors aren't thrown if a userhandler doesn't exist
 
         /// <summary>
         /// Callback fires when we log out
         /// </summary>
         /// <param name="callback"></param>
-        void OnLoggedOff(SteamUser.LoggedOffCallback callback)
+        private void OnLoggedOff(SteamUser.LoggedOffCallback callback)
         {
             Console.WriteLine("Logged off of Steam: {0}", callback.Result);
         }
 
-        void ReceivePrivateMessage(SteamFriends.FriendMsgCallback callback)
+        private void ReceivePrivateMessage(SteamFriends.FriendMsgCallback callback)
         {
             MessageEventArgs NewMessageData = new MessageEventArgs(this);
             NewMessageData.ReceivedMessage = callback.Message;
@@ -409,20 +403,16 @@ namespace SteamBotLite
             NewMessageData.Sender.DisplayName = SteamFriends.GetFriendPersonaName(callback.Sender);
             NewMessageData.Sender.UserURL = "http://steamcommunity.com/profiles/" + callback.Sender.ConvertToUInt64();
             base.PrivateMessageProcessEvent(NewMessageData);
-
         }
 
-        
-        void ReceiveChatMessage(SteamFriends.ChatMsgCallback callback)
+        private void ReceiveChatMessage(SteamFriends.ChatMsgCallback callback)
         {
-
             MessageEventArgs NewMessageData = new MessageEventArgs(this);
             NewMessageData.ReceivedMessage = callback.Message;
 
             NewMessageData.Chatroom = new Chatroom(callback.ChatRoomID.ConvertToUInt64(), this);
             NewMessageData.Chatroom.DisplayName = (callback.ChatRoomID.ToString());
-            
-            
+
             NewMessageData.Sender = new User(callback.ChatterID.ConvertToUInt64(), this);
             NewMessageData.Sender.DisplayName = SteamFriends.GetFriendPersonaName(callback.ChatterID.ConvertToUInt64());
             NewMessageData.Sender.UserURL = "http://steamcommunity.com/profiles/" + callback.ChatterID.ConvertToUInt64();
@@ -432,16 +422,12 @@ namespace SteamBotLite
             NewMessageData.Sender.DisplayName = SteamFriends.GetFriendPersonaName(callback.ChatterID.ConvertToUInt64());
 
             base.ChatRoomMessageProcessEvent(NewMessageData);
-
-
         }
 
-        void Chatmemberinfo(SteamFriends.ChatMemberInfoCallback callback)
+        private void Chatmemberinfo(SteamFriends.ChatMemberInfoCallback callback)
         {
-            
             if (callback.StateChangeInfo.StateChange != EChatMemberStateChange.Entered)
             {
-
             }
             else
             {
@@ -464,12 +450,11 @@ namespace SteamBotLite
         {
             try
             {
-                SteamID user = ConvertEntityToSteamID(messagedata.Destination); 
+                SteamID user = ConvertEntityToSteamID(messagedata.Destination);
                 SteamFriends.SendChatRoomMessage(user, EChatEntryType.ChatMsg, messagedata.ReplyMessage);
             }
             catch
             {
-                
             }
         }
 
@@ -482,7 +467,6 @@ namespace SteamBotLite
             }
             catch
             {
-
             }
         }
 
@@ -499,11 +483,10 @@ namespace SteamBotLite
             }
         }
 
-        SteamID ConvertEntityToSteamID(ChatroomEntity Entity)
+        private SteamID ConvertEntityToSteamID(ChatroomEntity Entity)
         {
             return new SteamID((Convert.ToUInt64(Entity.identifier)));
         }
-        
 
         public override void EnterChatRoom(object sender, ChatroomEntity ChatroomEntity)
         {
@@ -533,8 +516,7 @@ namespace SteamBotLite
             return SteamFriends.GetFriendPersonaName(Other);
         }
 
-
-        public override void Reboot(object sender , EventArgs e)
+        public override void Reboot(object sender, EventArgs e)
         {
             ResetConnection(SteamBotLiteLoginData);
             Console.WriteLine("Rebooting");
@@ -547,10 +529,9 @@ namespace SteamBotLite
 
         public override void SetStatusMessage(object sender, string message)
         {
-
             var request = new ClientMsgProtobuf<CMsgClientGamesPlayed>(EMsg.ClientGamesPlayed);
 
-           var gamePlayed = new CMsgClientGamesPlayed.GamePlayed();
+            var gamePlayed = new CMsgClientGamesPlayed.GamePlayed();
 
             if (!string.IsNullOrEmpty(message))
             {
@@ -559,10 +540,8 @@ namespace SteamBotLite
             }
 
             request.Body.games_played.Add(gamePlayed);
-            
-         steamClient.Send(request);
+
+            steamClient.Send(request);
         }
-
-
     }
 }

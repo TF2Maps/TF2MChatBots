@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SteamBotLite
 {
@@ -13,12 +11,14 @@ namespace SteamBotLite
         /// <summary>
         /// This class is a wrapper for an observerable collection, in order to ensure validity of inputs
         /// </summary>
-        /// 
-        ObservableCollection<Map> mapList = new ObservableCollection<Map>();
-        string tablename = "Deleted Maps";
+        ///
+        private ObservableCollection<Map> mapList = new ObservableCollection<Map>();
 
-        HTMLFileFromArrayListiners listiner;
-        public MapCollection(ObservableCollection<Map> inputlist , HTMLFileFromArrayListiners HtmlListiner)
+        private string tablename = "Deleted Maps";
+
+        private HTMLFileFromArrayListiners listiner;
+
+        public MapCollection(ObservableCollection<Map> inputlist, HTMLFileFromArrayListiners HtmlListiner)
         {
             this.mapList = inputlist;
             this.listiner = HtmlListiner;
@@ -34,26 +34,41 @@ namespace SteamBotLite
             TableDataValue Owner = new TableDataValue();
             Owner.VisibleValue = "Owner";
 
-            TableDataValue[] Data = new TableDataValue[] { MapEntry, ReasonEntry , Owner};
+            TableDataValue[] Data = new TableDataValue[] { MapEntry, ReasonEntry, Owner };
             HtmlListiner.SetTableHeader(tablename, Data);
 
             AllowOnlyUploadedMaps = false;
         }
 
-        private void MapList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+        private void MapList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
             CollectionChanged(this, e);
         }
+
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
-        private ObservableCollection<Map> GetMaplist() { return mapList; }
+        private ObservableCollection<Map> GetMaplist()
+        {
+            return mapList;
+        }
 
-        public Map GetMap(int position) { return mapList[position]; }
+        public Map GetMap(int position)
+        {
+            return mapList[position];
+        }
 
-        public IReadOnlyList<Map> GetAllMaps() { return mapList; }
+        public IReadOnlyList<Map> GetAllMaps()
+        {
+            return mapList;
+        }
 
-        public Map GetMapByFilename(string filename) { return mapList.FirstOrDefault(x => x.Filename == filename); }
+        public Map GetMapByFilename(string filename)
+        {
+            return mapList.FirstOrDefault(x => x.Filename == filename);
+        }
 
-        public void RemoveMap(Map map , string reason) {
+        public void RemoveMap(Map map, string reason)
+        {
             TableDataValue Owner = new TableDataValue();
             Owner.VisibleValue = map.SubmitterName;
             Owner.HoverText = map.Submitter.ToString();
@@ -64,28 +79,37 @@ namespace SteamBotLite
 
             TableDataValue ReasonEntry = new TableDataValue();
             ReasonEntry.VisibleValue = reason;
-            
-            TableDataValue[] Data = new TableDataValue[] { MapEntry, ReasonEntry , Owner };
-            
+
+            TableDataValue[] Data = new TableDataValue[] { MapEntry, ReasonEntry, Owner };
+
             listiner.AddEntryWithLimit(tablename, Data, 10);
         }
 
-        public void RemoveMap(int position) { mapList.RemoveAt(position); }
+        public void RemoveMap(int position)
+        {
+            mapList.RemoveAt(position);
+        }
 
-        public void InsertMap(int position, Map map) { mapList.Insert(position, map); }
+        public void InsertMap(int position, Map map)
+        {
+            mapList.Insert(position, map);
+        }
 
-        public int GetSize() { return mapList.Count; }
+        public int GetSize()
+        {
+            return mapList.Count;
+        }
 
         public bool AllowOnlyUploadedMaps { get; private set; }
         public string ForceMapsToBeUploadedErrorResponse { get; private set; }
 
-        public void RestrictMapsToBeUploaded (bool ForceMapsToBeUploaded, string ErrorMessage)
+        public void RestrictMapsToBeUploaded(bool ForceMapsToBeUploaded, string ErrorMessage)
         {
             this.AllowOnlyUploadedMaps = ForceMapsToBeUploaded;
             ForceMapsToBeUploadedErrorResponse = ErrorMessage;
         }
 
-        public IEnumerator<Map> GetEnumerator ()
+        public IEnumerator<Map> GetEnumerator()
         {
             return mapList.GetEnumerator();
         }
@@ -99,7 +123,8 @@ namespace SteamBotLite
                 mapList.Add(map);
                 return string.Format("{0} Has been added to the list!", map.Filename);
             }
-            else {
+            else
+            {
                 return MapCheck.ReturnMessage;
             }
         }
@@ -128,13 +153,14 @@ namespace SteamBotLite
                     ReturnMessage = "You are either not an admin or this isn't your map!";
                 }
             }
-            else {
+            else
+            {
                 ReturnMessage = MapCheck.ReturnMessage;
             }
 
             return ReturnMessage;
         }
-        
+
         private UpdateMapValidityCheck GetMapPositionInList(string mapName)
         {
             UpdateMapValidityCheck ReturnData = new UpdateMapValidityCheck();
@@ -155,25 +181,28 @@ namespace SteamBotLite
             return ReturnData;
         }
 
-        private bool CheckIfStringIsNumbers (string input)
+        private bool CheckIfStringIsNumbers(string input)
         {
             int x;
             return int.TryParse(input, out x);
-
         }
+
         private MapValidityCheck CheckIfValid(Map map)
         {
             MapValidityCheck ValidityCheck = new MapValidityCheck();
             try
             {
                 if (map.Uploaded == true) { }
-                else {
-                    if (AllowOnlyUploadedMaps) {
+                else
+                {
+                    if (AllowOnlyUploadedMaps)
+                    {
                         throw new ArgumentException(ForceMapsToBeUploadedErrorResponse);
                     }
 
                     if (map.DownloadURL != null & map.DownloadURL.StartsWith("http", StringComparison.OrdinalIgnoreCase)) { }
-                    else {
+                    else
+                    {
                         throw new ArgumentException("Your map isn't uploaded, and doesn't include a URL!");
                     }
                 }
@@ -187,27 +216,25 @@ namespace SteamBotLite
                 {
                     throw new ArgumentException("You must include more than numbers!");
                 }
-                if (map.Filename.Any(c => char.IsUpper(c))) {
+                if (map.Filename.Any(c => char.IsUpper(c)))
+                {
                     throw new ArgumentException("It includes an uppercase letter");
                 }
 
-                if (map.Filename.Length > 27) {
+                if (map.Filename.Length > 27)
+                {
                     throw new ArgumentException("It includes too many characters: " + "27");
                 }
 
-                if (mapList.Any(m => m.Filename.Equals(map.Filename))) {
+                if (mapList.Any(m => m.Filename.Equals(map.Filename)))
+                {
                     throw new ArgumentException("Your map has been rejected as it already exists in the map list!");
                 }
             }
-
             catch (ArgumentException ex) { ValidityCheck.SetInvalid(ex.Message); }
             catch (NullReferenceException ex) { throw new ArgumentException("Map isn't uploaded"); }
 
             return ValidityCheck;
         }
-
-        
-
     }
-
 }

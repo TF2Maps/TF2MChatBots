@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 
 namespace SteamBotLite
 {
-
     public abstract class DiscordInterface : ApplicationInterface
     {
         private DiscordClient _client;
-        string Token;
+        private string Token;
 
-        List<ulong> BroadCastChatrooms;
+        private List<ulong> BroadCastChatrooms;
 
         public DiscordInterface()
         {
@@ -22,13 +18,17 @@ namespace SteamBotLite
             Token = config["Token"].ToString();
             BroadCastChatrooms = new List<ulong>();
 
-            if (bool.Parse(config["UseWhitelistAsBroadCastChatrooms"].ToString()))  {
-                foreach (string item in Whitelist)  {
+            if (bool.Parse(config["UseWhitelistAsBroadCastChatrooms"].ToString()))
+            {
+                foreach (string item in Whitelist)
+                {
                     BroadCastChatrooms.Add(ulong.Parse(item));
                 }
             }
-            else {
-                foreach (string item in JsonConvert.DeserializeObject<List<string>>(config["Whitelist"].ToString()))  {
+            else
+            {
+                foreach (string item in JsonConvert.DeserializeObject<List<string>>(config["Whitelist"].ToString()))
+                {
                     BroadCastChatrooms.Add(ulong.Parse(item));
                 }
             }
@@ -49,7 +49,6 @@ namespace SteamBotLite
                 user.DisplayName = e.User.Name;
                 user.ExtraData = e.User;
 
-
                 try
                 {
                     if (e.User.ServerPermissions.Administrator)
@@ -63,15 +62,14 @@ namespace SteamBotLite
                 }
                 catch
                 {
-
                 }
 
                 MessageEventArgs Msg = new MessageEventArgs(this);
                 Msg.ReceivedMessage = e.Message.RawText;
                 Msg.Sender = user;
 
-                Msg.Chatroom = new Chatroom(e.Message.Channel,  this);
-                
+                Msg.Chatroom = new Chatroom(e.Message.Channel, this);
+
                 if (e.Message.Channel != null)
                 {
                     ChatRoomMessageProcessEvent(Msg);
@@ -85,16 +83,16 @@ namespace SteamBotLite
 
         public void ConnectionProcess(string token, DiscordClient Client)
         {
-            Client.Connect(token, TokenType.Bot);            
+            Client.Connect(token, TokenType.Bot);
         }
 
         public void DisconnectionProcess(DiscordClient Client)
         {
-            _client.ExecuteAndWait(async () => {
+            _client.ExecuteAndWait(async () =>
+            {
                 await Client.Disconnect();
             });
         }
-
 
         public override void EnterChatRoom(object sender, ChatroomEntity ChatroomEntity)
         {
@@ -136,7 +134,6 @@ namespace SteamBotLite
             }
             catch
             {
-
             }
         }
 
@@ -144,10 +141,8 @@ namespace SteamBotLite
         {
             try
             {
-                
-                
                 Discord.User user = (Discord.User)messagedata.Destination.ExtraData;
-                
+
                 Console.WriteLine("Casted Fine To Discord");
                 SendLargeMessage(user, messagedata.ReplyMessage);
             }
@@ -156,27 +151,24 @@ namespace SteamBotLite
                 Console.WriteLine("Casting Error");
             }
         }
-         
-        public void SendLargeMessage (Discord.User user , string message)
+
+        public void SendLargeMessage(Discord.User user, string message)
         {
             while (message.Length > 1999)
             {
                 user.SendMessage(message.Substring(0, 1999));
                 message = message.Remove(0, 1999);
-
             }
             user.SendMessage(message);
         }
-        
 
         public override void SetUsername(object sender, string Username)
         {
             _client.CurrentUser.Edit(username: Username);
         }
-        
+
         public override void tick()
         {
-            
         }
 
         public override void BroadCastMessage(object sender, string message)
@@ -192,11 +184,11 @@ namespace SteamBotLite
                 {
                     Console.WriteLine(e);
                 }
-
             }
         }
 
-        Game StatusName;
+        private Game StatusName;
+
         public override void SetStatusMessage(object sender, string message)
         {
             StatusName = new Game(message);

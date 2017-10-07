@@ -1,6 +1,6 @@
 ﻿namespace SteamBotLite
 {
-    class SteamAccountVBot : SteamInterface
+    internal class SteamAccountVBot : SteamInterface
     {
     }
 }

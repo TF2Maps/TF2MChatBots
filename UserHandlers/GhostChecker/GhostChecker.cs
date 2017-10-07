@@ -3,35 +3,38 @@ using System.Timers;
 
 namespace SteamBotLite
 {
-    public class GhostChecker :UserHandler
+    public class GhostChecker : UserHandler
     {
-        
-       // double interval = 300000; //Five Minutes
-        readonly double Minutes = 10;
-        double interval;
-        enum GhostStatus { Chatghosted, ChatPotentiallyGhosted, ChatHasNotGhosted , ChatCrashed};
-        GhostStatus CurrentGhostStatus = GhostStatus.ChatHasNotGhosted;
-        int CrashCheck = 0;
-        readonly int MinutesThreshhole = 10;
-        int timeleft;
-        Timer Tick;
+        // double interval = 300000; //Five Minutes
+        private readonly double Minutes = 10;
+
+        private double interval;
+
+        private enum GhostStatus
+        { Chatghosted, ChatPotentiallyGhosted, ChatHasNotGhosted, ChatCrashed };
+
+        private GhostStatus CurrentGhostStatus = GhostStatus.ChatHasNotGhosted;
+        private int CrashCheck = 0;
+        private readonly int MinutesThreshhole = 10;
+        private int timeleft;
+        private Timer Tick;
 
         public GhostChecker()
         {
             InitTimer();
         }
+
         /// <summary>
         /// The Main Timer's method, executed per tick
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void TickTasks(object sender, EventArgs e)
+        private void TickTasks(object sender, EventArgs e)
         {
             FireMainChatRoomEvent(ChatroomEventEnum.LeaveChat);
             FireMainChatRoomEvent(ChatroomEventEnum.EnterChat);
             CrashCheck++;
-            
-            
+
             if (CrashCheck >= 4)
             {
                 CrashCheck = 0;
@@ -42,7 +45,7 @@ namespace SteamBotLite
         /// <summary>
         /// Initialises the main timer
         /// </summary>
-        void InitTimer()
+        private void InitTimer()
         {
             interval = Minutes * 1000 * 60;
             Tick = new Timer();
@@ -59,11 +62,13 @@ namespace SteamBotLite
             Console.WriteLine("Restarted the timer");
         }
 
-        public override void ProcessPrivateMessage(object sender, MessageEventArgs e) { }
-        
+        public override void ProcessPrivateMessage(object sender, MessageEventArgs e)
+        {
+        }
 
-        public override void OnLoginCompleted(object sender, EventArgs e) { }
-        
+        public override void OnLoginCompleted(object sender, EventArgs e)
+        {
+        }
 
         public override void ChatMemberInfo(object sender, Tuple<ChatroomEntity, bool> e)
         {

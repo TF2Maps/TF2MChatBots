@@ -1,39 +1,35 @@
 ﻿using Newtonsoft.Json;
-using SteamKit2;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Timers;
 
 namespace SteamBotLite
 {
-    class MotdModule : BaseModule
+    internal class MotdModule : BaseModule
     {
-        public int postCount {get; set;}
+        public int postCount { get; set; }
         public int postCountLimit { get; set; }
-        public string message {get; set;}
+        public string message { get; set; }
         public string StatusMessage { get; private set; }
-        public ChatroomEntity setter {get; private set;}
+        public ChatroomEntity setter { get; private set; }
 
         public virtual int DefaultPostCountLimit()
         {
             return 24;
         }
 
-        public virtual string GetName ()
+        public virtual string GetName()
         {
             return "MOTD";
         }
 
-        MOTDITEM StatusMessageHolder;
+        private MOTDITEM StatusMessageHolder;
 
         private BaseTask motdPost;
 
         public MotdModule(VBot bot, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
-            // loading config 
+            // loading config
             int updateInterval = int.Parse(config["updateInterval"].ToString());
 
             // loading saved data
@@ -53,12 +49,10 @@ namespace SteamBotLite
 
         public override void OnAllModulesLoaded()
         {
-
         }
 
         public override string getPersistentData()
         {
-
             Dictionary<string, string> data = new Dictionary<string, string>();
             data.Add("motd", message);
             data.Add("count", postCount.ToString());
@@ -97,13 +91,15 @@ namespace SteamBotLite
                 userhandler.BroadcastMessageProcessEvent(message);
                 Parent.postCount++;
 
-                if (Parent.postCount > Parent.postCountLimit) {
+                if (Parent.postCount > Parent.postCountLimit)
+                {
                     Parent.message = null;
                 }
 
                 savePersistentData();
             }
         }
+
         /// <summary>
         /// Posts the MOTD to the group chat
         /// </summary>
@@ -133,7 +129,7 @@ namespace SteamBotLite
             {
                 //bot.SteamFriends.SetPersonaName("MOTD");
                 userhandler.BroadcastMessageProcessEvent(message);
-                
+
                 //bot.SteamFriends.SetPersonaName(bot.DisplayName);
                 postCount++;
                 if (postCount > postCountLimit)
@@ -165,7 +161,8 @@ namespace SteamBotLite
         abstract public class MotdCommand : BaseCommand
         {
             protected MotdModule motd;
-            public MotdCommand(VBot bot, string command, MotdModule motd) : base(bot,"!" + motd.GetName() + command)
+
+            public MotdCommand(VBot bot, string command, MotdModule motd) : base(bot, "!" + motd.GetName() + command)
             {
                 this.motd = motd;
             }
@@ -175,10 +172,14 @@ namespace SteamBotLite
 
         private class Get : MotdCommand
         {
-            public Get(VBot bot, MotdModule motd) : base(bot, "get", motd) { }
+            public Get(VBot bot, MotdModule motd) : base(bot, "get", motd)
+            {
+            }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                if (motd.postCount >= motd.postCountLimit){
+                if (motd.postCount >= motd.postCountLimit)
+                {
                     motd.message = null;
                     motd.postCount = 0;
                 }
@@ -189,7 +190,10 @@ namespace SteamBotLite
 
         private class Emulate : MotdCommand
         {
-            public Emulate(VBot bot, MotdModule motd) : base(bot, "Emulate", motd) { }
+            public Emulate(VBot bot, MotdModule motd) : base(bot, "Emulate", motd)
+            {
+            }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 motd.MotdPost(this, null);
@@ -199,12 +203,15 @@ namespace SteamBotLite
 
         private class Set : MotdCommand
         {
-            public Set(VBot bot, MotdModule motd) : base(bot, "Set", motd) { }
+            public Set(VBot bot, MotdModule motd) : base(bot, "Set", motd)
+            {
+            }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 if (param == String.Empty)
                     return "Make sure to include a MOTD to display!";
-                    
+
                 if (motd.message != null)
                     return "There is currently a MOTD, please remove it first";
 
@@ -219,7 +226,10 @@ namespace SteamBotLite
 
         private class SetExtended : MotdCommand
         {
-            public SetExtended(VBot bot, MotdModule motd) : base(bot, "extendedset", motd) { }
+            public SetExtended(VBot bot, MotdModule motd) : base(bot, "extendedset", motd)
+            {
+            }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 string[] parameters = param.Split(new char[] { ' ' }, 2);
@@ -253,7 +263,10 @@ namespace SteamBotLite
 
         private class Remove : MotdCommand
         {
-            public Remove(VBot bot, MotdModule motd) : base(bot, "Remove", motd) { }
+            public Remove(VBot bot, MotdModule motd) : base(bot, "Remove", motd)
+            {
+            }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
                 motd.message = null;
@@ -266,32 +279,39 @@ namespace SteamBotLite
 
         private class Tick : MotdCommand
         {
-            public Tick(VBot bot, MotdModule motd) : base(bot, "Tick", motd) { }
+            public Tick(VBot bot, MotdModule motd) : base(bot, "Tick", motd)
+            {
+            }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                return motd.GetName() +" displayed " + motd.postCount + " times and will display a total of " + motd.postCountLimit + " times in total";
+                return motd.GetName() + " displayed " + motd.postCount + " times and will display a total of " + motd.postCountLimit + " times in total";
             }
         }
 
         private class Setter : MotdCommand
         {
-            public Setter(VBot bot, MotdModule motd) : base(bot, "Setter", motd) { }
+            public Setter(VBot bot, MotdModule motd) : base(bot, "Setter", motd)
+            {
+            }
+
             protected override string exec(MessageEventArgs Msg, string param)
             {
-                return motd.GetName() +" set by " + motd.setter;
+                return motd.GetName() + " set by " + motd.setter;
             }
         }
-        class MOTDITEM
+
+        private class MOTDITEM
         {
-            BaseTask Task;
+            private BaseTask Task;
             public int postCount { get; set; }
             public int postCountLimit { get; set; }
             public string message;
-            public MOTDITEM(int updateinterval , ElapsedEventHandler PostMethod) { 
+
+            public MOTDITEM(int updateinterval, ElapsedEventHandler PostMethod)
+            {
                 Task = new BaseTask(updateinterval, new System.Timers.ElapsedEventHandler(PostMethod));
             }
-
         }
-
     }
 }

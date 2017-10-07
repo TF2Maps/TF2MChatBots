@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SteamBotLite
 {
     public class TrackingServerList
     {
-        ServerTrackingModule ServerTrackingModule;
+        private ServerTrackingModule ServerTrackingModule;
         private TrackingServerList trackedServers;
 
-        List<TrackingServerInfo> TrackingServerListObject { get; }
+        private List<TrackingServerInfo> TrackingServerListObject { get; }
 
         public TrackingServerList(ServerTrackingModule module, List<TrackingServerInfo> TrackingServerList)
         {
@@ -36,6 +33,7 @@ namespace SteamBotLite
             TrackingServerListObject.Remove(server);
             ServerTrackingModule.savePersistentData();
         }
+
         public void Clear()
         {
             TrackingServerListObject.Clear();
@@ -59,7 +57,6 @@ namespace SteamBotLite
         {
             return TrackingServerListObject.GetEnumerator();
         }
-
     }
 
     public class TrackingServerInfo : EventArgs
@@ -92,6 +89,5 @@ namespace SteamBotLite
                 " - " + this.playerCount + "/" + this.capacity +
                 " - join: steam://connect/" + this.serverIP + ":" + this.port;
         }
-
     }
 }

@@ -1,45 +1,40 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SteamBotLite;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SteamBotLite;
 
 namespace UsersModuleTests
 {
     [TestClass()]
     public class UsersModuleUsersModuleTest
     {
+        private UsersModule module;
 
+        private ChatroomEntity Admin;
+        private string AdminIdentifier = "0";
 
-        UsersModule module;
+        private ChatroomEntity NonAdmin;
+        private string NonAdminIdentifier = "1";
 
-        ChatroomEntity Admin;
-        string AdminIdentifier = "0";
+        private ChatroomEntity UnknownUser;
+        private string UnknownUserIdentifier = "2";
 
-        ChatroomEntity NonAdmin;
-        string NonAdminIdentifier = "1";
+        private ChatroomEntity OtherUser;
+        private string OtherUserIdentifier = "3";
 
-        ChatroomEntity UnknownUser;
-        string UnknownUserIdentifier = "2";
+        private ChatroomEntity AdminDeterminedByConfig;
+        private string AdminDeterminedByConfigIdentifier = "4";
 
-        ChatroomEntity OtherUser;
-        string OtherUserIdentifier = "3";
-
-        ChatroomEntity AdminDeterminedByConfig;
-        string AdminDeterminedByConfigIdentifier = "4";
-
-        Dictionary<string, Dictionary<string, object>> MakeConfig() {
+        private Dictionary<string, Dictionary<string, object>> MakeConfig()
+        {
             Dictionary<string, Dictionary<string, object>> ModuleHolder = new Dictionary<string, Dictionary<string, object>>();
-            
+
             ModuleHolder.Add("UsersModule", new Dictionary<string, object>());
             return ModuleHolder;
         }
 
         [TestInitialize()]
-        public void Initialize() { 
+        public void Initialize()
+        {
             module = new UsersModule(new TestUserHandler(), MakeConfig());
 
             Admin = new ChatroomEntity(AdminIdentifier, null);
@@ -59,9 +54,10 @@ namespace UsersModuleTests
         }
 
         [TestCleanup()]
-        public void Cleanup() {
+        public void Cleanup()
+        {
             module = new UsersModule(new TestUserHandler(), MakeConfig());
-            
+
             module.admins.Clear();
             module.bans.Clear();
 
