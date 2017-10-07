@@ -19,7 +19,6 @@ namespace SteamBotLite
         RepliesModule replyModule;
         AdminModule adminmodule;
         SearchModule searchModule;
-        ImpNaoModule impnaomodule;
         ServerListHolder serverlistmodule;
         CountDownModule countdownmodule;
         WebServerHostingModule WebServer;

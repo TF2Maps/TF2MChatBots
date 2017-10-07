@@ -550,7 +550,7 @@ namespace SteamBotLite
 
             var request = new ClientMsgProtobuf<CMsgClientGamesPlayed>(EMsg.ClientGamesPlayed);
 
-            var gamePlayed = new CMsgClientGamesPlayed.GamePlayed();
+           var gamePlayed = new CMsgClientGamesPlayed.GamePlayed();
 
             if (!string.IsNullOrEmpty(message))
             {

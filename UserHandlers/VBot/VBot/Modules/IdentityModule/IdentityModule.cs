@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace SteamBotLite
 {
-    public class IdentityModule : BaseModule, OnLoginCompletedListiners , MapListChangeListiner
+    public class IdentityModule : BaseModule, OnLoginCompletedListiners, MapListChangeListiner
     {
         UserHandler userhandler;
         ModuleHandler modulehandler;
@@ -33,13 +33,14 @@ namespace SteamBotLite
 
             handler.AddLoginEventListiner(this);
 
-            
+
             adminCommands.Add(new Rename(handler, this));
             adminCommands.Add(new SetStatusMessage(userhandler, modulehandler, this));
             adminCommands.Add(new UnsetStatusMessage(userhandler, modulehandler, this));
         }
 
-        public override void OnAllModulesLoaded() {
+        public override void OnAllModulesLoaded()
+        {
             userhandler.SetUsernameEventProcess(username);
             userhandler.SetStatusmessageEvent(StatusPrefix + status);
         }
@@ -68,13 +69,14 @@ namespace SteamBotLite
             }
         }
 
-        string getusername ()
+        string getusername()
         {
             return username;
         }
         public void OnLoginCompleted()
         {
-            if (UseStatus) {
+            if (UseStatus)
+            {
                 userhandler.SetStatusmessageEvent(StatusPrefix + status);
             }
             modulehandler.UpdateUsernameEvent(this, getusername());
@@ -141,7 +143,7 @@ namespace SteamBotLite
             }
         }
 
-       
+
         private class CheckStatus : BaseCommand
         {
             // Command to query if a server is active
@@ -176,13 +178,14 @@ namespace SteamBotLite
                     module.savePersistentData();
                     return "Renamed";
                 }
-                else {
+                else
+                {
                     return "There was no name!";
                 }
             }
 
         }
 
-       
+
     }
 }
