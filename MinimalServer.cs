@@ -1,11 +1,9 @@
-﻿using System.Net;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System;
+﻿using System;
+using System.Net;
 
 namespace SteamBotLite
 {
-    class MinimalServer
+    internal class MinimalServer
     {
         public MinimalServer()
         {
@@ -15,7 +13,7 @@ namespace SteamBotLite
             listener.Prefixes.Add("http://localhost:8080/index/");
             listener.Start();
             Console.WriteLine("Listening...");
-            // Note: The GetContext method blocks while waiting for a request. 
+            // Note: The GetContext method blocks while waiting for a request.
             HttpListenerContext context = listener.GetContext();
             HttpListenerRequest request = context.Request;
             // Obtain a response object.

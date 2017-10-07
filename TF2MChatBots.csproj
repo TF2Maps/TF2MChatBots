@@ -1,0 +1,242 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{D74C1993-F305-4333-B7A5-4B51600CAD1F}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SteamBotLite</RootNamespace>
+    <AssemblyName>SteamBotLite</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Discord.Net, Version=0.9.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Discord.Net.0.9.6\lib\net45\Discord.Net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.Apis, Version=1.25.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>packages\Google.Apis.1.25.0\lib\net45\Google.Apis.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.Apis.Auth, Version=1.25.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>packages\Google.Apis.Auth.1.25.0\lib\net45\Google.Apis.Auth.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.Apis.Auth.PlatformServices, Version=1.25.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>packages\Google.Apis.Auth.1.25.0\lib\net45\Google.Apis.Auth.PlatformServices.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.Apis.Core, Version=1.25.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>packages\Google.Apis.Core.1.25.0\lib\net45\Google.Apis.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.Apis.PlatformServices, Version=1.25.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>packages\Google.Apis.1.25.0\lib\net45\Google.Apis.PlatformServices.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.Apis.YouTube.v3, Version=1.25.0.760, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>packages\Google.Apis.YouTube.v3.1.25.0.760\lib\net45\Google.Apis.YouTube.v3.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.GData.Client, Version=2.2.0.0, Culture=neutral, PublicKeyToken=04a59ca9b0273830, processorArchitecture=MSIL">
+      <HintPath>packages\Google.GData.Client.2.2.0.0\lib\Google.GData.Client.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.GData.Extensions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=0b4c5df2ebf20876, processorArchitecture=MSIL">
+      <HintPath>packages\Google.GData.Extensions.2.2.0.0\lib\Google.GData.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions.Desktop, Version=1.0.168.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.Desktop.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Nito.AsyncEx, Version=4.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Nito.AsyncEx.4.0.1\lib\net45\Nito.AsyncEx.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Nito.AsyncEx.Concurrent, Version=4.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Nito.AsyncEx.4.0.1\lib\net45\Nito.AsyncEx.Concurrent.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Nito.AsyncEx.Enlightenment, Version=4.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Nito.AsyncEx.4.0.1\lib\net45\Nito.AsyncEx.Enlightenment.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
+      <HintPath>packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\RestSharp.105.2.3\lib\net45\RestSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SteamKit2, Version=1.8.1.0, Culture=neutral, PublicKeyToken=ed3ce47ed5aad940, processorArchitecture=MSIL">
+      <HintPath>packages\SteamKit2.1.8.1\lib\net45\SteamKit2.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WebSocket4Net, Version=0.14.1.0, Culture=neutral, PublicKeyToken=eb4e154b696bf72a, processorArchitecture=MSIL">
+      <HintPath>packages\WebSocket4Net.0.14.1\lib\net45\WebSocket4Net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Zlib.Portable, Version=1.11.0.0, Culture=neutral, PublicKeyToken=431cba815f6a8b5b, processorArchitecture=MSIL">
+      <HintPath>packages\Zlib.Portable.Signed.1.11.0\lib\portable-net4+sl5+wp8+win8+wpa81+MonoTouch+MonoAndroid\Zlib.Portable.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ApplicationInterfaces\ApplicationInterface.cs" />
+    <Compile Include="ApplicationInterfaces\ConsoleInterface.cs" />
+    <Compile Include="ApplicationInterfaces\Steam\Accounts\VBot\SteamAccountVBot.cs" />
+    <Compile Include="ApplicationInterfaces\Steam\ExtraData\BotSavedData.cs" />
+    <Compile Include="MinimalServer.cs" />
+    <Compile Include="UserHandlers\ConsoleHandler\ConsoleUserHandler.cs" />
+    <Compile Include="ApplicationInterfaces\Discord\DiscordInterface.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ApplicationInterfaces\Steam\SteamInterface.cs" />
+    <Compile Include="UserHandlers\GhostChecker\GhostChecker.cs" />
+    <Compile Include="UserHandlers\MediaHandler\MediaBot.cs" />
+    <Compile Include="UserHandlers\UserHandler.cs" />
+    <Compile Include="ApplicationInterfaces\Discord\Accounts\DiscordAccountVBot.cs" />
+    <Compile Include="ApplicationInterfaces\Discord\Accounts\DiscordAccountVFun.cs" />
+    <Compile Include="UserHandlers\VBot\OnLoginCompletedListiners.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Interfaces\HTMLFileFromArray - Copy.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Interfaces\MapListChangeListiners.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Interfaces\Interface1.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\ModuleHandler.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\AdminModule\Commands\CommandListRetrieve.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\AdminModule\Commands\GetAllModules.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\AdminModule\Commands\Reboot.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\AdminModule\Commands\Rejoin.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\AdminModule\Commands\RunScript.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\AdminModule\Commands\UserInfo.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\CountDownModule\CountDownModule.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\IdentityModule\Commands\CheckStatus.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\IdentityModule\Commands\Rename.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\IdentityModule\Commands\SetStatusMessage.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\IdentityModule\Commands\UnsetStatusMessage.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MapModule\Commands\AllowOnlyUploadedMapsSetter.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MapModule\Commands\UpdateName.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MapModule\Commands\DeleteMap.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MapModule\Commands\GetOwner.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MapModule\Commands\InsertMap.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MapModule\Commands\GetMaps.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MapModule\Commands\RepositionMap.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MapModule\Commands\UpdateMap.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MapModule\Commands\UploadCheck.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MapModule\Commands\WipeMaps.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MOTDModule\Commands\EmulateMotd.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MOTDModule\Commands\GetMOTD.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MOTDModule\Commands\MotdCommand.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MOTDModule\Commands\MOTDITEM.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MOTDModule\Commands\RemoveMotd.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MOTDModule\Commands\SetExtendedMotd.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MOTDModule\Commands\SetMotd.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MOTDModule\Commands\GetMotdSetter.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MOTDModule\Commands\CurrentMotdTick.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\ReplyModule\Commands\ReplyAdd.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\ReplyModule\Function\ReplyFunction.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\ReplyModule\Commands\ReplyRemove.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\SearchModule\Functions\Search.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\ServerTrackingModule\Commands\ActiveServers.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\ServerTrackingModule\Commands\FullServerQuery.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\ServerTrackingModule\Commands\ServerAdd.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\ServerTrackingModule\Commands\ServerRemove.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\ServerTrackingModule\Commands\SpecificServerStatus.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\ServerTrackingModule\Commands\ServerStatus.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\ServerTrackingModule\Data\TrackingServerInfo.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\UserModule\Commands\CheckStatus.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\WebServerModule\DataTypes\TableData.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\WebServerModule\DataTypes\TableDataValue.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\IdentityModule\IdentityModule.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\WebServerModule\DataTypes\ListHolder.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MapModule\DataTypes\Map.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MapModule\DataTypes\MapCollection.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MapModule\Commands\MapValidityCheck.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MapModule\UpdateMapValidityCheck.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\WebServerModule\Commands\RebootModule.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\WebServerModule\Commands\RemoveTable.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\WebServerModule\WebServerHostingModule.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\SearchModule\SearchClass.cs" />
+    <Compile Include="UserHandlers\VBot\VBot.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\BaseCommand.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\BaseModule.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\BaseTask.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MapModule\MapModule.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\MOTDModule\MotdModule.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\AdminModule\AdminModule.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\ReplyModule\RepliesModule.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\SearchModule\SearchModule.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\ServerTrackingModule\Data\TrackingServerList.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\ServerTrackingModule\ServerTrackingModule.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\ServerTrackingModule\Data\ServerListHolder.cs" />
+    <Compile Include="UserHandlers\VBot\VBot\Modules\UserModule\UsersModule.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

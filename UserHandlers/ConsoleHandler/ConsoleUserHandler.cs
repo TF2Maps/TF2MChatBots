@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SteamBotLite
 {
-    class ConsoleUserHandler : UserHandler
+    internal class ConsoleUserHandler : UserHandler
     {
-        public override void ChatMemberInfo(object sender , Tuple<ChatroomEntity,bool> e)
+        public override void ChatMemberInfo(object sender, Tuple<ChatroomEntity, bool> e)
         {
         }
 

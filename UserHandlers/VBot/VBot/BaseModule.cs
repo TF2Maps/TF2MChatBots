@@ -1,32 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-using Newtonsoft.Json;
 
 namespace SteamBotLite
 {
     public abstract class BaseModule
     {
-        public List<BaseCommand> commands {get; private set;}
-        public List<BaseCommand> adminCommands {get; private set;}
-        public List<BaseTask> tasks { get; private set;}
-
-        public string ModuleSavedDataFilePath()
-        {
-            return Path.Combine(userhandler.GetType().Name, this.GetType().Name + ".json");
-        }
-        
+        public Dictionary<string, object> config;
+        public bool DeletableModule = true;
         protected ModuleHandler userhandler;
 
-        public bool DeletableModule = true;
-
-        
-        public Dictionary<string, object> config;
-
-        public BaseModule(ModuleHandler bot, Dictionary<string, Dictionary<string,object>> Config)
+        public BaseModule(ModuleHandler bot, Dictionary<string, Dictionary<string, object>> Config)
         {
             string ThisObject = this.GetType().Name.ToString();
             Console.WriteLine(ThisObject);
@@ -40,14 +24,20 @@ namespace SteamBotLite
             LoadDependencies(bot);
         }
 
-        void LoadDependencies (ModuleHandler bot)
-        {
-            this.userhandler = bot;
-            commands = new List<BaseCommand>();
-            adminCommands = new List<BaseCommand>();
-            tasks = new List<BaseTask>();
+        public List<BaseCommand> adminCommands { get; private set; }
+        public List<BaseCommand> commands { get; private set; }
+        public List<BaseTask> tasks { get; private set; }
 
+        abstract public string getPersistentData();
+
+        abstract public void loadPersistentData();
+
+        public string ModuleSavedDataFilePath()
+        {
+            return Path.Combine(userhandler.GetType().Name, this.GetType().Name + ".json");
         }
+
+        public abstract void OnAllModulesLoaded();
 
         public void savePersistentData()
         {
@@ -62,14 +52,14 @@ namespace SteamBotLite
                 Directory.CreateDirectory(userhandler.GetType().Name);
                 System.IO.File.WriteAllText(ModuleSavedDataFilePath(), jsonData);
             };
-            
         }
 
-
-
-        public abstract void OnAllModulesLoaded();
-
-        abstract public string getPersistentData();
-        abstract public void loadPersistentData();
+        private void LoadDependencies(ModuleHandler bot)
+        {
+            this.userhandler = bot;
+            commands = new List<BaseCommand>();
+            adminCommands = new List<BaseCommand>();
+            tasks = new List<BaseTask>();
+        }
     }
 }
