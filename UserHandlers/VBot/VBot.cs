@@ -43,7 +43,7 @@ namespace SteamBotLite
         /// <param name="SteamConnectionHandler"></param>
         public VBot()
         {
-            // base.SetUsernameEvent += UpdateUsernameEvent;
+            
             Console.WriteLine("VBot Initialised");
             Console.WriteLine("Loading modules and stuff");
 
@@ -65,8 +65,6 @@ namespace SteamBotLite
             identitymodule = new IdentityModule(this, this, jsconfig);
             countdownmodule = new CountDownModule(this, jsconfig);
 
-            ModuleList = new List<BaseModule> { motdModule, mapModule, ServerTrackingModule, identitymodule, usersModule, replyModule, adminmodule, searchModule, WebServer, TrackingServerListmodule, countdownmodule };
-
             Console.WriteLine("Modules loaded and ModuleList intitialised");
 
             foreach (BaseModule module in ModuleList)
@@ -75,19 +73,19 @@ namespace SteamBotLite
             }
         }
 
-        public void AddEntryWithLimit(string identifier, TableDataValue[] data, int limit)
+        public void AddWebsiteEntryWithLimit(string identifier, TableDataValue[] data, int limit)
         {
             foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)
             {
-                Listiner.AddEntryWithLimit(identifier, data, limit);
+                Listiner.AddWebsiteEntryWithLimit(identifier, data, limit);
             }
         }
 
-        public void AddEntryWithoutLimit(string identifier, TableDataValue[] data)
+        public void AddWebsiteEntryWithoutLimit(string identifier, TableDataValue[] data)
         {
             foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)
             {
-                Listiner.AddEntryWithoutLimit(identifier, data);
+                Listiner.AddWebsiteEntryWithoutLimit(identifier, data);
             }
         }
 
@@ -101,6 +99,10 @@ namespace SteamBotLite
             OnLoginlistiners.Add(listiner);
         }
 
+        public void AddModuleToCurrentModules(BaseModule module)
+        {
+            this.ModuleList.Add(module);
+        }
         public void AddMapChangeEventListiner(ServerMapChangeListiner listiner)
         {
             MapChangeEventListiners.Add(listiner);

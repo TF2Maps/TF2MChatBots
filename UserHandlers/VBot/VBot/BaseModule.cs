@@ -9,6 +9,10 @@ namespace SteamBotLite
         public Dictionary<string, object> config;
         public bool DeletableModule = true;
         protected ModuleHandler userhandler;
+        public string ModuleSavedDataFilePath() 
+        {
+            return Path.Combine(userhandler.GetType().Name, this.GetType().Name + ".json"); 
+        }
 
         public BaseModule(ModuleHandler bot, Dictionary<string, Dictionary<string, object>> Config)
         {
@@ -16,6 +20,8 @@ namespace SteamBotLite
             Console.WriteLine(ThisObject);
             this.config = Config[ThisObject];
             LoadDependencies(bot);
+            bot.AddModuleToCurrentModules(this);
+            
         }
 
         public BaseModule(ModuleHandler bot, Dictionary<string, object> Jsconfig)
@@ -32,10 +38,7 @@ namespace SteamBotLite
 
         abstract public void loadPersistentData();
 
-        public string ModuleSavedDataFilePath()
-        {
-            return Path.Combine(userhandler.GetType().Name, this.GetType().Name + ".json");
-        }
+        
 
         public abstract void OnAllModulesLoaded();
 

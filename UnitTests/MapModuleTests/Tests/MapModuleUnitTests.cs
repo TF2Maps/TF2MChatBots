@@ -102,7 +102,7 @@ namespace MapModuleTests
         public void DeleteFirstMap()
         {
             MessageEventArgs Message = new MessageEventArgs(null);
-            Message.ReceivedMessage = DeleteCommand + " " + "0";
+            Message.ReceivedMessage = DeleteCommand + " " + "1";
 
             Message.Sender = new User(TestUser.identifier.ToString() + 1, null);
             Message.Sender.Rank = ChatroomEntity.AdminStatus.True;

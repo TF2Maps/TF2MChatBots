@@ -102,5 +102,9 @@ namespace SteamBotLite
         void ModuleHandler.UpdateUsernameEvent(object sender, string Username)
         {
         }
+
+        public void AddModuleToCurrentModules(BaseModule module)
+        {
+        }
     }
 }

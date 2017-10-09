@@ -2,11 +2,12 @@
 
 namespace SteamBotLite
 {
+    //TODO Implement the 'command' pattern 
     public interface HTMLFileFromArrayListiners
     {
-        void AddEntryWithLimit(string identifier, TableDataValue[] data, int limit);
+        void AddWebsiteEntryWithLimit(string identifier, TableDataValue[] data, int limit);
 
-        void AddEntryWithoutLimit(string identifier, TableDataValue[] data);
+        void AddWebsiteEntryWithoutLimit(string identifier, TableDataValue[] data);
 
         void HTMLFileFromArray(string[] Headernames, List<string[]> Data, string TableKey);
 

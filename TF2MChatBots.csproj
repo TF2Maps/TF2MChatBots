@@ -135,7 +135,6 @@
     <Compile Include="ApplicationInterfaces\ConsoleInterface.cs" />
     <Compile Include="ApplicationInterfaces\Steam\Accounts\VBot\SteamAccountVBot.cs" />
     <Compile Include="ApplicationInterfaces\Steam\ExtraData\BotSavedData.cs" />
-    <Compile Include="MinimalServer.cs" />
     <Compile Include="UserHandlers\ConsoleHandler\ConsoleUserHandler.cs" />
     <Compile Include="ApplicationInterfaces\Discord\DiscordInterface.cs" />
     <Compile Include="Program.cs" />
