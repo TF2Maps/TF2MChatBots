@@ -55,8 +55,8 @@ namespace SteamBotLite
                     Message.VisibleValue = param;
 
                     TableDataValue[] Data = new TableDataValue[] { Username, Message };
-                    module.handler.AddEntryWithoutLimit("Requests", Data);
-                    module.handler.AddEntryWithLimit("RequestsWithLimit", Data, 3);
+                    module.handler.AddWebsiteEntryWithoutLimit("Requests", Data);
+                    module.handler.AddWebsiteEntryWithLimit("RequestsWithLimit", Data, 3);
 
                     return "Added Entry";
                 }

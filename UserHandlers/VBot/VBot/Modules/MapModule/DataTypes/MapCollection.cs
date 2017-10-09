@@ -106,7 +106,7 @@ namespace SteamBotLite
 
             TableDataValue[] Data = new TableDataValue[] { MapEntry, ReasonEntry, Owner };
 
-            listiner.AddEntryWithLimit(tablename, Data, 10);
+            listiner.AddWebsiteEntryWithLimit(tablename, Data, 10);
         }
 
         public void RemoveMap(int position)

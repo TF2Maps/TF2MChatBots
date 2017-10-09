@@ -197,7 +197,7 @@ namespace SteamBotLite
             TableDataValue Time = new TableDataValue();
             Time.VisibleValue = DateTime.UtcNow.ToLongDateString() + " " + DateTime.UtcNow.ToLongTimeString();
 
-            WebServer.AddEntryWithLimit(TableLabel, new TableDataValue[] { MapName, PlayerCount, Time }, 10);
+            WebServer.AddWebsiteEntryWithLimit(TableLabel, new TableDataValue[] { MapName, PlayerCount, Time }, 10);
 
             if (e.playerCount > 8)
             {
@@ -212,7 +212,7 @@ namespace SteamBotLite
 
                 string RecentlyTestedTableLabel = "Recently Tested";
                 WebServer.SetTableHeader(RecentlyTestedTableLabel, new TableDataValue[] { HeaderName, HeaderNamePlayerCount, HeaderTime, HeaderServer });
-                WebServer.AddEntryWithLimit(RecentlyTestedTableLabel, new TableDataValue[] { MapName, PlayerCount, Time, ServerLabel }, 10);
+                WebServer.AddWebsiteEntryWithLimit(RecentlyTestedTableLabel, new TableDataValue[] { MapName, PlayerCount, Time, ServerLabel }, 10);
             }
         }
     }

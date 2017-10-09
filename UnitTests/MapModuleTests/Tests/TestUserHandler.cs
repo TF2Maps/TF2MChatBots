@@ -6,11 +6,11 @@ namespace SteamBotLite
 {
     internal class TestUserHandler : UserHandler, ModuleHandler, HTMLFileFromArrayListiners
     {
-        public void AddEntryWithLimit(string identifier, TableDataValue[] data, int limit)
+        public void AddWebsiteEntryWithLimit(string identifier, TableDataValue[] data, int limit)
         {
         }
 
-        public void AddEntryWithoutLimit(string identifier, TableDataValue[] data)
+        public void AddWebsiteEntryWithoutLimit(string identifier, TableDataValue[] data)
         {
         }
 

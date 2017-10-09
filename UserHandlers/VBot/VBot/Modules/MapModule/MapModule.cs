@@ -166,7 +166,7 @@ namespace SteamBotLite
 
                 Entries.Add(Values);
 
-                HTMLlistiner.AddEntryWithoutLimit(TableName, Values);
+                HTMLlistiner.AddWebsiteEntryWithoutLimit(TableName, Values);
             }
 
             TableData data = new TableData();

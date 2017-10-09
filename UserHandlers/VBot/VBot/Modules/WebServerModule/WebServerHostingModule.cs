@@ -47,7 +47,7 @@ namespace SteamBotLite
             CloseWebServer();
         }
 
-        void HTMLFileFromArrayListiners.AddEntryWithLimit(string identifier, TableDataValue[] data, int limit)
+        void HTMLFileFromArrayListiners.AddWebsiteEntryWithLimit(string identifier, TableDataValue[] data, int limit)
         {
             GetTableData(identifier).TableValues.Add(data);
 
@@ -63,7 +63,7 @@ namespace SteamBotLite
             AddTableFromEntry(identifier, GetTableData(identifier));
         }
 
-        void HTMLFileFromArrayListiners.AddEntryWithoutLimit(string identifier, TableDataValue[] data)
+        void HTMLFileFromArrayListiners.AddWebsiteEntryWithoutLimit(string identifier, TableDataValue[] data)
         {
             GetTableData(identifier).TableValues.Add(data);
             AddTableFromEntry(identifier, GetTableData(identifier));
