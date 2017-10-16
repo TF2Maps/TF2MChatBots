@@ -1,14 +1,12 @@
-﻿using System.Collections.Generic;
+﻿
+using System.Collections.Generic;
 
 namespace SteamBotLite
 {
     //TODO Implement the 'command' pattern 
-    public interface HTMLFileFromArrayListiners
+    public interface IHTMLFileFromArrayListiners
     {
-
-        void AddWebsiteEntryWithLimit(string identifier, TableDataValue[] data, int limit);
-
-        void AddWebsiteEntryWithoutLimit(string identifier, TableDataValue[] data);
+        void AddWebsiteEntry(string identifier, TableDataValue[] data, int limit);
 
         void HTMLFileFromArray(string[] Headernames, List<string[]> Data, string TableKey);
 
@@ -16,4 +14,15 @@ namespace SteamBotLite
 
         void SetTableHeader(string TableIdentifier, TableDataValue[] Header);
     }
+
+
+    public abstract class HTMLCommand
+    {
+        string Identifier;
+        TableDataValue[] Data;
+        int limit;
+        string TableKey;
+        public abstract void Execute();
+    }
+    
 }

@@ -12,7 +12,7 @@ namespace SteamBotLite
 
         public MapCollection mapList;
 
-        private HTMLFileFromArrayListiners HTMLlistiner;
+        private IHTMLFileFromArrayListiners HTMLlistiner;
         private string MapListUploadCheck;
         private int MaxMapNumber = 10;
         private string ServerMapListUrl;
@@ -21,13 +21,13 @@ namespace SteamBotLite
 
         private string TableName = "Current Maps";
 
-        public MapModule(VBot bot, HTMLFileFromArrayListiners HtmlListiner, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
+        public MapModule(VBot bot, IHTMLFileFromArrayListiners HtmlListiner, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
             this.HTMLlistiner = HtmlListiner;
             LoadModule(bot);
         }
 
-        public MapModule(ModuleHandler bot, HTMLFileFromArrayListiners HtmlListiner, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
+        public MapModule(ModuleHandler bot, IHTMLFileFromArrayListiners HtmlListiner, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
             this.HTMLlistiner = HtmlListiner;
             LoadModule(bot);
@@ -166,7 +166,7 @@ namespace SteamBotLite
 
                 Entries.Add(Values);
 
-                HTMLlistiner.AddWebsiteEntryWithoutLimit(TableName, Values);
+                HTMLlistiner.AddWebsiteEntry(TableName, Values, 0);
             }
 
             TableData data = new TableData();

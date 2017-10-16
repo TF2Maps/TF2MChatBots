@@ -99,6 +99,7 @@
     <Compile Include="Tests\MapModuleUnitTests.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Tests\UsersModuleTests.cs" />
+    <Compile Include="Tests\VBotTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\TF2MChatBots.csproj">

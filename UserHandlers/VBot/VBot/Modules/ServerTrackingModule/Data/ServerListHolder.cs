@@ -13,11 +13,11 @@ namespace SteamBotLite
 
         private string[] Header = new string[] { "Map", "Time Played" };
 
-        private HTMLFileFromArrayListiners listiner;
+        private IHTMLFileFromArrayListiners listiner;
 
         private List<Maplist> Maplists;
 
-        public TrackingServerListHolder(ModuleHandler bot, HTMLFileFromArrayListiners listiner, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
+        public TrackingServerListHolder(ModuleHandler bot, IHTMLFileFromArrayListiners listiner, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
             loadPersistentData();
             this.Maplists = new List<Maplist>();

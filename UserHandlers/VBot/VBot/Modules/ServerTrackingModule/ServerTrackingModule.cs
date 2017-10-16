@@ -22,9 +22,9 @@ namespace SteamBotLite
 
         private BaseTask serverUpdate;
 
-        private HTMLFileFromArrayListiners WebServer;
+        private IHTMLFileFromArrayListiners WebServer;
 
-        public ServerTrackingModule(ModuleHandler bot, HTMLFileFromArrayListiners WebServer, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
+        public ServerTrackingModule(ModuleHandler bot, IHTMLFileFromArrayListiners WebServer, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
             this.WebServer = WebServer;
             Bot = bot;
@@ -197,7 +197,7 @@ namespace SteamBotLite
             TableDataValue Time = new TableDataValue();
             Time.VisibleValue = DateTime.UtcNow.ToLongDateString() + " " + DateTime.UtcNow.ToLongTimeString();
 
-            WebServer.AddWebsiteEntryWithLimit(TableLabel, new TableDataValue[] { MapName, PlayerCount, Time }, 10);
+            WebServer.AddWebsiteEntry(TableLabel, new TableDataValue[] { MapName, PlayerCount, Time }, 10);
 
             if (e.playerCount > 8)
             {
@@ -212,7 +212,7 @@ namespace SteamBotLite
 
                 string RecentlyTestedTableLabel = "Recently Tested";
                 WebServer.SetTableHeader(RecentlyTestedTableLabel, new TableDataValue[] { HeaderName, HeaderNamePlayerCount, HeaderTime, HeaderServer });
-                WebServer.AddWebsiteEntryWithLimit(RecentlyTestedTableLabel, new TableDataValue[] { MapName, PlayerCount, Time, ServerLabel }, 10);
+                WebServer.AddWebsiteEntry(RecentlyTestedTableLabel, new TableDataValue[] { MapName, PlayerCount, Time, ServerLabel }, 10);
             }
         }
     }

@@ -5,9 +5,12 @@ using System.Collections.Specialized;
 
 namespace SteamBotLite
 {
-    public class VBot : UserHandler, HTMLFileFromArrayListiners, ModuleHandler
+    public class VBot : UserHandler, IHTMLFileFromArrayListiners, ModuleHandler
     {
-        public List<HTMLFileFromArrayListiners> HTMLParsers;
+        public List<IHTMLFileFromArrayListiners> HTMLParsers;
+
+
+
         public List<MapListChangeListiner> ListChangeEventListiners = new List<MapListChangeListiner>();
         public List<ServerMapChangeListiner> MapChangeEventListiners = new List<ServerMapChangeListiner>();
         public MapModule mapModule;
@@ -48,7 +51,7 @@ namespace SteamBotLite
             Console.WriteLine("Loading modules and stuff");
 
             MapChangeEventListiners = new List<ServerMapChangeListiner>();
-            HTMLParsers = new List<HTMLFileFromArrayListiners>();
+            HTMLParsers = new List<IHTMLFileFromArrayListiners>();
             OnLoginlistiners = new List<OnLoginCompletedListiners>();
             ListChangeEventListiners = new List<MapListChangeListiner>();
 
@@ -73,19 +76,11 @@ namespace SteamBotLite
             }
         }
 
-        public void AddWebsiteEntryWithLimit(string identifier, TableDataValue[] data, int limit)
+        public void AddWebsiteEntry(string identifier, TableDataValue[] data, int limit)
         {
-            foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)
+            foreach (IHTMLFileFromArrayListiners Listiner in HTMLParsers)
             {
-                Listiner.AddWebsiteEntryWithLimit(identifier, data, limit);
-            }
-        }
-
-        public void AddWebsiteEntryWithoutLimit(string identifier, TableDataValue[] data)
-        {
-            foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)
-            {
-                Listiner.AddWebsiteEntryWithoutLimit(identifier, data);
+                Listiner.AddWebsiteEntry(identifier, data, limit);
             }
         }
 
@@ -160,9 +155,17 @@ namespace SteamBotLite
             return ModuleList;
         }
 
+        public void RunHTMLCommand (HTMLCommand Command)
+        {
+            foreach (IHTMLFileFromArrayListiners Listiner in HTMLParsers)
+            {
+                //Listiner.RunHTMLCommand(Command);
+            }
+        }
+
         public void HTMLFileFromArray(string[] Headernames, List<string[]> Data, string TableKey)
         {
-            foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)
+            foreach (IHTMLFileFromArrayListiners Listiner in HTMLParsers)
             {
                 Listiner.HTMLFileFromArray(Headernames, Data, TableKey);
             }
@@ -170,7 +173,7 @@ namespace SteamBotLite
 
         public void MakeTableFromEntry(string TableKey, TableData TableData)
         {
-            foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)
+            foreach (IHTMLFileFromArrayListiners Listiner in HTMLParsers)
             {
                 Listiner.MakeTableFromEntry(TableKey, TableData);
             }
@@ -231,7 +234,7 @@ namespace SteamBotLite
 
         public void SetTableHeader(string TableIdentifier, TableDataValue[] Header)
         {
-            foreach (HTMLFileFromArrayListiners Listiner in HTMLParsers)
+            foreach (IHTMLFileFromArrayListiners Listiner in HTMLParsers)
             {
                 Listiner.SetTableHeader(TableIdentifier, Header);
             }

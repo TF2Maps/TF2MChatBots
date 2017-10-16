@@ -6,7 +6,7 @@ using System.Net;
 
 namespace SteamBotLite
 {
-    internal partial class WebServerHostingModule : BaseModule, HTMLFileFromArrayListiners
+    internal partial class WebServerHostingModule : BaseModule, IHTMLFileFromArrayListiners
     {
         readonly protected string header;
         readonly protected string trailer;
@@ -47,15 +47,16 @@ namespace SteamBotLite
             CloseWebServer();
         }
 
-        void HTMLFileFromArrayListiners.AddWebsiteEntryWithLimit(string identifier, TableDataValue[] data, int limit)
+        void IHTMLFileFromArrayListiners.AddWebsiteEntry(string identifier, TableDataValue[] data, int limit)
         {
             GetTableData(identifier).TableValues.Add(data);
 
-            int ExcessToRemove = GetTableData(identifier).TableValues.Count - limit;
+            int CurrentTableCount = GetTableData(identifier).TableValues.Count;
+            int ExcessToRemove = CurrentTableCount - limit;
 
             int entriestoremove = limit;
 
-            if (GetTableData(identifier).TableValues.Count > entriestoremove)
+            if ( (limit > 0) & (CurrentTableCount > limit))
             {
                 GetTableData(identifier).TableValues.RemoveRange(0, ExcessToRemove);
             }
@@ -63,11 +64,6 @@ namespace SteamBotLite
             AddTableFromEntry(identifier, GetTableData(identifier));
         }
 
-        void HTMLFileFromArrayListiners.AddWebsiteEntryWithoutLimit(string identifier, TableDataValue[] data)
-        {
-            GetTableData(identifier).TableValues.Add(data);
-            AddTableFromEntry(identifier, GetTableData(identifier));
-        }
 
         public void CloseWebServer()
         {
@@ -95,7 +91,7 @@ namespace SteamBotLite
         }
 
         //For legacy reasons
-        void HTMLFileFromArrayListiners.HTMLFileFromArray(string[] Headernames, List<string[]> Data, string TableKey)
+        void IHTMLFileFromArrayListiners.HTMLFileFromArray(string[] Headernames, List<string[]> Data, string TableKey)
         {
             TableData ThisTableData = new TableData();
 
@@ -145,7 +141,7 @@ namespace SteamBotLite
         }
 
         //Does this pass by value or by reference?
-        void HTMLFileFromArrayListiners.MakeTableFromEntry(string TableKey, TableData TableData)
+        void IHTMLFileFromArrayListiners.MakeTableFromEntry(string TableKey, TableData TableData)
         {
             AddTableFromEntry(TableKey, TableData);
         }
@@ -235,7 +231,7 @@ namespace SteamBotLite
             }
         }
 
-        void HTMLFileFromArrayListiners.SetTableHeader(string TableIdentifier, TableDataValue[] Header)
+        void IHTMLFileFromArrayListiners.SetTableHeader(string TableIdentifier, TableDataValue[] Header)
         {
             GetTableData(TableIdentifier).Header = Header;
         }

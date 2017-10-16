@@ -4,9 +4,9 @@ using System.Collections.Specialized;
 
 namespace SteamBotLite
 {
-    internal class TestUserHandler : UserHandler, ModuleHandler, HTMLFileFromArrayListiners
+    internal class TestUserHandler : UserHandler, ModuleHandler, IHTMLFileFromArrayListiners
     {
-        public void AddWebsiteEntryWithLimit(string identifier, TableDataValue[] data, int limit)
+        public void AddWebsiteEntry(string identifier, TableDataValue[] data, int limit)
         {
         }
 
@@ -55,7 +55,7 @@ namespace SteamBotLite
             return new List<BaseModule>();
         }
 
-        void HTMLFileFromArrayListiners.HTMLFileFromArray(string[] Headernames, List<string[]> Data, string TableKey)
+        void IHTMLFileFromArrayListiners.HTMLFileFromArray(string[] Headernames, List<string[]> Data, string TableKey)
         {
         }
 

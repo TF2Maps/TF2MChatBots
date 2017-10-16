@@ -5,9 +5,9 @@ namespace SteamBotLite
 {
     public class ListHolder : BaseModule
     {
-        private HTMLFileFromArrayListiners handler;
+        private IHTMLFileFromArrayListiners handler;
 
-        public ListHolder(ModuleHandler handler, HTMLFileFromArrayListiners HTMLHandler, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(handler, Jsconfig)
+        public ListHolder(ModuleHandler handler, IHTMLFileFromArrayListiners HTMLHandler, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(handler, Jsconfig)
         {
             this.handler = HTMLHandler;
 
@@ -55,8 +55,8 @@ namespace SteamBotLite
                     Message.VisibleValue = param;
 
                     TableDataValue[] Data = new TableDataValue[] { Username, Message };
-                    module.handler.AddWebsiteEntryWithoutLimit("Requests", Data);
-                    module.handler.AddWebsiteEntryWithLimit("RequestsWithLimit", Data, 3);
+                    module.handler.AddWebsiteEntry("Requests", Data, 0);
+                    module.handler.AddWebsiteEntry("RequestsWithLimit", Data, 3);
 
                     return "Added Entry";
                 }

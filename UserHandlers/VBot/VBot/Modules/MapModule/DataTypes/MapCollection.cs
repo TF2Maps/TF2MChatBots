@@ -8,7 +8,7 @@ namespace SteamBotLite
 {
     public class MapCollection
     {
-        private HTMLFileFromArrayListiners listiner;
+        private IHTMLFileFromArrayListiners listiner;
 
         /// <summary>
         /// This class is a wrapper for an observerable collection, in order to ensure validity of inputs
@@ -18,7 +18,7 @@ namespace SteamBotLite
 
         private string tablename = "Deleted Maps";
 
-        public MapCollection(ObservableCollection<Map> inputlist, HTMLFileFromArrayListiners HtmlListiner)
+        public MapCollection(ObservableCollection<Map> inputlist, IHTMLFileFromArrayListiners HtmlListiner)
         {
             this.mapList = inputlist;
             this.listiner = HtmlListiner;
@@ -106,7 +106,7 @@ namespace SteamBotLite
 
             TableDataValue[] Data = new TableDataValue[] { MapEntry, ReasonEntry, Owner };
 
-            listiner.AddWebsiteEntryWithLimit(tablename, Data, 10);
+            listiner.AddWebsiteEntry(tablename, Data, 10);
         }
 
         public void RemoveMap(int position)
