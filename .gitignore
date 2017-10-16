@@ -30,3 +30,4 @@ packages
 
 # Allow NuGet specific exes and dlls
 !.nuget/Microsoft.Build.dll
+.vs/TF2MChatBots/v15/sqlite3/storage.ide
