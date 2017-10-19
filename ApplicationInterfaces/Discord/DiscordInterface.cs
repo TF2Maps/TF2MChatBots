@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SteamBotLite
 {
@@ -39,16 +40,11 @@ namespace SteamBotLite
             _client = new DiscordSocketClient();
             ConnectionProcess(Token, _client);
             _client.MessageReceived += _client_MessageReceived;
-            _client.MessageReceived += _client_MessageReceived1;
             AnnounceLoginCompleted();
             Console.WriteLine("Connected to discord!");
         }
 
-        private System.Threading.Tasks.Task _client_MessageReceived1(SocketMessage arg)
-        {
-            throw new NotImplementedException();
-        }
-
+     
         public override void BroadCastMessage(object sender, string message)
         {
             foreach (ulong chatroom in BroadCastChatrooms)
@@ -65,10 +61,14 @@ namespace SteamBotLite
             }
         }
 
-        public void ConnectionProcess(string token, DiscordSocketClient Client)
+        public async Task ConnectionProcess(string token, DiscordSocketClient Client)
         {
-            Client.LoginAsync(TokenType.Bot, token);
-            Client.StartAsync();
+            await Client.LoginAsync(TokenType.Bot, token);
+            await Client.StartAsync();
+            Console.WriteLine("BEGUN THE LOGIN?");
+            await Client.StartAsync();
+            await Task.Delay(-1);
+            
         }
 
         public void DisconnectionProcess(DiscordSocketClient Client)
@@ -99,7 +99,7 @@ namespace SteamBotLite
         public override void Reboot(object sender, EventArgs e)
         {
             DisconnectionProcess(_client);
-            ConnectionProcess(Token, _client);
+            ConnectionProcess(Token, _client).RunSynchronously();
         }
 
         public override void ReceiveChatMemberInfo(ChatroomEntity ChatroomEntity, bool AdminStatus)
@@ -107,29 +107,32 @@ namespace SteamBotLite
             throw new NotImplementedException();
         }
 
-        public override void SendChatRoomMessage(object sender, MessageEventArgs messagedata)
+        public override async void SendChatRoomMessageAsync(object sender, MessageEventArgs messagedata)
         {
             try
             {
                 SocketTextChannel channel = (SocketTextChannel)messagedata.Chatroom.identifier;
-                
-                channel.SendMessageAsync(messagedata.ReplyMessage);
-                
 
+                await channel.SendMessageAsync(messagedata.ReplyMessage);
+                await _client.StartAsync();
+                Console.WriteLine("Sent Message");
             }
-            catch
+            catch (Exception e)
             {
+                Console.WriteLine(e);
             }
         }
 
-        public void SendLargeMessage(SocketUser user, string message)
+        public async Task SendLargeMessageAsync(SocketUser user, string message)
         {
             while (message.Length > 1999)
             {
-                user.SendMessageAsync(message.Substring(0, 1999));
+                await user.SendMessageAsync(message.Substring(0, 1999));
                 message = message.Remove(0, 1999);
             }
-            user.SendMessageAsync(message);
+            await user.SendMessageAsync(message);
+            await _client.StartAsync();
+            Console.WriteLine("Sent Message");
         }
 
         public override void SendPrivateMessage(object sender, MessageEventArgs messagedata)
@@ -140,11 +143,11 @@ namespace SteamBotLite
                 SocketUser user = (SocketUser)messagedata.Destination.ExtraData;
 
                 Console.WriteLine("Casted Fine To Discord");
-                SendLargeMessage(user, messagedata.ReplyMessage);
+                SendLargeMessageAsync(user, messagedata.ReplyMessage);
             }
-            catch
+            catch (Exception e)
             {
-                Console.WriteLine("Casting Error");
+                Console.WriteLine(e);
             }
         }
 
@@ -192,8 +195,9 @@ namespace SteamBotLite
                     user.Rank = ChatroomEntity.AdminStatus.False;
                 }*/
             }
-            catch
+            catch (Exception e)
             {
+                Console.WriteLine(e);
             }
 
             MessageEventArgs Msg = new MessageEventArgs(this);
