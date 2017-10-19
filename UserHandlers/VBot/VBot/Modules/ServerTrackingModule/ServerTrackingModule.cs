@@ -22,9 +22,9 @@ namespace SteamBotLite
 
         private BaseTask serverUpdate;
 
-        private IHTMLFileFromArrayListiners WebServer;
+        private IHTMLFileFromArrayPasser WebServer;
 
-        public ServerTrackingModule(ModuleHandler bot, IHTMLFileFromArrayListiners WebServer, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
+        public ServerTrackingModule(ModuleHandler bot, IHTMLFileFromArrayPasser WebServer, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
             this.WebServer = WebServer;
             Bot = bot;
@@ -184,9 +184,10 @@ namespace SteamBotLite
             TableDataValue HeaderTime = new TableDataValue();
             HeaderTime.VisibleValue = "Time (UTC)";
 
-            WebServer.SetTableHeader(TableLabel, new TableDataValue[] { HeaderName, HeaderNamePlayerCount, HeaderTime });
-
-            //Add Entry
+            SetTableHeader tableheaderSetter = new SetTableHeader();
+            tableheaderSetter.TableIdentifier = TableLabel;
+            tableheaderSetter.Header = new TableDataValue[] { HeaderName, HeaderNamePlayerCount, HeaderTime };
+            WebServer.HandleCommand(tableheaderSetter);
 
             TableDataValue MapName = new TableDataValue();
             MapName.VisibleValue = e.currentMap;
@@ -197,8 +198,12 @@ namespace SteamBotLite
             TableDataValue Time = new TableDataValue();
             Time.VisibleValue = DateTime.UtcNow.ToLongDateString() + " " + DateTime.UtcNow.ToLongTimeString();
 
-            WebServer.AddWebsiteEntry(TableLabel, new TableDataValue[] { MapName, PlayerCount, Time }, 10);
-
+            AddWebsiteEntry AddSiteEntry = new AddWebsiteEntry();
+            AddSiteEntry.Data = new TableDataValue[] { MapName, PlayerCount, Time };
+            AddSiteEntry.limit = 10;
+            AddSiteEntry.Identifier = TableLabel;
+            WebServer.HandleCommand(AddSiteEntry);
+            
             if (e.playerCount > 8)
             {
                 userhandler.BroadcastMessageProcessEvent(e.ToString());
@@ -211,8 +216,19 @@ namespace SteamBotLite
                 ServerLabel.Link = "steam://connect/" + e.serverIP + ":" + e.port;
 
                 string RecentlyTestedTableLabel = "Recently Tested";
-                WebServer.SetTableHeader(RecentlyTestedTableLabel, new TableDataValue[] { HeaderName, HeaderNamePlayerCount, HeaderTime, HeaderServer });
-                WebServer.AddWebsiteEntry(RecentlyTestedTableLabel, new TableDataValue[] { MapName, PlayerCount, Time, ServerLabel }, 10);
+
+                SetTableHeader tableheader = new SetTableHeader();
+                tableheader.TableIdentifier = RecentlyTestedTableLabel;
+                tableheader.Header = new TableDataValue[] { HeaderName, HeaderNamePlayerCount, HeaderTime, HeaderServer };
+
+                WebServer.HandleCommand(tableheader);
+
+                AddWebsiteEntry WebSiteEntryToAdd = new AddWebsiteEntry();
+                WebSiteEntryToAdd.Data = new TableDataValue[] { MapName, PlayerCount, Time, ServerLabel };
+                WebSiteEntryToAdd.limit = 10;
+                WebSiteEntryToAdd.Identifier = RecentlyTestedTableLabel;
+
+                WebServer.HandleCommand(WebSiteEntryToAdd);
             }
         }
     }

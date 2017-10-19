@@ -4,7 +4,7 @@ using System.Collections.Specialized;
 
 namespace SteamBotLite
 {
-    internal class TestUserHandler : UserHandler, ModuleHandler, IHTMLFileFromArrayListiners
+    internal class TestUserHandler : UserHandler, ModuleHandler, IHTMLFileFromArrayListiners, IHTMLFileFromArrayPasser
     {
         public void AddWebsiteEntry(string identifier, TableDataValue[] data, int limit)
         {
@@ -59,10 +59,6 @@ namespace SteamBotLite
         {
         }
 
-        void ModuleHandler.HTMLFileFromArray(string[] headerNames, List<string[]> dataEntries, string v)
-        {
-        }
-
         public void MakeTableFromEntry(string TableKey, TableData TableData)
         {
         }
@@ -104,6 +100,10 @@ namespace SteamBotLite
         }
 
         public void AddModuleToCurrentModules(BaseModule module)
+        {
+        }
+
+        public void HandleCommand(HTMLCommand command)
         {
         }
     }

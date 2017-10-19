@@ -7,13 +7,14 @@ namespace SteamBotLite
         private List<string[]> CommandList;
         private Dictionary<string, List<string[]>> CommandListHeld;
         private ModuleHandler modulehandler;
-        private UserHandler userhandler;
+        private IHTMLFileFromArrayPasser HtmlHandler;
+        public UserHandler userhandler;
 
-        public AdminModule(ModuleHandler handler, UserHandler userhandler, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(handler, Jsconfig)
+        public AdminModule(ModuleHandler handler, IHTMLFileFromArrayPasser HtmlHandler, UserHandler userhandler, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(handler, Jsconfig)
         {
             DeletableModule = false;
             this.modulehandler = handler;
-            this.userhandler = userhandler;
+            this.HtmlHandler = HtmlHandler;
 
             loadPersistentData();
             savePersistentData();
@@ -26,7 +27,6 @@ namespace SteamBotLite
 
             adminCommands.Add(new Reboot(handler, this));
             adminCommands.Add(new RunScript(handler, this));
-            adminCommands.Add(new Rejoin(userhandler, modulehandler, this));
         }
 
         public override string getPersistentData()
@@ -64,7 +64,13 @@ namespace SteamBotLite
                 }
                 CommandListHeld.Add(module.GetType().Name.ToString(), CommandList);
 
-                modulehandler.HTMLFileFromArray(HeaderNames, CommandList, module.GetType().Name.ToString());
+                HTMLFileFromArray filefromarray = new HTMLFileFromArray();
+                filefromarray.Headernames = HeaderNames;
+                filefromarray.Data = CommandList;
+                filefromarray.TableKey = module.GetType().Name.ToString();
+                HtmlHandler.HandleCommand(filefromarray);
+
+                
             }
         }
 

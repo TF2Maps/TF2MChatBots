@@ -13,11 +13,11 @@ namespace SteamBotLite
 
         private string[] Header = new string[] { "Map", "Time Played" };
 
-        private IHTMLFileFromArrayListiners listiner;
+        private IHTMLFileFromArrayPasser listiner;
 
         private List<Maplist> Maplists;
 
-        public TrackingServerListHolder(ModuleHandler bot, IHTMLFileFromArrayListiners listiner, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
+        public TrackingServerListHolder(ModuleHandler bot, IHTMLFileFromArrayPasser listiner, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
             loadPersistentData();
             this.Maplists = new List<Maplist>();
@@ -130,7 +130,12 @@ namespace SteamBotLite
                     Data.Add(DataEntry);
                 }
 
-                listiner.HTMLFileFromArray(header, Data, "ExportedData");
+                HTMLFileFromArray HtmlFromArray = new HTMLFileFromArray();
+                HtmlFromArray.Data = Data;
+                HtmlFromArray.Headernames = header;
+                HtmlFromArray.TableKey = "ExportedData";
+
+                listiner.HandleCommand(HtmlFromArray);
             }
         }
 
@@ -180,7 +185,12 @@ namespace SteamBotLite
         {
             foreach (Maplist entry in Maplists)
             {
-                listiner.HTMLFileFromArray(Header, ParseSummarisedListToHTMLTable(SummariseEntries(MapTests, entry.Maps, entry.ListKind)), entry.ListName);
+                HTMLFileFromArray HtmlFromArray = new HTMLFileFromArray();
+                HtmlFromArray.Data = ParseSummarisedListToHTMLTable(SummariseEntries(MapTests, entry.Maps, entry.ListKind));
+                HtmlFromArray.Headernames = Header;
+                HtmlFromArray.TableKey = entry.ListName;
+
+                listiner.HandleCommand(HtmlFromArray);
             }
         }
 

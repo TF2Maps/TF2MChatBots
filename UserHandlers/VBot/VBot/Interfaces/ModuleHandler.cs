@@ -3,7 +3,7 @@ using System.Collections.Specialized;
 
 namespace SteamBotLite
 {
-    public interface ModuleHandler
+    public interface ModuleHandler 
     {
         void AddListChangeEventListiner(MapListChangeListiner listiner);
 
@@ -19,7 +19,7 @@ namespace SteamBotLite
 
         List<BaseModule> GetAllModules();
 
-        void HTMLFileFromArray(string[] headerNames, List<string[]> dataEntries, string v);
+     
 
         void OnMaplistchange(IReadOnlyList<Map> mapList, object sender, NotifyCollectionChangedEventArgs args);
 

@@ -6,7 +6,7 @@ using System.Net;
 
 namespace SteamBotLite
 {
-    internal partial class WebServerHostingModule : BaseModule, IHTMLFileFromArrayListiners
+    internal partial class WebServerHostingModule : BaseModule, IHTMLFileFromArrayListiners, IHTMLFileFromArrayPasser
     {
         readonly protected string header;
         readonly protected string trailer;
@@ -239,6 +239,11 @@ namespace SteamBotLite
         private void SetTableHeader(string tableKey, TableDataValue[] header)
         {
             SetTableHeader(tableKey, header);
+        }
+
+        public void HandleCommand(HTMLCommand command)
+        {
+            command.Execute(this);
         }
     }
 }

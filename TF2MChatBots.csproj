@@ -153,7 +153,6 @@
     <Compile Include="UserHandlers\VBot\VBot\Modules\AdminModule\Commands\CommandListRetrieve.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\AdminModule\Commands\GetAllModules.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\AdminModule\Commands\Reboot.cs" />
-    <Compile Include="UserHandlers\VBot\VBot\Modules\AdminModule\Commands\Rejoin.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\AdminModule\Commands\RunScript.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\AdminModule\Commands\UserInfo.cs" />
     <Compile Include="UserHandlers\VBot\VBot\Modules\CountDownModule\CountDownModule.cs" />

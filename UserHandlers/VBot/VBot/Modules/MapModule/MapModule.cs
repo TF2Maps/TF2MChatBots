@@ -12,7 +12,7 @@ namespace SteamBotLite
 
         public MapCollection mapList;
 
-        private IHTMLFileFromArrayListiners HTMLlistiner;
+        private IHTMLFileFromArrayPasser HTMLlistiner;
         private string MapListUploadCheck;
         private int MaxMapNumber = 10;
         private string ServerMapListUrl;
@@ -21,13 +21,13 @@ namespace SteamBotLite
 
         private string TableName = "Current Maps";
 
-        public MapModule(VBot bot, IHTMLFileFromArrayListiners HtmlListiner, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
+        public MapModule(VBot bot, IHTMLFileFromArrayPasser HtmlListiner, Dictionary<string, Dictionary<string, object>> Jsconfig) : base(bot, Jsconfig)
         {
             this.HTMLlistiner = HtmlListiner;
             LoadModule(bot);
         }
 
-        public MapModule(ModuleHandler bot, IHTMLFileFromArrayListiners HtmlListiner, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
+        public MapModule(ModuleHandler bot, IHTMLFileFromArrayPasser HtmlListiner, Dictionary<string, object> Jsconfig) : base(bot, Jsconfig)
         {
             this.HTMLlistiner = HtmlListiner;
             LoadModule(bot);
@@ -166,14 +166,23 @@ namespace SteamBotLite
 
                 Entries.Add(Values);
 
-                HTMLlistiner.AddWebsiteEntry(TableName, Values, 0);
+                AddWebsiteEntry WebsiteEntry = new AddWebsiteEntry();
+                WebsiteEntry.Identifier = TableName;
+                WebsiteEntry.Data = Values;
+                WebsiteEntry.limit = 0;
+
+                HTMLlistiner.HandleCommand(WebsiteEntry);
             }
 
             TableData data = new TableData();
             data.Header = GetMapListTableHeader();
             data.TableValues = Entries;
 
-            HTMLlistiner.MakeTableFromEntry(TableName, data);
+            MakeTableFromEntry TableFromEntry = new MakeTableFromEntry();
+            TableFromEntry.TableKey = TableName;
+            TableFromEntry.Data = data;
+
+            HTMLlistiner.HandleCommand(TableFromEntry);
         }
 
         private TableDataValue[] GetMapListTableHeader()
@@ -194,7 +203,11 @@ namespace SteamBotLite
 
         private void LoadModule(ModuleHandler bot)
         {
-            HTMLlistiner.SetTableHeader(TableName, GetMapListTableHeader()); //Ensures the maplist is shown before deleted maps
+            SetTableHeader TableHeaderSetterCommand = new SetTableHeader();
+            TableHeaderSetterCommand.TableIdentifier = TableName;
+            TableHeaderSetterCommand.Header = GetMapListTableHeader();
+
+            HTMLlistiner.HandleCommand(TableHeaderSetterCommand);
 
             loadPersistentData();
 
