@@ -39,13 +39,12 @@ namespace SteamBotLite
 
             _client = new DiscordSocketClient();
             ConnectionProcess(Token, _client);
-            _client.MessageReceived += MessageReceived;
+            _client.MessageReceived += _client_MessageReceived;
             AnnounceLoginCompleted();
             Console.WriteLine("Connected to discord!");
         }
 
-        
-
+     
         public override void BroadCastMessage(object sender, string message)
         {
             foreach (ulong chatroom in BroadCastChatrooms)
@@ -112,13 +111,9 @@ namespace SteamBotLite
         {
             try
             {
-                //ulong id = (ulong)messagedata.Chatroom.identifier;
                 SocketTextChannel channel = (SocketTextChannel)messagedata.Chatroom.identifier;
-                Console.WriteLine("Channel to send to is: " + channel.Id);
-
 
                 await channel.SendMessageAsync(messagedata.ReplyMessage);
-                
                 await _client.StartAsync();
                 Console.WriteLine("Sent Message");
             }
@@ -130,32 +125,14 @@ namespace SteamBotLite
 
         public async Task SendLargeMessageAsync(SocketUser user, string message)
         {
-
-            try
+            while (message.Length > 1999)
             {
-                Console.WriteLine(user.Id);
-                Console.WriteLine(user);
-
-                Console.WriteLine("SENDING LARGE MESSAGE");
-                while (message.Length > 1999)
-                {
-                    
-                  //  await user.SendMessageAsync(message.Substring(0, 1999));
-               //     await _client.StartAsync();
-                    message = message.Remove(0, 1999);
-                    
-                }
-             //   await user.SendMessageAsync(message);
-            //    await _client.StartAsync();
-                Console.WriteLine("Sent Message");
-                return;
+                await user.SendMessageAsync(message.Substring(0, 1999));
+                message = message.Remove(0, 1999);
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-
-            }
-            
+            await user.SendMessageAsync(message);
+            await _client.StartAsync();
+            Console.WriteLine("Sent Message");
         }
 
         public override void SendPrivateMessage(object sender, MessageEventArgs messagedata)
@@ -163,10 +140,10 @@ namespace SteamBotLite
             try
             {
                 
-                //SocketUser user = (SocketUser)messagedata.Destination.ExtraData;
+                SocketUser user = (SocketUser)messagedata.Destination.ExtraData;
 
                 Console.WriteLine("Casted Fine To Discord");
-              //  SendLargeMessageAsync(user, messagedata.ReplyMessage);
+                SendLargeMessageAsync(user, messagedata.ReplyMessage);
             }
             catch (Exception e)
             {
@@ -191,33 +168,32 @@ namespace SteamBotLite
         {
         }
 
-        private Task MessageReceived(SocketMessage message)
+        private System.Threading.Tasks.Task _client_MessageReceived(SocketMessage message)
         {
             Console.WriteLine(message.Content);
-
-
+            
             SteamBotLite.User user = new SteamBotLite.User(message.Author.Id, this);
             user.DisplayName = message.Author.Username;
             user.ExtraData = message.Author;
 
             try
             {
-                Console.WriteLine("Attempting to cast");
-                SocketGuildUser MessageSender = null;
-
-                if (message.Author.GetType().Equals(MessageSender))
+                SocketGuildUser MessageSender = (SocketGuildUser)message.Author;
+                if (MessageSender.GuildPermissions.KickMembers == true)
                 {
-                    MessageSender = (SocketGuildUser)message.Author;
-                    if (MessageSender.GuildPermissions.KickMembers == true)
-                    {
-                        user.Rank = ChatroomEntity.AdminStatus.True;
-                    }
-                    else
-                    {
-                        user.Rank = ChatroomEntity.AdminStatus.False;
-                    }
+                    user.Rank = ChatroomEntity.AdminStatus.True;
+                } else
+                {
+                    user.Rank = ChatroomEntity.AdminStatus.False;
                 }
-              
+                /*if (message.Author == "admin")
+                {
+                    user.Rank = ChatroomEntity.AdminStatus.True;
+                }
+                else
+                {
+                    user.Rank = ChatroomEntity.AdminStatus.False;
+                }*/
             }
             catch (Exception e)
             {
@@ -227,9 +203,9 @@ namespace SteamBotLite
             MessageEventArgs Msg = new MessageEventArgs(this);
             Msg.ReceivedMessage = message.Content;
             Msg.Sender = user;
-            
+
             Msg.Chatroom = new Chatroom(message.Channel, this);
-            Console.WriteLine("Handling message!");
+
             if (message.Channel != null)
             {
                 ChatRoomMessageProcessEvent(Msg);
@@ -238,6 +214,7 @@ namespace SteamBotLite
             {
                 PrivateMessageProcessEvent(Msg);
             }
+
             return null;
         }
     }
