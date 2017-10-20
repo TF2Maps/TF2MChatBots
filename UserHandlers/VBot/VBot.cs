@@ -54,7 +54,7 @@ namespace SteamBotLite
             HTMLParsers = new List<IHTMLFileFromArrayPasser>();
             OnLoginlistiners = new List<OnLoginCompletedListiners>();
             ListChangeEventListiners = new List<MapListChangeListiner>();
-            ModuleList = new List<BaseModule>();
+
             // loading modules
             WebServer = new WebServerHostingModule(this, jsconfig);
             mapModule = new MapModule(this, this, jsconfig);

@@ -14,8 +14,8 @@
 
             protected override string exec(MessageEventArgs Msg, string param)
             {
-              //  module.userhandler.Reboot();
-                return "This feature has been depreciated";
+                module.userhandler.Reboot();
+                return "Rebooted";
             }
         }
     }

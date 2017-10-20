@@ -1,6 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
-
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -10,8 +8,7 @@ namespace SteamBotLite
 {
     public abstract class DiscordInterface : ApplicationInterface
     {
-        private DiscordSocketClient _client;
-       // private DiscordClient _client;
+        private DiscordClient _client;
         private List<ulong> BroadCastChatrooms;
         private Game StatusName;
         private string Token;
@@ -37,22 +34,25 @@ namespace SteamBotLite
                 }
             }
 
-            _client = new DiscordSocketClient();
+            _client = new DiscordClient();
             ConnectionProcess(Token, _client);
             _client.MessageReceived += _client_MessageReceived;
             AnnounceLoginCompleted();
             Console.WriteLine("Connected to discord!");
         }
 
+<<<<<<< HEAD
      
+=======
+>>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
         public override void BroadCastMessage(object sender, string message)
         {
             foreach (ulong chatroom in BroadCastChatrooms)
             {
                 try
                 {
-                    SocketTextChannel Destination = (Discord.WebSocket.SocketTextChannel)_client.GetChannel(chatroom);
-                    Destination.SendMessageAsync(message);
+                    Channel Destination = _client.GetChannel(chatroom);
+                    Destination.SendMessage(message);
                 }
                 catch (Exception e)
                 {
@@ -61,6 +61,7 @@ namespace SteamBotLite
             }
         }
 
+<<<<<<< HEAD
         public async Task ConnectionProcess(string token, DiscordSocketClient Client)
         {
             await Client.LoginAsync(TokenType.Bot, token);
@@ -69,11 +70,19 @@ namespace SteamBotLite
             await Client.StartAsync();
             await Task.Delay(-1);
             
+=======
+        public void ConnectionProcess(string token, DiscordClient Client)
+        {
+            Client.Connect(token, TokenType.Bot);
+>>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
         }
 
-        public void DisconnectionProcess(DiscordSocketClient Client)
+        public void DisconnectionProcess(DiscordClient Client)
         {
-            Client.LogoutAsync();
+            _client.ExecuteAndWait(async () =>
+            {
+                await Client.Disconnect();
+            });
         }
 
         public override void EnterChatRoom(object sender, ChatroomEntity ChatroomEntity)
@@ -88,7 +97,7 @@ namespace SteamBotLite
 
         public override string GetUsername()
         {
-            return _client.CurrentUser.Username.ToString();
+            return _client.CurrentUser.Name.ToString();
         }
 
         public override void LeaveChatroom(object sender, ChatroomEntity ChatroomEntity)
@@ -111,11 +120,16 @@ namespace SteamBotLite
         {
             try
             {
+<<<<<<< HEAD
                 SocketTextChannel channel = (SocketTextChannel)messagedata.Chatroom.identifier;
 
                 await channel.SendMessageAsync(messagedata.ReplyMessage);
                 await _client.StartAsync();
                 Console.WriteLine("Sent Message");
+=======
+                Channel channel = (Channel)messagedata.Chatroom.identifier;
+                channel.SendMessage(messagedata.ReplyMessage);
+>>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
             }
             catch (Exception e)
             {
@@ -123,6 +137,7 @@ namespace SteamBotLite
             }
         }
 
+<<<<<<< HEAD
         public async Task SendLargeMessageAsync(SocketUser user, string message)
         {
             while (message.Length > 1999)
@@ -133,14 +148,23 @@ namespace SteamBotLite
             await user.SendMessageAsync(message);
             await _client.StartAsync();
             Console.WriteLine("Sent Message");
+=======
+        public void SendLargeMessage(Discord.User user, string message)
+        {
+            while (message.Length > 1999)
+            {
+                user.SendMessage(message.Substring(0, 1999));
+                message = message.Remove(0, 1999);
+            }
+            user.SendMessage(message);
+>>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
         }
 
         public override void SendPrivateMessage(object sender, MessageEventArgs messagedata)
         {
             try
             {
-                
-                SocketUser user = (SocketUser)messagedata.Destination.ExtraData;
+                Discord.User user = (Discord.User)messagedata.Destination.ExtraData;
 
                 Console.WriteLine("Casted Fine To Discord");
                 SendLargeMessageAsync(user, messagedata.ReplyMessage);
@@ -153,43 +177,43 @@ namespace SteamBotLite
 
         public override void SetStatusMessage(object sender, string message)
         {
-            _client.SetGameAsync(message);
+            StatusName = new Game(message);
+            _client.SetGame(StatusName);
         }
 
         public override void SetUsername(object sender, string Username)
         {
-            /*
-            _client.CurrentUser.Username = Username;
             _client.CurrentUser.Edit(username: Username);
-        */
         }
 
         public override void tick()
         {
         }
 
-        private System.Threading.Tasks.Task _client_MessageReceived(SocketMessage message)
+        private void _client_MessageReceived(object sender, Discord.MessageEventArgs e)
         {
-            Console.WriteLine(message.Content);
-            
-            SteamBotLite.User user = new SteamBotLite.User(message.Author.Id, this);
-            user.DisplayName = message.Author.Username;
-            user.ExtraData = message.Author;
-
-            try
+            Console.WriteLine(e.Message.RawText);
+            if (!e.Message.IsAuthor)
             {
-                SocketGuildUser MessageSender = (SocketGuildUser)message.Author;
-                if (MessageSender.GuildPermissions.KickMembers == true)
+                SteamBotLite.User user = new SteamBotLite.User(e.User.Id, this);
+                user.DisplayName = e.User.Name;
+                user.ExtraData = e.User;
+
+                try
                 {
-                    user.Rank = ChatroomEntity.AdminStatus.True;
-                } else
-                {
-                    user.Rank = ChatroomEntity.AdminStatus.False;
+                    if (e.User.ServerPermissions.Administrator)
+                    {
+                        user.Rank = ChatroomEntity.AdminStatus.True;
+                    }
+                    else
+                    {
+                        user.Rank = ChatroomEntity.AdminStatus.False;
+                    }
                 }
-                /*if (message.Author == "admin")
+                catch
                 {
-                    user.Rank = ChatroomEntity.AdminStatus.True;
                 }
+<<<<<<< HEAD
                 else
                 {
                     user.Rank = ChatroomEntity.AdminStatus.False;
@@ -199,23 +223,24 @@ namespace SteamBotLite
             {
                 Console.WriteLine(e);
             }
+=======
+>>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
 
-            MessageEventArgs Msg = new MessageEventArgs(this);
-            Msg.ReceivedMessage = message.Content;
-            Msg.Sender = user;
+                MessageEventArgs Msg = new MessageEventArgs(this);
+                Msg.ReceivedMessage = e.Message.RawText;
+                Msg.Sender = user;
 
-            Msg.Chatroom = new Chatroom(message.Channel, this);
+                Msg.Chatroom = new Chatroom(e.Message.Channel, this);
 
-            if (message.Channel != null)
-            {
-                ChatRoomMessageProcessEvent(Msg);
+                if (e.Message.Channel != null)
+                {
+                    ChatRoomMessageProcessEvent(Msg);
+                }
+                else
+                {
+                    PrivateMessageProcessEvent(Msg);
+                }
             }
-            else
-            {
-                PrivateMessageProcessEvent(Msg);
-            }
-
-            return null;
         }
     }
 }
