@@ -174,7 +174,7 @@ namespace SteamBotLite
             e.ReplyMessage = ChatMessageHandler(e, e.ReceivedMessage);
             if (e.ReplyMessage != null)
             {
-                e.InterfaceHandlerDestination.SendChatRoomMessageAsync(this, e);
+                e.InterfaceHandlerDestination.SendChatRoomMessage(this, e);
             }
         }
 

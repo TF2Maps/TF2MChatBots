@@ -1,5 +1,5 @@
 {  
-   "ServerTrackingModule":{  
+   "ServerModule":{  
       "updateInterval":40000,
       "Servers":[  
          {  
@@ -60,7 +60,7 @@
       "Address":"http://168.235.90.109:80/",
       "CSSPath":"Website/stylesheet.css/"
    },
-   "TrackingServerListHolder":{  
+   "ServerListHolder":{  
       "ListConfigs":[  
       ]
    }

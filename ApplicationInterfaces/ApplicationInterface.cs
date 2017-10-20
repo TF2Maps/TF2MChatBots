@@ -57,7 +57,7 @@ namespace SteamBotLite
         {
             userhandler.ChatRoomJoin += EnterChatRoom;
             userhandler.ChatRoomLeave += LeaveChatroom;
-            userhandler.SendChatRoomMessageEvent += SendChatRoomMessageAsync;
+            userhandler.SendChatRoomMessageEvent += SendChatRoomMessage;
             userhandler.SendPrivateMessageEvent += SendPrivateMessage;
             userhandler.SetUsernameEvent += SetUsername;
             userhandler.RebootEvent += Reboot;
@@ -129,7 +129,7 @@ namespace SteamBotLite
 
         public abstract void ReceiveChatMemberInfo(ChatroomEntity ChatroomEntity, bool AdminStatus);
 
-        public abstract void SendChatRoomMessageAsync(object sender, MessageEventArgs messagedata);
+        public abstract void SendChatRoomMessage(object sender, MessageEventArgs messagedata);
 
         public abstract void SendPrivateMessage(object sender, MessageEventArgs messagedata);
 

@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace SteamBotLite
 {
@@ -41,22 +40,6 @@ namespace SteamBotLite
             Console.WriteLine("Connected to discord!");
         }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-     
-=======
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
-=======
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
-=======
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
-=======
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
-=======
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
         public override void BroadCastMessage(object sender, string message)
         {
             foreach (ulong chatroom in BroadCastChatrooms)
@@ -73,44 +56,9 @@ namespace SteamBotLite
             }
         }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-        public async Task ConnectionProcess(string token, DiscordSocketClient Client)
-        {
-            await Client.LoginAsync(TokenType.Bot, token);
-            await Client.StartAsync();
-            Console.WriteLine("BEGUN THE LOGIN?");
-            await Client.StartAsync();
-            await Task.Delay(-1);
-            
-=======
         public void ConnectionProcess(string token, DiscordClient Client)
         {
             Client.Connect(token, TokenType.Bot);
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
-=======
-        public void ConnectionProcess(string token, DiscordClient Client)
-        {
-            Client.Connect(token, TokenType.Bot);
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
-=======
-        public void ConnectionProcess(string token, DiscordClient Client)
-        {
-            Client.Connect(token, TokenType.Bot);
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
-=======
-        public void ConnectionProcess(string token, DiscordClient Client)
-        {
-            Client.Connect(token, TokenType.Bot);
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
-=======
-        public void ConnectionProcess(string token, DiscordClient Client)
-        {
-            Client.Connect(token, TokenType.Bot);
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
         }
 
         public void DisconnectionProcess(DiscordClient Client)
@@ -144,7 +92,7 @@ namespace SteamBotLite
         public override void Reboot(object sender, EventArgs e)
         {
             DisconnectionProcess(_client);
-            ConnectionProcess(Token, _client).RunSynchronously();
+            ConnectionProcess(Token, _client);
         }
 
         public override void ReceiveChatMemberInfo(ChatroomEntity ChatroomEntity, bool AdminStatus)
@@ -152,71 +100,18 @@ namespace SteamBotLite
             throw new NotImplementedException();
         }
 
-        public override async void SendChatRoomMessageAsync(object sender, MessageEventArgs messagedata)
+        public override void SendChatRoomMessage(object sender, MessageEventArgs messagedata)
         {
             try
             {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-                SocketTextChannel channel = (SocketTextChannel)messagedata.Chatroom.identifier;
-
-                await channel.SendMessageAsync(messagedata.ReplyMessage);
-                await _client.StartAsync();
-                Console.WriteLine("Sent Message");
-=======
                 Channel channel = (Channel)messagedata.Chatroom.identifier;
                 channel.SendMessage(messagedata.ReplyMessage);
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
-=======
-                Channel channel = (Channel)messagedata.Chatroom.identifier;
-                channel.SendMessage(messagedata.ReplyMessage);
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
-=======
-                Channel channel = (Channel)messagedata.Chatroom.identifier;
-                channel.SendMessage(messagedata.ReplyMessage);
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
-=======
-                Channel channel = (Channel)messagedata.Chatroom.identifier;
-                channel.SendMessage(messagedata.ReplyMessage);
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
-=======
-                Channel channel = (Channel)messagedata.Chatroom.identifier;
-                channel.SendMessage(messagedata.ReplyMessage);
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
             }
-            catch (Exception e)
+            catch
             {
-                Console.WriteLine(e);
             }
         }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-        public async Task SendLargeMessageAsync(SocketUser user, string message)
-        {
-            while (message.Length > 1999)
-            {
-                await user.SendMessageAsync(message.Substring(0, 1999));
-                message = message.Remove(0, 1999);
-            }
-            await user.SendMessageAsync(message);
-            await _client.StartAsync();
-            Console.WriteLine("Sent Message");
-=======
-=======
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
-=======
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
-=======
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
-=======
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
         public void SendLargeMessage(Discord.User user, string message)
         {
             while (message.Length > 1999)
@@ -225,19 +120,6 @@ namespace SteamBotLite
                 message = message.Remove(0, 1999);
             }
             user.SendMessage(message);
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
-=======
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
-=======
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
-=======
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
-=======
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
         }
 
         public override void SendPrivateMessage(object sender, MessageEventArgs messagedata)
@@ -247,11 +129,11 @@ namespace SteamBotLite
                 Discord.User user = (Discord.User)messagedata.Destination.ExtraData;
 
                 Console.WriteLine("Casted Fine To Discord");
-                SendLargeMessageAsync(user, messagedata.ReplyMessage);
+                SendLargeMessage(user, messagedata.ReplyMessage);
             }
-            catch (Exception e)
+            catch
             {
-                Console.WriteLine(e);
+                Console.WriteLine("Casting Error");
             }
         }
 
@@ -293,30 +175,6 @@ namespace SteamBotLite
                 catch
                 {
                 }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-                else
-                {
-                    user.Rank = ChatroomEntity.AdminStatus.False;
-                }*/
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-=======
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
-=======
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
-=======
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
-=======
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
-=======
->>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
 
                 MessageEventArgs Msg = new MessageEventArgs(this);
                 Msg.ReceivedMessage = e.Message.RawText;

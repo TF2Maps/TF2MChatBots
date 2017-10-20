@@ -34,7 +34,7 @@ namespace SteamBotLite
         {
         }
 
-        public override void SendChatRoomMessageAsync(object sender, MessageEventArgs messagedata)
+        public override void SendChatRoomMessage(object sender, MessageEventArgs messagedata)
         {
             Console.WriteLine(messagedata.ReplyMessage);
         }

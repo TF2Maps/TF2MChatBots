@@ -76,7 +76,7 @@ namespace SteamBotLite
                             TimeString = "Stream";
                         }
                         e.ReplyMessage = data.items[0].snippet.title + " [" + TimeString + "]";
-                        e.InterfaceHandlerDestination.SendChatRoomMessageAsync(this, e);
+                        e.InterfaceHandlerDestination.SendChatRoomMessage(this, e);
                     }
                     Console.WriteLine(GetVideoData(VideoID));
                 }
