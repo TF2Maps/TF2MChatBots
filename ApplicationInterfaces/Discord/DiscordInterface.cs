@@ -43,7 +43,10 @@ namespace SteamBotLite
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
      
+=======
+>>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
 =======
 >>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
 =======
@@ -66,6 +69,7 @@ namespace SteamBotLite
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         public async Task ConnectionProcess(string token, DiscordSocketClient Client)
         {
             await Client.LoginAsync(TokenType.Bot, token);
@@ -74,6 +78,11 @@ namespace SteamBotLite
             await Client.StartAsync();
             await Task.Delay(-1);
             
+=======
+        public void ConnectionProcess(string token, DiscordClient Client)
+        {
+            Client.Connect(token, TokenType.Bot);
+>>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
 =======
         public void ConnectionProcess(string token, DiscordClient Client)
         {
@@ -131,11 +140,16 @@ namespace SteamBotLite
             {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 SocketTextChannel channel = (SocketTextChannel)messagedata.Chatroom.identifier;
 
                 await channel.SendMessageAsync(messagedata.ReplyMessage);
                 await _client.StartAsync();
                 Console.WriteLine("Sent Message");
+=======
+                Channel channel = (Channel)messagedata.Chatroom.identifier;
+                channel.SendMessage(messagedata.ReplyMessage);
+>>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
 =======
                 Channel channel = (Channel)messagedata.Chatroom.identifier;
                 channel.SendMessage(messagedata.ReplyMessage);
@@ -153,6 +167,7 @@ namespace SteamBotLite
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         public async Task SendLargeMessageAsync(SocketUser user, string message)
         {
             while (message.Length > 1999)
@@ -166,6 +181,8 @@ namespace SteamBotLite
 =======
 =======
 >>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
+=======
+>>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
         public void SendLargeMessage(Discord.User user, string message)
         {
             while (message.Length > 1999)
@@ -175,6 +192,9 @@ namespace SteamBotLite
             }
             user.SendMessage(message);
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
+=======
 >>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
 =======
 >>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
@@ -235,6 +255,7 @@ namespace SteamBotLite
                 }
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 else
                 {
                     user.Rank = ChatroomEntity.AdminStatus.False;
@@ -244,6 +265,8 @@ namespace SteamBotLite
             {
                 Console.WriteLine(e);
             }
+=======
+>>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
 =======
 >>>>>>> parent of 7cd599b... Updated Nuget packages, made changes necessary
 =======
