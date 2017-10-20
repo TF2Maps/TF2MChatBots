@@ -49,7 +49,7 @@ namespace SteamBotLite
             
             Console.WriteLine("VBot Initialised");
             Console.WriteLine("Loading modules and stuff");
-
+            ModuleList = new List<BaseModule>();
             MapChangeEventListiners = new List<ServerMapChangeListiner>();
             HTMLParsers = new List<IHTMLFileFromArrayPasser>();
             OnLoginlistiners = new List<OnLoginCompletedListiners>();
