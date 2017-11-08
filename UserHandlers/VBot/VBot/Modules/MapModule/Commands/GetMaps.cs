@@ -125,7 +125,7 @@ namespace SteamBotLite
                     }
                     else
                     {
-                        chatResponse += " at: http://vbot.site";
+                        chatResponse += " at: http://vbot.website";
                     }
 
                     if (MapsAddedToResponse == 0)
