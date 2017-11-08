@@ -121,7 +121,7 @@ namespace SteamBotLite
 
                     if (maps.Count > MapsAddedToResponse)
                     {
-                        chatResponse += string.Format(" (and {0} more at: http://vbot.site )", maps.Count - MapsAddedToResponse);
+                        chatResponse += string.Format(" (and {0} more at: http://vbot.website )", maps.Count - MapsAddedToResponse);
                     }
                     else
                     {
