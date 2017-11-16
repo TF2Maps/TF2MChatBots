@@ -163,7 +163,7 @@ namespace SteamBotLite
 
                 try
                 {
-                    if (e.User.ServerPermissions.Administrator)
+                    if (e.User.ServerPermissions.Administrator | e.User.ServerPermissions.KickMembers)
                     {
                         user.Rank = ChatroomEntity.AdminStatus.True;
                     }
