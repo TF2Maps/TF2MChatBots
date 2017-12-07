@@ -145,7 +145,7 @@ namespace SteamBotLite
 
         public override void SetUsername(object sender, string Username)
         {
-            _client.CurrentUser.Edit(username: Username);
+            //_client.CurrentUser.Edit(username: Username);
         }
 
         public override void tick()
