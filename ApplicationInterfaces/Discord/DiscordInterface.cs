@@ -139,8 +139,8 @@ namespace SteamBotLite
 
         public override void SetStatusMessage(object sender, string message)
         {
-            StatusName = new Game(message);
-            _client.SetGame(StatusName);
+            //StatusName = new Game(message);
+            //_client.SetGame(StatusName);
         }
 
         public override void SetUsername(object sender, string Username)
