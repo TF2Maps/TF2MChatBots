@@ -58,7 +58,13 @@ namespace SteamBotLite
 
         public void ConnectionProcess(string token, DiscordClient Client)
         {
-            Client.Connect(token, TokenType.Bot);
+            _client.ExecuteAndWait(async () =>
+            {
+                
+                await Client.Connect(token, TokenType.Bot); ;
+            });
+
+            
         }
 
         public void DisconnectionProcess(DiscordClient Client)

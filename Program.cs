@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SteamBotLite.ApplicationInterfaces.HTTP_Discord;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -23,6 +24,8 @@ namespace SteamBotLite
 
         private static void Main(string[] args)
         {
+            
+
             //Create userHandlers//
             List<UserHandler> UserHandlers = new List<UserHandler>();
             Console.WriteLine("RUNNING");
@@ -35,7 +38,7 @@ namespace SteamBotLite
             List<ApplicationInterface> Bots = new List<ApplicationInterface>();
 
             ConsoleInterface DebugInterface = new ConsoleInterface();
-
+            
             Console.WriteLine("Would you like to run the console? Y/N");
 
             /*
@@ -59,20 +62,29 @@ namespace SteamBotLite
                 }
             }
             */
+
+            HttpInterface Test_Bot = new HttpInterface();
+            Bots.Add(Test_Bot);
+            AssignConnection(VbotHandler, Test_Bot);
+
+
             SteamAccountVBot SteamPlatformInterface = new SteamAccountVBot();
-            DiscordAccountVBot DiscordPlatformInterfaceRelay = new DiscordAccountVBot();
-
+            
             Bots.Add(SteamPlatformInterface);
-            Bots.Add(DiscordPlatformInterfaceRelay);
-
+            AssignConnection(consolehandler, SteamPlatformInterface);
+            //DiscordAccountVBot DiscordPlatformInterfaceRelay = new DiscordAccountVBot();
+            //Bots.Add(DiscordPlatformInterfaceRelay);
+            //AssignConnection(VbotHandler, DiscordPlatformInterfaceRelay);
+            
+            
             //Link userhandlers and classes that are two way//
-            AssignConnection(MediaHandler, DiscordPlatformInterfaceRelay);
+            //AssignConnection(MediaHandler, DiscordPlatformInterfaceRelay);
             AssignConnection(MediaHandler, SteamPlatformInterface);
 
-            AssignConnection(VbotHandler, DiscordPlatformInterfaceRelay);
+            
             AssignConnection(VbotHandler, SteamPlatformInterface);
-            AssignConnection(consolehandler, DiscordPlatformInterfaceRelay);
-            AssignConnection(consolehandler, SteamPlatformInterface);
+            //AssignConnection(consolehandler, DiscordPlatformInterfaceRelay);
+            
             AssignConnection(ghostchecker, SteamPlatformInterface);
 
             Thread[] BotThreads = new Thread[Bots.Count];

@@ -133,6 +133,7 @@
   <ItemGroup>
     <Compile Include="ApplicationInterfaces\ApplicationInterface.cs" />
     <Compile Include="ApplicationInterfaces\ConsoleInterface.cs" />
+    <Compile Include="ApplicationInterfaces\HTTP_Discord\HttpInterface.cs" />
     <Compile Include="ApplicationInterfaces\Steam\Accounts\VBot\SteamAccountVBot.cs" />
     <Compile Include="ApplicationInterfaces\Steam\ExtraData\BotSavedData.cs" />
     <Compile Include="UserHandlers\ConsoleHandler\ConsoleUserHandler.cs" />
