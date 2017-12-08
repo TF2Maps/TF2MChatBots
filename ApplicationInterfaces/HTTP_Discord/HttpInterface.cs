@@ -104,13 +104,29 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
         }
         void SendMessageThroughWebhook(string message, string URL)
         {
+            System.Threading.Thread.Sleep(1000);
+
+            string full_message = message;
+            if (full_message.Length > 1900)
+            {
+                message = message.Substring(0, 1900);
+            }
+
             var client = new RestClient(URL);
             var request = new RestRequest(Method.POST);
             request.AddHeader("postman-token", "2e66de8f-1f2c-d2f9-97cb-fc3b69c1d071");
             request.AddHeader("cache-control", "no-cache");
             request.AddHeader("content-type", "application/x-www-form-urlencoded");
-            request.AddParameter("application/x-www-form-urlencoded", "content=" + WebUtility.UrlEncode(message) + "&username=" + WebUtility.UrlEncode(Username) , ParameterType.RequestBody);
+            request.AddParameter("application/x-www-form-urlencoded", "content=" + WebUtility.UrlEncode(message) + "&username=" + WebUtility.UrlEncode(Username), ParameterType.RequestBody);
             IRestResponse response = client.Execute(request);
+            if (full_message.Length > 1900)
+            {
+                SendMessageThroughWebhook(message.Substring(1900, message.Length - 1900), URL);
+            }
+
+            
+
+
         }
 
         public class Author

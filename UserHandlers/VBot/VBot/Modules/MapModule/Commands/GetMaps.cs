@@ -55,12 +55,11 @@ namespace SteamBotLite
                 }
 
                 Tuple<string, string> Responses = GetMapsWithFilter(MapFilter, Filter, OnlyWantUploaded);
-
-                userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = Msg.Sender, ReplyMessage = Responses.Item2 });
+                Msg.InterfaceHandlerDestination.SendPrivateMessage(this, new MessageEventArgs(null) { Destination = Msg.Sender, ReplyMessage = Responses.Item2 });
 
                 if (DateTime.Now < LastExecuted.AddMinutes(1))
                 {
-                    userhandler.SendPrivateMessageProcessEvent(new MessageEventArgs(null) { Destination = Msg.Sender, ReplyMessage = Responses.Item1 });
+                    Msg.InterfaceHandlerDestination.SendPrivateMessage(this, new MessageEventArgs(null) { Destination = Msg.Sender, ReplyMessage = Responses.Item1 });
 
                     return null;
                 }
