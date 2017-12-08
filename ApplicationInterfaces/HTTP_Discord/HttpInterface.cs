@@ -15,32 +15,47 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
     public class HttpInterface : ApplicationInterface
     {
         string LastMsg = "";
+        Dictionary<string, string> Last_Message;
         string Username = "VBot-C#";
 
         public HttpInterface()
         {
-            this.WebHook = config["WebHook"].ToString();
+           // this.WebHook = config["WebHook"].ToString();
             this.token = config["Token"].ToString();
-            GetLatestMessages();
-            GetChannelMessages();
-            SendMessageThroughWebhook("Hello world", config["WebHook"].ToString() );
+            this.Private_Msgs_Webhook = config["PrivateMsgs"].ToString();
+            this.Broadcasts_Webhook = config["Broadcasts"].ToString();
+
+            channels = JsonConvert.DeserializeObject<Dictionary<string,string>>(config["Channels"].ToString());
+            Last_Message = new Dictionary<string, string>();
+            foreach (KeyValuePair<string,string> chatroom in channels)
+            {
+                GetLatestMessages(chatroom.Key);
+            }
+
+            GetChannelMessages(channels);
+            SendMessageThroughWebhook("Hello world", config["WebHook"].ToString());
         }
+
         string token = "";
-        string WebHook = "";
+        //string WebHook = "";
+        string Private_Msgs_Webhook = "";
+        string Broadcasts_Webhook = "";
+
+        Dictionary<string, string> channels;
         public override void BroadCastMessage(object sender, string message)
         {
-            SendMessageThroughWebhook(message, WebHook);
+            SendMessageThroughWebhook(message, Broadcasts_Webhook);
         }
         public override void SendChatRoomMessage(object sender, MessageEventArgs messagedata)
         {
-            SendMessageThroughWebhook(messagedata.ReplyMessage, WebHook);
+            SendMessageThroughWebhook(messagedata.ReplyMessage, channels[messagedata.Chatroom.identifier.ToString()]);
         }
 
         public override void SendPrivateMessage(object sender, MessageEventArgs messagedata)
         {
             string prevusername = Username;
             Username = prevusername + "-Private";
-            SendMessageThroughWebhook(messagedata.ReplyMessage, WebHook);
+            SendMessageThroughWebhook(messagedata.ReplyMessage, Private_Msgs_Webhook);
             Username = prevusername;
         }
 
@@ -71,7 +86,7 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
         {
             try
             {
-                var recent_msgs = GetChannelMessages();
+                var recent_msgs = GetChannelMessages(channels);
                 foreach (var msg in recent_msgs)
                 {
                     ChatRoomMessageProcessEvent(msg);
@@ -83,9 +98,9 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
             }
         }
 
-        void GetLatestMessages()
+        void GetLatestMessages(string chatroom)
         {
-            var client = new RestClient("https://discordapp.com/api/v6/channels/346831363787456513/messages");
+            var client = new RestClient("https://discordapp.com/api/v6/channels/" + chatroom + "/messages");
             var request = new RestRequest(Method.GET);
             request.AddHeader("postman-token", "ad8e82e8-c4bc-33b2-b891-6ab7d35a0fda");
             request.AddHeader("cache-control", "no-cache");
@@ -98,13 +113,13 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
 
             if (ChannelMessages.Count > 0)
             {
-                LastMsg = ChannelMessages[0].id;
+                Last_Message[chatroom] = ChannelMessages[0].id;
             }
 
         }
         void SendMessageThroughWebhook(string message, string URL)
         {
-            System.Threading.Thread.Sleep(1000);
+            System.Threading.Thread.Sleep(500);
 
             string full_message = message;
             if (full_message.Length > 1900)
@@ -123,10 +138,6 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
             {
                 SendMessageThroughWebhook(message.Substring(1900, message.Length - 1900), URL);
             }
-
-            
-
-
         }
 
         public class Author
@@ -154,12 +165,27 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
             public List<object> mentions { get; set; }
             public int type { get; set; }
         }
+        public List<MessageEventArgs> GetChannelMessages(Dictionary<string,string> all_channels)
+        {
+            List<MessageEventArgs> responses = new List<MessageEventArgs>() ;
+            try {
+                foreach (KeyValuePair<string,string> channel in all_channels)
+                {
+                    foreach (var response in GetChannelMessages(channel.Key))
+                    {
+                        responses.Add(response);
+                    }
+                }
+            }
+            catch { }
+            return responses;
 
-        public List<MessageEventArgs> GetChannelMessages()
+        }
+        public List<MessageEventArgs> GetChannelMessages(string channel)
         {
             
-            System.Threading.Thread.Sleep(1000);
-            var client = new RestClient("https://discordapp.com/api/v6/channels/346831363787456513/messages?after=" + LastMsg);
+            System.Threading.Thread.Sleep(125);
+            var client = new RestClient("https://discordapp.com/api/v6/channels/" + channel + "/messages?after=" + Last_Message[channel]);
             var request = new RestRequest(Method.GET);
             request.AddHeader("postman-token", "ad8e82e8-c4bc-33b2-b891-6ab7d35a0fda");
             request.AddHeader("cache-control", "no-cache");
@@ -172,18 +198,18 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
 
             if (ChannelMessages.Count > 0)
             {
-                LastMsg = ChannelMessages[0].id;
+                Last_Message[channel] = ChannelMessages[0].id;
             }
             
 
             foreach (ChannelMessages msg in ChannelMessages)
             {
                 MessageEventArgs Converted_msg = new MessageEventArgs(this);
-                Converted_msg.Chatroom = new ChatroomEntity("346831363787456513", this);
+                Converted_msg.Chatroom = new ChatroomEntity(channel, this);
                 Converted_msg.ReceivedMessage = msg.content;
                 var sender = new ChatroomEntity(msg.author.id, this);
                 sender.DisplayName = msg.author.username;
-                sender.ParentIdentifier = "346831363787456513";
+                sender.ParentIdentifier = channel;
                 Converted_msg.Sender = sender;
                 
                 Returning.Add(Converted_msg);

@@ -25,23 +25,33 @@ namespace SteamBotLite
         private static void Main(string[] args)
         {
             
-
-            //Create userHandlers//
-            List<UserHandler> UserHandlers = new List<UserHandler>();
             Console.WriteLine("RUNNING");
+
+            
             ConsoleUserHandler consolehandler = new ConsoleUserHandler();
             MediaBot MediaHandler = new MediaBot();
-            VBot VbotHandler = new VBot();
+            VBot vbot_instance = new VBot();
             GhostChecker ghostchecker = new GhostChecker();
-
-            // Create Interfaces//
-            List<ApplicationInterface> Bots = new List<ApplicationInterface>();
-
-            ConsoleInterface DebugInterface = new ConsoleInterface();
+            List<UserHandler> user_handlers = new List<UserHandler>() {
+                consolehandler, MediaHandler, vbot_instance, ghostchecker
+            };
             
-            Console.WriteLine("Would you like to run the console? Y/N");
+            HttpInterface Test_Bot = new HttpInterface();
+            SteamAccountVBot SteamPlatformInterface = new SteamAccountVBot();
+            List<ApplicationInterface> services = new List<ApplicationInterface>() {
+                SteamPlatformInterface, Test_Bot
+            };
+
+            foreach(UserHandler handler in user_handlers)
+            {
+                foreach(ApplicationInterface service_instance in services)
+                {
+                    AssignConnection(handler, service_instance);
+                }
+            }
 
             /*
+            ConsoleInterface DebugInterface = new ConsoleInterface();
             if (Console.ReadLine().Equals("Y"))
             {
                 bool RunConsole = true;
@@ -63,36 +73,13 @@ namespace SteamBotLite
             }
             */
 
-            HttpInterface Test_Bot = new HttpInterface();
-            Bots.Add(Test_Bot);
-            AssignConnection(VbotHandler, Test_Bot);
 
-
-            SteamAccountVBot SteamPlatformInterface = new SteamAccountVBot();
-            
-            Bots.Add(SteamPlatformInterface);
-            AssignConnection(consolehandler, SteamPlatformInterface);
-            //DiscordAccountVBot DiscordPlatformInterfaceRelay = new DiscordAccountVBot();
-            //Bots.Add(DiscordPlatformInterfaceRelay);
-            //AssignConnection(VbotHandler, DiscordPlatformInterfaceRelay);
-            
-            
-            //Link userhandlers and classes that are two way//
-            //AssignConnection(MediaHandler, DiscordPlatformInterfaceRelay);
-            AssignConnection(MediaHandler, SteamPlatformInterface);
-
-            
-            AssignConnection(VbotHandler, SteamPlatformInterface);
-            //AssignConnection(consolehandler, DiscordPlatformInterfaceRelay);
-            
-            AssignConnection(ghostchecker, SteamPlatformInterface);
-
-            Thread[] BotThreads = new Thread[Bots.Count];
+            Thread[] BotThreads = new Thread[services.Count];
 
             //Start looping and iterating//
-            for (int x = 0; x < Bots.Count; x++)
+            for (int x = 0; x < services.Count; x++)
             {
-                BotThreads[x] = new Thread(new ThreadStart(Bots[x].StartTickThreadLoop));
+                BotThreads[x] = new Thread(new ThreadStart(services[x].StartTickThreadLoop));
                 BotThreads[x].Start();
             }
 
