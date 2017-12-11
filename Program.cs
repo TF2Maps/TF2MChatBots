@@ -80,6 +80,7 @@ namespace SteamBotLite
             for (int x = 0; x < services.Count; x++)
             {
                 BotThreads[x] = new Thread(new ThreadStart(services[x].StartTickThreadLoop));
+                BotThreads[x].Priority = ThreadPriority.BelowNormal;
                 BotThreads[x].Start();
             }
 
@@ -87,6 +88,7 @@ namespace SteamBotLite
 
             while (Running)
             {
+                System.Threading.Thread.Sleep(30000);
             }
         }
     }

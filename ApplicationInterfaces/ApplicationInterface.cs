@@ -141,6 +141,7 @@ namespace SteamBotLite
         {
             while (TickThread == TickThreadState.Running)
             {
+                System.Threading.Thread.Sleep(250);
                 tick();
             }
         }
