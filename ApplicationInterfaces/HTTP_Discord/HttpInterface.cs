@@ -17,6 +17,7 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
         string LastMsg = "";
         Dictionary<string, string> Last_Message;
         string Username = "VBot-C#";
+        List<string> Admins_Roles;
 
         public HttpInterface()
         {
@@ -24,9 +25,10 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
             this.token = config["Token"].ToString();
             this.Private_Msgs_Webhook = config["PrivateMsgs"].ToString();
             this.Broadcasts_Webhook = config["Broadcasts"].ToString();
-
+            Admins_Roles = JsonConvert.DeserializeObject<List<string>>(config["Admins"].ToString());
             channels = JsonConvert.DeserializeObject<Dictionary<string,string>>(config["Channels"].ToString());
             Last_Message = new Dictionary<string, string>();
+
             foreach (KeyValuePair<string,string> chatroom in channels)
             {
                 GetLatestMessages(chatroom.Key);
@@ -55,6 +57,9 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
         {
             string prevusername = Username;
             Username = prevusername + "-Private";
+            messagedata.ReplyMessage = "<@" + messagedata.Destination.identifier + "> " + "\n" + messagedata.ReplyMessage;
+
+
             SendMessageThroughWebhook(messagedata.ReplyMessage, Private_Msgs_Webhook);
             Username = prevusername;
         }
@@ -89,7 +94,11 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
                 var recent_msgs = GetChannelMessages(channels);
                 foreach (var msg in recent_msgs)
                 {
-                    ChatRoomMessageProcessEvent(msg);
+                    if (msg.Sender.Rank == ChatroomEntity.AdminStatus.True) {
+                        ChatRoomMessageProcessEvent(msg);
+                    } else {
+                        ChatRoomMessageProcessEvent(msg);
+                    }
                 }
             }
             catch (Exception e)
@@ -115,11 +124,25 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
             {
                 Last_Message[chatroom] = ChannelMessages[0].id;
             }
-
         }
+
         void SendMessageThroughWebhook(string message, string URL)
         {
             System.Threading.Thread.Sleep(500);
+
+            string[] AllWords = message.Split(' ');
+            string newreply = "";
+
+            foreach (string word in AllWords) {
+                string append = word + " ";
+                if (append.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                {
+                    append = "<" + append.Trim(' ') + ">";
+                }
+                newreply += append;
+            }
+            message = newreply;
+
 
             string full_message = message;
             if (full_message.Length > 1900)
@@ -181,6 +204,33 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
             return responses;
 
         }
+
+        public class GuildPermissionsReturn
+        {
+            public bool deaf { get; set; }
+            public DateTime joined_at { get; set; }
+            public User user { get; set; }
+            public List<string> roles { get; set; }
+            public bool mute { get; set; }
+        }
+
+        public bool CheckUserIsAdmin (string author) {
+            var client = new RestClient("https://discordapp.com/api/v6/guilds/217585440457228290/members/" + author);
+            var request = new RestRequest(Method.GET);
+            request.AddHeader("postman-token", "4906efa5-8a48-bee3-2e58-37701c20c21b");
+            request.AddHeader("cache-control", "no-cache");
+            request.AddHeader("authorization", "Bot " + token);
+            IRestResponse response = client.Execute(request);
+
+            GuildPermissionsReturn Perms = JsonConvert.DeserializeObject<GuildPermissionsReturn>(response.Content);
+            foreach (string role in Perms.roles) {
+                if (Admins_Roles.Contains(role)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public List<MessageEventArgs> GetChannelMessages(string channel)
         {
             
@@ -211,6 +261,9 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
                 sender.DisplayName = msg.author.username;
                 sender.ParentIdentifier = channel;
                 Converted_msg.Sender = sender;
+                if (CheckUserIsAdmin(msg.author.id)){
+                    sender.Rank = ChatroomEntity.AdminStatus.True;
+                }
                 
                 Returning.Add(Converted_msg);
             }
