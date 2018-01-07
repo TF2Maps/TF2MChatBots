@@ -109,20 +109,29 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
 
         void GetLatestMessages(string chatroom)
         {
-            var client = new RestClient("https://discordapp.com/api/v6/channels/" + chatroom + "/messages");
-            var request = new RestRequest(Method.GET);
-            request.AddHeader("postman-token", "ad8e82e8-c4bc-33b2-b891-6ab7d35a0fda");
-            request.AddHeader("cache-control", "no-cache");
-            request.AddHeader("authorization", "Bot " + token);
-            IRestResponse response = client.Execute(request);
-
-            List<MessageEventArgs> Returning = new List<MessageEventArgs>();
-
-            List<ChannelMessages> ChannelMessages = JsonConvert.DeserializeObject<List<ChannelMessages>>(response.Content);
-
-            if (ChannelMessages.Count > 0)
+            try
             {
-                Last_Message[chatroom] = ChannelMessages[0].id;
+
+
+                var client = new RestClient("https://discordapp.com/api/v6/channels/" + chatroom + "/messages");
+                var request = new RestRequest(Method.GET);
+                request.AddHeader("postman-token", "ad8e82e8-c4bc-33b2-b891-6ab7d35a0fda");
+                request.AddHeader("cache-control", "no-cache");
+                request.AddHeader("authorization", "Bot " + token);
+                IRestResponse response = client.Execute(request);
+
+                List<MessageEventArgs> Returning = new List<MessageEventArgs>();
+
+                List<ChannelMessages> ChannelMessages = JsonConvert.DeserializeObject<List<ChannelMessages>>(response.Content);
+
+                if (ChannelMessages.Count > 0)
+                {
+                    Last_Message[chatroom] = ChannelMessages[0].id;
+                }
+            }
+            catch
+            {
+
             }
         }
 
