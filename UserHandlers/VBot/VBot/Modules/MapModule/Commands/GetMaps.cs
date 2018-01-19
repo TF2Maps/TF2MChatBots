@@ -109,10 +109,10 @@ namespace SteamBotLite
                             string mapLine = string.Format(Nextnum + ") {0} // {1} // {2} ({3})", maps[i].Filename, maps[i].DownloadURL, maps[i].SubmitterName, maps[i].Submitter.ToString());
 
                             if (!string.IsNullOrEmpty(maps[i].Notes))
-                                mapLine += "\nNotes: " + maps[i].Notes;
+                                mapLine += " \nNotes: " + maps[i].Notes;
 
                             if (i < maps.Count - 1)
-                                mapLine += "\n";
+                                mapLine += " \n";
 
                             pmResponse += mapLine;
                         }
