@@ -162,11 +162,11 @@ namespace SteamBotLite
 
                 if (currentserverstate != null)
                 {
-                    if (!(TrackedServers.Servers[x].currentMap.Equals(currentserverstate.currentMap)))
+                    if (!(TrackedServers.Servers[x].currentMap.Equals(currentserverstate.currentMap)) && currentserverstate.playerCount > 8)
                     {
                         ServerMapChanged(this, currentserverstate);
+                        TrackedServers.Servers[x].update(currentserverstate);
                     }
-                    TrackedServers.Servers[x].update(currentserverstate);
                 }
             }
         }
