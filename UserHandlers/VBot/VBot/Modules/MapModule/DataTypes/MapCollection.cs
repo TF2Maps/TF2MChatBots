@@ -134,7 +134,7 @@ namespace SteamBotLite
 
         public string UpdateMap(string MapName, Map NewMapData, ChatroomEntity User)
         {
-            MapValidityCheck MapCheck = CheckIfValid(NewMapData, (NewMapData.Filename != MapName));
+            MapValidityCheck MapCheck = CheckIfValid(NewMapData, (NewMapData.Filename.Equals(MapName) == false));
             UpdateMapValidityCheck Updatecheck = GetMapPositionInList(MapName);
             string ReturnMessage;
 
