@@ -417,7 +417,29 @@ namespace MapModuleTests
 
             Assert.AreEqual(TestMap.Filename, Mapname);
         }
+        [TestMethod]
+        public void UpdateMapKeepName()
+        {
+            MessageEventArgs Message = new MessageEventArgs(null);
+            Message.ReceivedMessage = AddCommand + " " + Mapname + " " + url + " " + notes;
+            Message.Sender = TestUser;
 
+            FireCommand(Message, module);
+
+            string NewURL = url + 2;
+            string NewNote = notes + 2;
+
+            Message.ReceivedMessage = UpdateCommand + " " + Mapname + " " + Mapname + " " + NewURL + " " + NewNote;
+
+            Console.WriteLine(FireCommand(Message, module));
+
+            Map TestMap = module.mapList.GetMap(0);
+            Assert.IsTrue(module.mapList.GetSize() == 1);
+            Assert.AreEqual(TestMap.Filename, TestMap.Filename);
+            Assert.AreEqual(NewURL, TestMap.DownloadURL);
+            Assert.AreEqual(NewNote, TestMap.Notes);
+            Assert.AreEqual(identifier, TestMap.Submitter);
+        }
         [TestMethod]
         public void UpdateMapAllProperties()
         {
