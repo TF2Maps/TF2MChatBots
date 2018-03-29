@@ -55,7 +55,7 @@ namespace SteamBotLite
 
         public string AddMap(Map map)
         {
-            MapValidityCheck MapCheck = CheckIfValid(map);
+            MapValidityCheck MapCheck = CheckIfValid(map, true);
 
             if (MapCheck.IsValid)
             {
@@ -134,7 +134,7 @@ namespace SteamBotLite
 
         public string UpdateMap(string MapName, Map NewMapData, ChatroomEntity User)
         {
-            MapValidityCheck MapCheck = CheckIfValid(NewMapData);
+            MapValidityCheck MapCheck = CheckIfValid(NewMapData, (NewMapData.Filename.Equals(MapName) == false));
             UpdateMapValidityCheck Updatecheck = GetMapPositionInList(MapName);
             string ReturnMessage;
 
@@ -170,7 +170,7 @@ namespace SteamBotLite
             return int.TryParse(input, out x);
         }
 
-        private MapValidityCheck CheckIfValid(Map map)
+        private MapValidityCheck CheckIfValid(Map map, bool checkDuplicates)
         {
             MapValidityCheck ValidityCheck = new MapValidityCheck();
             try
@@ -209,7 +209,7 @@ namespace SteamBotLite
                     throw new ArgumentException("It includes too many characters: " + "27");
                 }
 
-                if (mapList.Any(m => m.Filename.Equals(map.Filename)))
+                if (checkDuplicates && mapList.Any(m => m.Filename.Equals(map.Filename)))
                 {
                     throw new ArgumentException("Your map has been rejected as it already exists in the map list!");
                 }
