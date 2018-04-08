@@ -24,15 +24,13 @@ namespace SteamBotLite
 
         private List<BaseCommand> chatCommands = new List<BaseCommand>();
 
-        private CountDownModule countdownmodule;
-
         private IdentityModule identitymodule;
 
         // Loading Config
         private Dictionary<string, Dictionary<string, object>> jsconfig = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, object>>>(System.IO.File.ReadAllText(@"config.json"));
 
         // Class members
-        private MotdModule motdModule;
+        //private MotdModule motdModule;
 
         private RepliesModule replyModule;
         private SearchModule searchModule;
@@ -59,14 +57,15 @@ namespace SteamBotLite
             WebServer = new WebServerHostingModule(this, jsconfig);
             mapModule = new MapModule(this, this, jsconfig);
             TrackingServerListmodule = new TrackingServerListHolder(this, this, jsconfig);
-            motdModule = new MotdModule(this, jsconfig);
+            
             ServerTrackingModule = new ServerTrackingModule(this, this, jsconfig);
             usersModule = new UsersModule(this, jsconfig);
             replyModule = new RepliesModule(this, jsconfig);
             searchModule = new SearchModule(this, jsconfig);
             adminmodule = new AdminModule(this, this, this, jsconfig );
             identitymodule = new IdentityModule(this, this, jsconfig);
-            countdownmodule = new CountDownModule(this, jsconfig);
+            //motdModule = new MotdModule(this, jsconfig);
+            //countdownmodule = new CountDownModule(this, jsconfig);
 
             Console.WriteLine("Modules loaded and ModuleList intitialised");
 

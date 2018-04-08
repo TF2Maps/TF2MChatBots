@@ -203,6 +203,11 @@ namespace SteamBotLite
                 {
                     throw new ArgumentException("It includes an uppercase letter");
                 }
+                if (map.Filename.Contains('_') & map.Filename.IndexOf('_') != map.Filename.LastIndexOf('_'))
+                {} else
+                {
+                    throw new ArgumentException("Your map name needs to have the following format: Gamemode_Mapname_Version");
+                }
 
                 if (map.Filename.Length > 27)
                 {

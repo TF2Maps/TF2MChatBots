@@ -12,7 +12,7 @@ namespace MapModuleTests
         private string AddCommand = "!add";
         private string DeleteCommand = "!delete";
         private string identifier = "0";
-        private string Mapname = "mapname";
+        private string Mapname = "mapname_name_v1";
         private MapModule module;
         private string notes = "these are notes";
         private ChatroomEntity TestUser;
@@ -218,12 +218,20 @@ namespace MapModuleTests
 
             AssertMaplistSize(0);
         }
+        [TestMethod]
+        public void NeedUnderlines()
+        {
+            MessageEventArgs Message = new MessageEventArgs(null);
+            Message.ReceivedMessage = AddCommand + " " + "mapname" + " " + url + " " + notes;
+            Message.Sender = TestUser;
 
+            AssertMaplistSize(0);
+        }
         [TestMethod]
         public void NoCapitals()
         {
             MessageEventArgs Message = new MessageEventArgs(null);
-            Message.ReceivedMessage = AddCommand + " " + "MAPNAME" + " " + url + " " + notes;
+            Message.ReceivedMessage = AddCommand + " " + "GAMEMODE_MAPNAME_RC1" + " " + url + " " + notes;
             Message.Sender = TestUser;
 
             AssertMaplistSize(0);
@@ -343,7 +351,7 @@ namespace MapModuleTests
         public void SmallerThan27Chars()
         {
             MessageEventArgs Message = new MessageEventArgs(null);
-            Message.ReceivedMessage = AddCommand + " " + "mapnamemapnamemapnamemapnamemapnamemapnamemapnamemapnamemapnamemapnamemapnamemapnamemapname" + " " + url + " " + notes;
+            Message.ReceivedMessage = AddCommand + " " + "mapn_am_emapnamemapnamemapnamemapnamemapnamemapnamemapnamemapnamemapnamemapnamemapnamemapname" + " " + url + " " + notes;
             Message.Sender = TestUser;
 
             AssertMaplistSize(0);
@@ -443,7 +451,7 @@ namespace MapModuleTests
         [TestMethod]
         public void UpdateMapAllProperties()
         {
-            string NewMapName = "foo";
+            string NewMapName = "foo_bar_rc1";
 
             MessageEventArgs Message = new MessageEventArgs(null);
             Message.ReceivedMessage = AddCommand + " " + Mapname + " " + url + " " + notes;
@@ -469,7 +477,7 @@ namespace MapModuleTests
         [TestMethod]
         public void UpdateMapNameOnlyOldOneUploaded()
         {
-            string NewMapName = "foo";
+            string NewMapName = "foo_bar_rc1";
 
             module.SubstituteWebPageWithString(Mapname);
             MessageEventArgs Message = new MessageEventArgs(null);
@@ -497,7 +505,7 @@ namespace MapModuleTests
         [TestMethod]
         public void UpdateMapOnlyNewOneUploaded()
         {
-            string NewMapName = "foo";
+            string NewMapName = "foo_bar_rc1";
 
             module.SubstituteWebPageWithString(NewMapName);
             MessageEventArgs Message = new MessageEventArgs(null);
@@ -532,7 +540,7 @@ namespace MapModuleTests
                 Console.WriteLine(FireCommand(Message, module));
             }
 
-            string NewMapName = "newmap";
+            string NewMapName = "foo_bar_rc1";
             string NewURL = "HTTP://NEWURL";
             string NewNote = "NEW NOTES";
 

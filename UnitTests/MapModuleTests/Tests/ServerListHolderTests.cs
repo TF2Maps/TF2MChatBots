@@ -10,7 +10,7 @@ namespace MapModuleTests
     public class TrackingServerListHolderTests
     {
         private int identifier = 0;
-        private string MapName = "TESTMAP";
+        private string MapName = "TESTMAP_R";
         private TrackingServerListHolder module;
         private TrackingServerListHolder.PlayEntry TestPlayEntry;
 
@@ -20,7 +20,7 @@ namespace MapModuleTests
             module.AddEntry(MapName, TestPlayEntry);
             Assert.IsTrue(module.MapTests[MapName].Contains(TestPlayEntry));
         }
-
+        
         // Use TestCleanup to run code after each test has run
         [TestCleanup()]
         public void Cleanup()
