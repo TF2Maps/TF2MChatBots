@@ -87,9 +87,8 @@ namespace SteamBotLite
                     SpideredData = SpideredData[1].Split(new string[] { SearchEntry.SpiderSuffix }, StringSplitOptions.RemoveEmptyEntries);
                     response = SpideredData[0];
                 }
+                response = WebUtility.UrlDecode(response);
 
-                // Try to avoid console writing and prefer a proper logging system
-                Console.WriteLine(response);
                 return response;
             }
             catch (Exception ex)

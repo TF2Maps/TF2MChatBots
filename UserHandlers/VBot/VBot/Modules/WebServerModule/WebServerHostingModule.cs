@@ -149,19 +149,22 @@ namespace SteamBotLite
         public override void OnAllModulesLoaded()
         { }
 
-        public void StartWebServer(string prefix)
+        public async void StartWebServer(string prefix)
         {
             Console.WriteLine("Website Loding");
             listener = new HttpListener();
             listener.Prefixes.Add(prefix);
             listener.Start();
-
-            listener.BeginGetContext(new AsyncCallback(ResponseMethod), listener);
-
+            while (true)
+            { 
+                var data = await listener.GetContextAsync();
+                ResponseMethod(data);
+            }
             Console.WriteLine("Website Loaded");
 
         }
 
+        
         private void AddTableFromEntry(string TableKey, TableData TableData)
         {
             if (DataLists.ContainsKey(TableKey))
@@ -198,11 +201,8 @@ namespace SteamBotLite
             savePersistentData();
         }
 
-        private void ResponseMethod(IAsyncResult result)
+        private void ResponseMethod(HttpListenerContext context)
         {
-            HttpListener listener = (HttpListener)result.AsyncState;
-
-            HttpListenerContext context = listener.EndGetContext(result);
             HttpListenerResponse response = context.Response;
             byte[] buff = System.Text.Encoding.UTF8.GetBytes("Sorry an Error Has occured");
 
@@ -227,7 +227,6 @@ namespace SteamBotLite
             {
                 response.ContentLength64 = buff.Length;
                 response.Close(buff, true);
-                listener.BeginGetContext(new AsyncCallback(ResponseMethod), listener);
             }
         }
 
