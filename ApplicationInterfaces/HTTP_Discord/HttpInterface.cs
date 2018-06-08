@@ -89,21 +89,26 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
 
         public override void tick()
         {
-            try
+            var recent_msgs = GetChannelMessages(channels);
+            foreach (var msg in recent_msgs)
             {
-                var recent_msgs = GetChannelMessages(channels);
-                foreach (var msg in recent_msgs)
+                try
                 {
-                    if (msg.Sender.Rank == ChatroomEntity.AdminStatus.True) {
+
+                    if (msg.Sender.Rank == ChatroomEntity.AdminStatus.True)
+                    {
                         ChatRoomMessageProcessEvent(msg);
-                    } else {
+                    }
+                    else
+                    {
                         ChatRoomMessageProcessEvent(msg);
                     }
                 }
-            }
-            catch (Exception e)
-            {
 
+                catch (Exception e)
+                {
+
+                }
             }
         }
 
@@ -111,8 +116,6 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
         {
             try
             {
-
-
                 var client = new RestClient("https://discordapp.com/api/v6/channels/" + chatroom + "/messages");
                 var request = new RestRequest(Method.GET);
                 request.AddHeader("postman-token", "ad8e82e8-c4bc-33b2-b891-6ab7d35a0fda");
@@ -200,16 +203,19 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
         public List<MessageEventArgs> GetChannelMessages(Dictionary<string,string> all_channels)
         {
             List<MessageEventArgs> responses = new List<MessageEventArgs>() ;
-            try {
+            
                 foreach (KeyValuePair<string,string> channel in all_channels)
+                {
+                try
                 {
                     foreach (var response in GetChannelMessages(channel.Key))
                     {
                         responses.Add(response);
                     }
                 }
+                catch { }
             }
-            catch { }
+            
             return responses;
 
         }
