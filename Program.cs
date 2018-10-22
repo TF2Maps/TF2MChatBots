@@ -50,30 +50,6 @@ namespace SteamBotLite
                 }
             }
 
-            /*
-            ConsoleInterface DebugInterface = new ConsoleInterface();
-            if (Console.ReadLine().Equals("Y"))
-            {
-                bool RunConsole = true;
-
-                while (RunConsole)
-                {
-                    MessageEventArgs Msg = new MessageEventArgs(DebugInterface);
-                    Msg.Sender = new ChatroomEntity("Console", DebugInterface);
-                    Msg.ReceivedMessage = Console.ReadLine();
-                    Msg.Sender.Rank = ChatroomEntity.AdminStatus.True;
-                    VbotHandler.ProcessPrivateMessage(DebugInterface, Msg);
-                    Msg.InterfaceHandlerDestination = DebugInterface;
-
-                    if (Msg.ReceivedMessage.Equals("Exit"))
-                    {
-                        RunConsole = false;
-                    }
-                }
-            }
-            */
-
-
             Thread[] BotThreads = new Thread[services.Count];
 
             //Start looping and iterating//
