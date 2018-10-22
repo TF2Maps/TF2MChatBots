@@ -69,8 +69,7 @@ namespace SteamBotLite
                 filefromarray.Data = CommandList;
                 filefromarray.TableKey = module.GetType().Name.ToString();
                 HtmlHandler.HandleCommand(filefromarray);
-
-                
+         
             }
         }
 

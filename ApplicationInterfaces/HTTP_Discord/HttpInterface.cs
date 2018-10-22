@@ -65,7 +65,7 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
                 Username = prevusername;
             } catch (Exception e)
             {
-
+                Console.WriteLine(e);
             }
         }
 
@@ -112,7 +112,7 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
 
                 catch (Exception e)
                 {
-
+                    Console.WriteLine(e);
                 }
             }
         }
@@ -137,9 +137,9 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
                     Last_Message[chatroom] = ChannelMessages[0].id;
                 }
             }
-            catch
+            catch (Exception e)
             {
-
+                Console.WriteLine(e);
             }
         }
 
@@ -184,7 +184,7 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
             }
             catch (Exception e)
             {
-
+                Console.WriteLine(e);
             }
         }
 
@@ -221,12 +221,15 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
             {
                 try
                 {
+                    
                     foreach (var response in GetChannelMessages(channel.Key))
                     {
                         responses.Add(response);
                     }
                 }
-                catch { }
+                catch (Exception e) {
+                    Console.WriteLine(e);
+                }
             }
 
             return responses;
@@ -263,7 +266,7 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
             }
             catch (Exception e)
             {
-
+                Console.WriteLine(e);
             }
             return false;
         }
@@ -271,6 +274,7 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
         public List<MessageEventArgs> GetChannelMessages(string channel)
         {
             try {
+
                 System.Threading.Thread.Sleep(125);
                 var client = new RestClient("https://discordapp.com/api/v6/channels/" + channel + "/messages?after=" + Last_Message[channel]);
                 var request = new RestRequest(Method.GET);
@@ -308,6 +312,8 @@ namespace SteamBotLite.ApplicationInterfaces.HTTP_Discord
             }
             catch (Exception e)
             {
+                Console.WriteLine("Channel: " + channel);
+                Console.WriteLine(e);
                 return new List<MessageEventArgs>();
             }
         } 

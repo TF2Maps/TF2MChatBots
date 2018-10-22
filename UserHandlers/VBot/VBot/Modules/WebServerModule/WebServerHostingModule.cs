@@ -151,14 +151,21 @@ namespace SteamBotLite
 
         public async void StartWebServer(string prefix)
         {
-            Console.WriteLine("Website Loding");
-            listener = new HttpListener();
-            listener.Prefixes.Add(prefix);
-            listener.Start();
-            while (true)
-            { 
-                var data = await listener.GetContextAsync();
-                ResponseMethod(data);
+            Console.WriteLine("Website Loading");
+            try
+            {
+                listener = new HttpListener();
+                listener.Prefixes.Add(prefix);
+                listener.Start();
+                while (true)
+                {
+                    var data = await listener.GetContextAsync();
+                    ResponseMethod(data);
+                }
+
+            } catch (Exception e)
+            {
+
             }
             Console.WriteLine("Website Loaded");
 
