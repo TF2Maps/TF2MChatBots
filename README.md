@@ -30,3 +30,34 @@ In bin/example there are several files.
 config.json is used by the VBot Userhandler, i've provided an example configuration for it. If there's a module loaded in VBot that isn't in the config it'll throw an error upon initialisation.
 
 The files in applicationconfigs are used for "Interfaces" to login, as well as restrict their chat. They are named (and case-sensitive) to the classes that load them. For example "SteamAccountVBot" class will load SteamAccountVBot.json
+
+# Setting up 
+## Windows
+Simply download the git repo, and compile the program, you will need to copy the files from bin/example into the build directory.
+## Linux
+First install mono, instructions are at: https://www.mono-project.com/docs/getting-started/install/linux/
+You will then need to install mono-devel (to compile) and git (to download the repo)
+sudo apt install mono-devel
+sudo apt install git
+
+Then you need to download the project
+
+git clone https://github.com/TF2Maps/TF2MChatBots.git
+cd TF2MChatBots
+git pull
+
+The software utilises a variety of nuget packages, so you need to install nuget, then run it to retrieve needed packages
+sudo apt install nuget 
+nuget restore 
+
+Then you can compile the bot. There will be errors as the test suite will fail to compile, but the main project which outputs the executable needed to run the software will succeed. 
+msbuild /p:Configuration=Release
+
+You then need to copy files from bin/example into bin/release, or use your own configuration files. 
+cp -r bin/example/* bin/Release
+
+Once you configire the software by editing the files, it can be run with:
+cd bin
+cd Release
+mono SteamBotLite.exe
+
