@@ -65,7 +65,7 @@ Servers: Unused value, configuration is in module configuration.
 ### ServerListHolder
 Unsure what this is used for TBH. 
 
-## VBot (bin/example/VBot/
+## VBot (bin/example/VBot/)
 In the configuration files, there is the VBot directory which has further configuration for each module, and also saved data. 
 
 ### SearchModule.JSON
