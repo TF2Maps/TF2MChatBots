@@ -39,36 +39,37 @@ First install mono, instructions are at: https://www.mono-project.com/docs/getti
 
 You will then need to install mono-devel (to compile) and git (to download the repo)
 
-sudo apt install mono-devel
+  sudo apt install mono-devel
 
-sudo apt install git
+  sudo apt install git
 
 Then you need to download the project
 
-git clone https://github.com/TF2Maps/TF2MChatBots.git
+  git clone https://github.com/TF2Maps/TF2MChatBots.git
 
-cd TF2MChatBots
+  cd TF2MChatBots
 
-git pull
+  git pull
 
 The software utilises a variety of nuget packages, so you need to install nuget, then run it to retrieve needed packages
 
-sudo apt install nuget 
+  sudo apt install nuget 
 
-nuget restore 
+  nuget restore 
 
 Then you can compile the bot. There will be errors as the test suite will fail to compile, but the main project which outputs the executable needed to run the software will succeed. 
 
-msbuild /p:Configuration=Release
+  msbuild /p:Configuration=Release
 
 You then need to copy files from bin/example into bin/release, or use your own configuration files. 
 
-cp -r bin/example/* bin/Release
+  cp -r bin/example/* bin/Release
 
 Once you configire the software by editing the files, it can be run with:
-cd bin
 
-cd Release
+  cd bin
 
-mono SteamBotLite.exe
+  cd Release
+
+  mono SteamBotLite.exe
 
