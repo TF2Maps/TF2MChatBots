@@ -1,0 +1,26 @@
+[  
+    {  
+       "capacity":0,
+       "currentMap":"",
+       "playerCount":0,
+       "port":27015,
+       "serverIP":"192.223.27.185",
+       "tag":"MVM"
+    },
+    {  
+       "capacity":24,
+       "currentMap":"pl_nelder_grove_b2",
+       "playerCount":20,
+       "port":27015,
+       "serverIP":"45.63.4.250",
+       "tag":"NYServer"
+    },
+    {  
+       "capacity":24,
+       "currentMap":"koth_pillar_a1",
+       "playerCount":19,
+       "port":27015,
+       "serverIP":"45.76.80.90",
+       "tag":"EUServer"
+    }
+ ]
