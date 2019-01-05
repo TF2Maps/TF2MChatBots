@@ -1,0 +1,12 @@
+{
+    "WebHook": "https://discordapp.com/api/webhooks/<token>",
+    "Token": "<token>",
+    "Channels": { "111111111111111111": "https://discordapp.com/api/webhooks/" },
+    "Broadcasts": "https://discordapp.com/api/webhooks/",
+    "PrivateMsgs": "https://discordapp.com/api/webhooks/",
+    "Whitelist": [ 111111111111111111 ],
+    "BlackList": [ 111111111111111111 ],
+    "Admins": [ 111111111111111111 ],
+    "WhitelistOnly": true,
+    "UseWhitelistAsBroadCastChatrooms": true
+}
