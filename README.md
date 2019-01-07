@@ -128,7 +128,10 @@ Then you need to download the project
   cd TF2MChatBots
 
   git pull
-
+You need to get the compiler
+  
+  sudo apt-get install msbuild
+  
 The software utilises a variety of nuget packages, so you need to install nuget, then run it to retrieve needed packages
 
   sudo apt install nuget 
